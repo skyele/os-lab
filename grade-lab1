@@ -26,7 +26,7 @@ def test_padding():
 def test_overflow_warning():
     r.match("error! writing through NULL pointer! \(%n argument\)")
     r.match("warning! The value %n argument pointed to has been overflowed!")
-    r.match("chnum1: 30 chnum2: 31")
+    r.match("chnum1: 29 chnum2: 30")
     r.match("chnum1: -1")
 
 #BACKTRACE_RE = r"^ *ebp +f01[0-9a-z]{5} +eip +f0100[0-9a-z]{3} +args +([0-9a-z]+)"
