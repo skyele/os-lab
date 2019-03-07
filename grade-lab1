@@ -12,7 +12,7 @@ def test_jos():
 
 @test(20, parent=test_jos)
 def test_printf():
-    r.match("6828 decimal is 015254 octal!")
+    r.match(".*6828 decimal is 015254 octal!")
 
 @test(10, parent=test_jos)
 def test_sign():
