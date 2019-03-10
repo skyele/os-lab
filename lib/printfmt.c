@@ -85,8 +85,9 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 	register const char *p;
 	register int ch, err;
 	unsigned long long num;
-	int base, lflag, width, precision, altflag;
+	int base, lflag, width, precision, altflag, plusflag;
 	char padc;
+	char count;
 
 	while (1) {
 		while ((ch = *(unsigned char *) fmt++) != '%') {
@@ -101,6 +102,8 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		precision = -1;
 		lflag = 0;
 		altflag = 0;
+		plusflag = 0;
+		count = 0;
 	reswitch:
 		switch (ch = *(unsigned char *) fmt++) {
 
@@ -108,7 +111,9 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		case '-':
 			padc = '-';
 			goto reswitch;
-
+		case '+':
+			plusflag = 1;
+			goto signedDecimal;
 		// flag to pad with 0's instead of spaces
 		case '0':
 			padc = '0';
@@ -158,6 +163,7 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		// character
 		case 'c':
 			putch(va_arg(ap, int), putdat);
+			count++;
 			break;
 
 		// error message
@@ -176,23 +182,35 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 			if ((p = va_arg(ap, char *)) == NULL)
 				p = "(null)";
 			if (width > 0 && padc != '-')
-				for (width -= strnlen(p, precision); width > 0; width--)
+				for (width -= strnlen(p, precision); width > 0; width--){
 					putch(padc, putdat);
-			for (; (ch = *p++) != '\0' && (precision < 0 || --precision >= 0); width--)
+					count++;
+				}
+			for (; (ch = *p++) != '\0' && (precision < 0 || --precision >= 0); width--){
 				if (altflag && (ch < ' ' || ch > '~'))
 					putch('?', putdat);
 				else
 					putch(ch, putdat);
-			for (; width > 0; width--)
+				count++;
+			}
+			for (; width > 0; width--){
 				putch(' ', putdat);
+				count++;
+			}
 			break;
 
 		// (signed) decimal
 		case 'd':
+		signedDecimal:
 			num = getint(&ap, lflag);
 			if ((long long) num < 0) {
 				putch('-', putdat);
 				num = -(long long) num;
+				count++;
+			}
+			else if(plusflag){
+				putch('+', putdat);
+				count++;
 			}
 			base = 10;
 			goto number;
@@ -206,15 +224,18 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		// (unsigned) octal
 		case 'o':
 			// Replace this with your code.
-			putch('X', putdat);
-			putch('X', putdat);
-			putch('X', putdat);
-			break;
+			putch('0', putdat);
+			count++;
+			num = getuint(&ap, lflag);
+			base = 8;
+			goto number;
 
 		// pointer
 		case 'p':
 			putch('0', putdat);
 			putch('x', putdat);
+			count++;
+			count++;
 			num = (unsigned long long)
 				(uintptr_t) va_arg(ap, void *);
 			base = 16;
@@ -231,11 +252,15 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		// escaped '%' character
 		case '%':
 			putch(ch, putdat);
+			count++;
 			break;
+		case 'n':
 
+			break;
 		// unrecognized escape sequence - just print it literally
 		default:
 			putch('%', putdat);
+			count++;
 			for (fmt--; fmt[-1] != '%'; fmt--)
 				/* do nothing */;
 			break;
