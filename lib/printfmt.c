@@ -40,18 +40,25 @@ printnum(void (*putch)(int, void*), void *putdat,
 	// space on the right side if neccesary.
 	// you can add helper function if needed.
 	// your code here:
-	
-	// first recursively print all preceding (more significant) digits
-	if (num >= base) {
-		printnum(putch, putdat, num / base, base, width - 1, padc);
-	} else {
-		// print any needed pad characters before first digit
+	if(padc == '-'){
+		padc = ' ';
+		printnum(putch, putdat, num, base, 0, padc);
 		while (--width > 0)
 			putch(padc, putdat);
 	}
+	else {
+		// first recursively print all preceding (more significant) digits
+		if (num >= base) {
+			printnum(putch, putdat, num / base, base, width - 1, padc);
+		} else {
+			// print any needed pad characters before first digit
+			while (--width > 0)
+				putch(padc, putdat);
+		}
 
-	// then print this (the least significant) digit
-	putch("0123456789abcdef"[num % base], putdat);
+		// then print this (the least significant) digit
+		putch("0123456789abcdef"[num % base], putdat);
+	}
 }
 
 // Get an unsigned int of various possible sizes from a varargs list,
@@ -92,7 +99,6 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 	unsigned long long num;
 	int base, lflag, width, precision, altflag, plusflag;
 	char padc;
-	char count;
 
 	while (1) {
 		while ((ch = *(unsigned char *) fmt++) != '%') {
@@ -108,7 +114,7 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		lflag = 0;
 		altflag = 0;
 		plusflag = 0;
-		count = 0;
+
 	reswitch:
 		switch (ch = *(unsigned char *) fmt++) {
 
@@ -116,9 +122,6 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		case '-':
 			padc = '-';
 			goto reswitch;
-		case '+':
-			plusflag = 1;
-			goto signedDecimal;
 		// flag to pad with 0's instead of spaces
 		case '0':
 			padc = '0';
@@ -168,7 +171,6 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		// character
 		case 'c':
 			putch(va_arg(ap, int), putdat);
-			count++;
 			break;
 
 		// error message
@@ -187,35 +189,29 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 			if ((p = va_arg(ap, char *)) == NULL)
 				p = "(null)";
 			if (width > 0 && padc != '-')
-				for (width -= strnlen(p, precision); width > 0; width--){
+				for (width -= strnlen(p, precision); width > 0; width--)
 					putch(padc, putdat);
-					count++;
-				}
-			for (; (ch = *p++) != '\0' && (precision < 0 || --precision >= 0); width--){
+			for (; (ch = *p++) != '\0' && (precision < 0 || --precision >= 0); width--)
 				if (altflag && (ch < ' ' || ch > '~'))
 					putch('?', putdat);
 				else
 					putch(ch, putdat);
-				count++;
-			}
-			for (; width > 0; width--){
+			for (; width > 0; width--)
 				putch(' ', putdat);
-				count++;
-			}
 			break;
 
+		case '+':
+			plusflag = 1;
+			goto reswitch;
 		// (signed) decimal
 		case 'd':
-		signedDecimal:
 			num = getint(&ap, lflag);
 			if ((long long) num < 0) {
 				putch('-', putdat);
 				num = -(long long) num;
-				count++;
 			}
 			else if(plusflag){
 				putch('+', putdat);
-				count++;
 			}
 			base = 10;
 			goto number;
@@ -230,7 +226,6 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		case 'o':
 			// Replace this with your code.
 			putch('0', putdat);
-			count++;
 			num = getuint(&ap, lflag);
 			base = 8;
 			goto number;
@@ -239,8 +234,6 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 		case 'p':
 			putch('0', putdat);
 			putch('x', putdat);
-			count++;
-			count++;
 			num = (unsigned long long)
 				(uintptr_t) va_arg(ap, void *);
 			base = 16;
@@ -275,22 +268,31 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 				  const char *overflow_error = "\nwarning! The value %n argument pointed to has been overflowed!\n";
 
 				  // Your code here
-
+					if ((p = va_arg(ap, char *)) == NULL){
+						const char *tmp = null_error;
+						for (; (ch = *tmp++) != '\0';){
+							putch(ch, putdat);
+						}
+					}else if(*(int *)putdat > 127){
+						const char *tmp = overflow_error;
+						for (; (ch = *tmp++) != '\0';){
+							putch(ch, putdat);
+						}
+						*(char *)p = -1;
+					}else{
+						*(char *)p = *(int *)putdat;
+					}
 				  break;
 			  }
 
 		// escaped '%' character
 		case '%':
 			putch(ch, putdat);
-			count++;
 			break;
-		case 'n':
 
-			break;
 		// unrecognized escape sequence - just print it literally
 		default:
 			putch('%', putdat);
-			count++;
 			for (fmt--; fmt[-1] != '%'; fmt--)
 				/* do nothing */;
 			break;
