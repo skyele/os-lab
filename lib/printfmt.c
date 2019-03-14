@@ -275,10 +275,12 @@ vprintfmt(void (*putch)(int, void*), void *putdat, const char *fmt, va_list ap)
 						}
 					}else if(*(int *)putdat > 127){
 						const char *tmp = overflow_error;
+						*(char *)p = *(int *)putdat;
+						
 						for (; (ch = *tmp++) != '\0';){
 							putch(ch, putdat);
 						}
-						*(char *)p = -1;
+						
 					}else{
 						*(char *)p = *(int *)putdat;
 					}
