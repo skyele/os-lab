@@ -67,6 +67,7 @@ endif
 GDBPORT	:= $(shell expr `id -u` % 5000 + 25000)
 
 CC	:= $(GCCPREFIX)gcc -pipe
+GDB	:= $(GCCPREFIX)gdb
 AS	:= $(GCCPREFIX)as
 AR	:= $(GCCPREFIX)ar
 LD	:= $(GCCPREFIX)ld
@@ -148,7 +149,7 @@ QEMUOPTS += $(QEMUEXTRA)
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@
 
 gdb:
-	gdb -n -x .gdbinit
+	$(GDB) -n -x .gdbinit
 
 pre-qemu: .gdbinit
 
@@ -204,15 +205,12 @@ grade:
 
 handin: tarball
 	@echo
-	@echo "Please upload your tar file to ftp(in os's lab1 webpage)"
+	@echo "Please upload your tar file to ftp(in os's lab2 webpage)"
 	@echo
 	@echo "For example, if your student id is 123456, then replace <student id>.tar.gz to 123456.tar.gz"
 
 tarball: realclean
 	tar cf - `find . -type f | grep -v '^\.*$$' | grep -v '/CVS/' | grep -v '/\.svn/' | grep -v '/\.git/' | grep -v 'lab[0-9].*\.tar\.gz'` | gzip > lab$(LAB)-handin.tar.gz
-
-#handin-prep:
-#	@./handin-prep
 
 
 # This magic automatically generates makefile dependencies
