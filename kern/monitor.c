@@ -13,7 +13,6 @@
 
 #define CMDBUF_SIZE	80	// enough for one VGA text line
 
-
 struct Command {
 	const char *name;
 	const char *desc;
@@ -24,8 +23,11 @@ struct Command {
 static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
+	{ "backtrace", "Display a listing of function call frames for debugging", mon_backtrace },
+	{ "time", "Display the execution time of a function", mon_time }
 };
 
+int command_size = 4;
 /***** Implementations of basic kernel monitor commands *****/
 
 int
@@ -58,10 +60,35 @@ int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
 	// Your code here.
+	uint32_t *the_ebp = (uint32_t *)read_ebp();
+	while(the_ebp != NULL){
+		struct Eipdebuginfo info;
+		cprintf("eip %08x ebp %08x args %08x %08x %08x %08x %08x\n", the_ebp[1], the_ebp, the_ebp[2], the_ebp[3], the_ebp[4], the_ebp[5], the_ebp[6]);
+		debuginfo_eip(the_ebp[1], &info);
+		cprintf("       %s:%d %.*s+%d\n", info.eip_file, info.eip_line, info.eip_fn_namelen, info.eip_fn_name, the_ebp[1] - (uint32_t)info.eip_fn_addr);
+		the_ebp = (uint32_t *)*the_ebp;
+	}
+    cprintf("Backtrace success\n");
 	return 0;
 }
 
+int 
+mon_time(int argc, char **argv, struct Trapframe *tf){
+	cycles_t start = 0;
+	char *fun_n = argv[1];
 
+	if(argc != 2)
+		return -1;
+	for(int i = 0; i < command_size; i++){
+		if(strcmp(commands[i].name, fun_n) == 0){
+			start = currentcycles();
+			commands[i].func(argc-2, argv + 2, tf);
+		}		
+	}
+	cycles_t end = currentcycles();
+	cprintf("%s cycles: %ul\n", fun_n, end - start);
+	return 0;
+}
 
 /***** Kernel monitor command interpreter *****/
 
@@ -123,3 +150,10 @@ monitor(struct Trapframe *tf)
 				break;
 	}
 }
+
+cycles_t currentcycles() {
+    cycles_t result;
+    __asm__ __volatile__("rdtsc" : "=A" (result));
+    return result;
+}
+
