@@ -24,11 +24,13 @@ static struct Command commands[] = {
 	{ "help", "Display this list of commands", mon_help },
 	{ "kerninfo", "Display information about the kernel", mon_kerninfo },
 	{ "backtrace", "Display a listing of function call frames for debugging", mon_backtrace },
-	{ "time", "Display the execution time of a function", mon_time }
+	{ "time", "Display the execution time of a function", mon_time },
+	{ "showmappings", "Display the physical page mappings that apply to a range of virtual address", mon_showmappings}
 };
 
 int command_size = 4;
 /***** Implementations of basic kernel monitor commands *****/
+static long atol(const char *nptr);
 
 int
 mon_help(int argc, char **argv, struct Trapframe *tf)
@@ -87,6 +89,18 @@ mon_time(int argc, char **argv, struct Trapframe *tf){
 	}
 	cycles_t end = currentcycles();
 	cprintf("%s cycles: %ul\n", fun_n, end - start);
+	return 0;
+}
+
+int mon_showmappings(int argc, char **argv, struct Trapframe *tf){
+	cprintf("the number is %d\n", argc);
+	if(argc != 3){
+		cprintf("usage: %s <start-virtual-address> <end-virtual-address>\n", __FUNCTION__);
+	}
+	long low_va = 0, high_va = 0;
+	char *tmp ;
+	low_va = strtol(argv[1], &tmp, 16);
+	cprintf("0x%x\n", low_va);
 	return 0;
 }
 
@@ -157,3 +171,30 @@ cycles_t currentcycles() {
     return result;
 }
 
+static long atol(const char *nptr)  
+{  
+        int c;              /* current char */  
+        long total;         /* current total */  
+        int sign;           /* if '-', then negative, otherwise positive */  
+  
+        /* skip whitespace */  
+        while ( (char)*nptr == ' ' || (char)*nptr == '\n' || (char)*nptr == '\t'|| (char)*nptr == '\f'|| (char)*nptr == '\b')  
+            ++nptr;  
+  
+        c = (int)(unsigned char)*nptr++;  
+        sign = c;           /* save sign indication */  
+        if (c == '-' || c == '+')  
+            c = (int)(unsigned char)*nptr++;    /* skip sign */  
+  
+        total = 0;  
+  
+        while ((c-'0')>=0 &&(c-'0')<=9) {  
+            total = 10 * total + (c - '0');     /* accumulate digit */  
+            c = (int)(unsigned char)*nptr++;    /* get next char */  
+        }  
+  
+        if (sign == '-')  
+            return -total;  
+        else  
+            return total;   /* return result, negated if necessary */  
+}  

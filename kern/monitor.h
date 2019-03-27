@@ -17,6 +17,7 @@ int mon_help(int argc, char **argv, struct Trapframe *tf);
 int mon_kerninfo(int argc, char **argv, struct Trapframe *tf);
 int mon_backtrace(int argc, char **argv, struct Trapframe *tf);
 int mon_time(int argc, char **argv, struct Trapframe *tf);
+int mon_showmappings(int argc, char **argv, struct Trapframe *tf);
 cycles_t currentcycles();
 
 #endif	// !JOS_KERN_MONITOR_H

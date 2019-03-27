@@ -204,8 +204,9 @@ mem_init(void)
 	// we just set up the mapping anyway.
 	// Permissions: kernel RW, user NONE
 	// Your code goes here:
-	boot_map_region(kern_pgdir, KERNBASE, (uint32_t)(0 - KERNBASE), 0, PTE_W);
+	boot_map_region_large(kern_pgdir, KERNBASE, (uint32_t)(0 - KERNBASE), 0, PTE_W);
 	
+	cprintf("0\n");
 	// Check that the initial page directory has been set up correctly.
 	check_kern_pgdir();
 	cprintf("1\n");
@@ -216,6 +217,10 @@ mem_init(void)
 	//
 	// If the machine reboots at this point, you've probably set up your
 	// kern_pgdir wrong.
+	uint32_t cr4 = rcr4();
+	cr4 |= CR4_PSE;
+	lcr4(cr4);
+
 	lcr3(PADDR(kern_pgdir));
 	cprintf("2\n");
 	check_page_free_list(0);
@@ -435,6 +440,17 @@ static void
 boot_map_region_large(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm)
 {
 	// Fill this function in
+	cprintf("in %s\n", __FUNCTION__);
+	cprintf("PTSIZE: %x\n", PTSIZE);
+	cprintf("size/PTSIZE: %d\n", size/PTSIZE);
+	assert(va%PTSIZE==0);
+	assert(pa%PTSIZE==0);
+	for(int i = 0; i < size/PTSIZE; i++){
+		pde_t *the_pde = &pgdir[PDX(va)];
+		*the_pde = PTE_ADDR(pa) | perm | PTE_P | PTE_PS;
+		va+=PTSIZE;
+		pa+=PTSIZE;
+	}
 }
 
 //
