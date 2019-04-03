@@ -5,10 +5,10 @@
 #include <inc/error.h>
 #include <inc/string.h>
 #include <inc/assert.h>
-
 #include <kern/pmap.h>
 #include <kern/kclock.h>
 #include <kern/env.h>
+#include <inc/queue.h>
 
 // These variables are set by i386_detect_memory()
 size_t npages;			// Amount of physical memory (in pages)
@@ -63,10 +63,12 @@ i386_detect_memory(void)
 // --------------------------------------------------------------
 
 static void boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm);
+static void boot_map_region_large(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm);
 static void check_page_free_list(bool only_low_memory);
 static void check_page_alloc(void);
 static void check_kern_pgdir(void);
 static physaddr_t check_va2pa(pde_t *pgdir, uintptr_t va);
+static physaddr_t check_va2pa_large(pde_t *pgdir, uintptr_t va);
 static void check_page(void);
 static void check_page_installed_pgdir(void);
 
@@ -356,6 +358,23 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 // Hint: the TA solution uses pgdir_walk
 static void
 boot_map_region(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm)
+{
+	// Fill this function in
+}
+
+//
+//
+// Map [va, va+size) of virtual address space to physical [pa, pa+size)
+// in the page table rooted at pgdir.  Size is a multiple of *PTSIZE*.
+// Use permission bits perm|PTE_P|PTE_PS for the entries.
+//
+// This function is only intended to set up the ``static'' mappings
+// above UTOP. As such, it should *not* change the pp_ref field on the
+// mapped pages.
+//
+// Hint: the TA solution uses pgdir_walk
+static void
+boot_map_region_large(pde_t *pgdir, uintptr_t va, size_t size, physaddr_t pa, int perm)
 {
 	// Fill this function in
 }
@@ -659,8 +678,15 @@ check_kern_pgdir(void)
 		assert(check_va2pa(pgdir, UENVS + i) == PADDR(envs) + i);
 
 	// check phys mem
-	for (i = 0; i < npages * PGSIZE; i += PGSIZE)
-		assert(check_va2pa(pgdir, KERNBASE + i) == i);
+	if (check_va2pa_large(pgdir, KERNBASE) == 0) {
+		for (i = 0; i < npages * PGSIZE; i += PTSIZE)
+			assert(check_va2pa_large(pgdir, KERNBASE + i) == i);
+
+		cprintf("large page installed!\n");
+	} else {
+        for (i = 0; i < npages * PGSIZE; i += PGSIZE)
+            assert(check_va2pa(pgdir, KERNBASE + i) == i);
+	}
 
 	// check kernel stack
 	for (i = 0; i < KSTKSIZE; i += PGSIZE)
@@ -707,6 +733,14 @@ check_va2pa(pde_t *pgdir, uintptr_t va)
 	return PTE_ADDR(p[PTX(va)]);
 }
 
+static physaddr_t
+check_va2pa_large(pde_t *pgdir, uintptr_t va)
+{
+	pgdir = &pgdir[PDX(va)];
+	if (!(*pgdir & PTE_P) | !(*pgdir & PTE_PS))
+		return ~0;
+	return PTE_ADDR(*pgdir);
+}
 
 // check page_insert, page_remove, &c
 static void
