@@ -130,6 +130,22 @@ def test_evilhello():
     r.match('.00001000. user_mem_check assertion failure for va f0100...',
             '.00001000. free env 00001000')
 
+@test(5)
+def test_evilhello2():
+    r.user_test("evilhello2")
+    r.match('IN RING0!!!',
+            'Incoming TRAP frame at 0xefffffbc',
+            'TRAP frame at 0xf.......')
+
+@test(5)
+def test_sbrk():
+    r.user_test("sbrktest")
+    r.match('.00000000. new env 00001000',
+            'SBRK_TEST\(ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKL\)',
+            '.00001000. exiting gracefully',
+            '.00001000. free env 00001000',
+            'Destroyed the only environment - nothing more to do!')
+
 end_part("B")
 
 run_tests()

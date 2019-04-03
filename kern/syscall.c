@@ -62,6 +62,24 @@ sys_env_destroy(envid_t envid)
 	return 0;
 }
 
+static int
+sys_map_kernel_page(void* kpage, void* va)
+{
+    int r;
+    struct PageInfo* p = pa2page(PADDR(kpage));
+    if (p == NULL)
+        return E_INVAL;
+    r = page_insert(curenv->env_pgdir, p, va, PTE_U | PTE_W);
+    return r;
+}
+
+static int
+sys_sbrk(uint32_t inc)
+{
+    // LAB3: your code here.
+    return 0;
+}
+
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
