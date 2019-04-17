@@ -4,7 +4,10 @@
 # error "This is a JOS kernel header; user programs should not #include it"
 #endif
 
+#include <inc/memlayout.h>
 struct Trapframe;
+typedef unsigned long long cycles_t;
+extern pde_t* kern_pgdir;
 
 // Activate the kernel monitor,
 // optionally providing a trap frame indicating the current state
@@ -15,5 +18,8 @@ void monitor(struct Trapframe *tf);
 int mon_help(int argc, char **argv, struct Trapframe *tf);
 int mon_kerninfo(int argc, char **argv, struct Trapframe *tf);
 int mon_backtrace(int argc, char **argv, struct Trapframe *tf);
+int mon_time(int argc, char **argv, struct Trapframe *tf);
+int mon_showmappings(int argc, char **argv, struct Trapframe *tf);
+cycles_t currentcycles();
 
 #endif	// !JOS_KERN_MONITOR_H
