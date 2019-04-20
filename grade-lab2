@@ -25,4 +25,8 @@ def test_check_kern_pgdir():
 def test_check_page_installed_pgdir():
     r.match(r"check_page_installed_pgdir\(\) succeeded!")
 
+@test(10, "Large kernel page size", parent=test_jos)
+def test_check_page_installed_pgdir():
+    r.match(r"large page installed!")
+
 run_tests()
