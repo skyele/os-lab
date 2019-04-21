@@ -46,10 +46,54 @@
 /*
  * Lab 3: Your code here for generating entry points for the different traps.
  */
-
-
+	TRAPHANDLER_NOEC(DIVIDE_HANDLER   , T_DIVIDE )
+	TRAPHANDLER_NOEC(DEBUG_HANDLER    , T_DEBUG  )
+	TRAPHANDLER_NOEC(NMI_HANDLER      , T_NMI    )
+	TRAPHANDLER_NOEC(BRKPT_HANDLER    , T_BRKPT  )
+	TRAPHANDLER_NOEC(OFLOW_HANDLER    , T_OFLOW  )
+	TRAPHANDLER_NOEC(BOUND_HANDLER    , T_BOUND  )
+	TRAPHANDLER_NOEC(ILLOP_HANDLER    , T_ILLOP  )
+	TRAPHANDLER_NOEC(DEVICE_HANDLER   , T_DEVICE )
+	TRAPHANDLER(	 DBLFLT_HANDLER   , T_DBLFLT )
+	TRAPHANDLER(	 TSS_HANDLER      , T_TSS	 )
+	TRAPHANDLER(	 SEGNP_HANDLER    , T_SEGNP  )
+	TRAPHANDLER(	 STACK_HANDLER    , T_STACK  )
+	TRAPHANDLER(	 GPFLT_HANDLER    , T_GPFLT  )
+	TRAPHANDLER(	 PGFLT_HANDLER    , T_PGFLT  )
+	TRAPHANDLER_NOEC(FPERR_HANDLER 	  , T_FPERR  )
+	TRAPHANDLER(	 ALIGN_HANDLER    , T_ALIGN  )
+	TRAPHANDLER_NOEC(MCHK_HANDLER     , T_MCHK   )
+	TRAPHANDLER_NOEC(SIMDERR_HANDLER  , T_SIMDERR)
+	; TRAPHANDLER_NOEC(SYSCALL_HANDLER, T_SYSCALL) /* just test*/
 
 /*
  * Lab 3: Your code here for _alltraps
  */
 
+.globl _alltraps
+_alltraps:
+	pushw $0
+	pushw %ds 
+	pushw $0
+	pushw %es 
+	pushal
+
+	movl $(GD_KD), %eax 
+	movw %ax, %ds 
+	movw %ax, %es 
+
+	pushl %esp 
+	call trap
+
+.global sysenter_handler
+sysenter_handler:
+	pushl %esi 
+	pushl %edi
+	pushl %ebx
+	pushl %ecx 
+	pushl %edx
+	pushl %eax
+	call syscall
+	movl %esi, %edx
+	movl %ebp, %ecx 
+	sysexit

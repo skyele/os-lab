@@ -113,6 +113,7 @@ stab_binsearch(const struct Stab *stabs, int *region_left, int *region_right,
 int
 debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	const struct Stab *stabs, *stab_end;
 	const char *stabstr, *stabstr_end;
 	int lfile, rfile, lfun, rfun, lline, rline;
@@ -124,7 +125,6 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	info->eip_fn_namelen = 9;
 	info->eip_fn_addr = addr;
 	info->eip_fn_narg = 0;
-
 	// Find the relevant set of stabs
 	if (addr >= ULIM) {
 		stabs = __STAB_BEGIN__;
@@ -142,7 +142,9 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 		// Make sure this memory is valid.
 		// Return -1 if it is not.  Hint: Call user_mem_check.
 		// LAB 3: Your code here.
-
+		if(user_mem_check(curenv, usd, sizeof(struct UserStabData), PTE_U | PTE_W) < 0){
+			return -1;
+		}
 		stabs = usd->stabs;
 		stab_end = usd->stab_end;
 		stabstr = usd->stabstr;
@@ -150,8 +152,13 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 
 		// Make sure the STABS and string table memory is valid.
 		// LAB 3: Your code here.
+		if(user_mem_check(curenv, stabs, (stab_end - stabs) * sizeof(struct Stab), PTE_U | PTE_W) < 0){
+			return -1;
+		}
+		if(user_mem_check(curenv, stabstr, (stabstr_end - stabstr) * sizeof(char), PTE_U | PTE_W) < 0){
+			return -1;
+		}
 	}
-
 	// String table validity checks
 	if (stabstr_end <= stabstr || stabstr_end[-1] != 0)
 		return -1;
@@ -194,7 +201,6 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	// Ignore stuff after the colon.
 	info->eip_fn_namelen = strfind(info->eip_fn_name, ':') - info->eip_fn_name;
 
-
 	// Search within [lline, rline] for the line number stab.
 	// If found, set info->eip_line to the right line number.
 	// If not found, return -1.
@@ -212,7 +218,6 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 		return -1;
 	}
 
-
 	// Search backwards from the line number for the relevant filename
 	// stab.
 	// We can't just use the "lfile" stab because inlined functions
@@ -225,7 +230,6 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 	if (lline >= lfile && stabs[lline].n_strx < stabstr_end - stabstr)
 		info->eip_file = stabstr + stabs[lline].n_strx;
 
-
 	// Set eip_fn_narg to the number of arguments taken by the function,
 	// or 0 if there was no containing function.
 	if (lfun < rfun)
@@ -233,6 +237,5 @@ debuginfo_eip(uintptr_t addr, struct Eipdebuginfo *info)
 		     lline < rfun && stabs[lline].n_type == N_PSYM;
 		     lline++)
 			info->eip_fn_narg++;
-
 	return 0;
 }

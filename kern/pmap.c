@@ -97,6 +97,8 @@ boot_alloc(uint32_t n)
 	if (!nextfree) {
 		extern char end[];
 		nextfree = ROUNDUP((char *) end, PGSIZE);
+		if((uint32_t)end % PGSIZE == 0)
+			nextfree+=PGSIZE;
 	}
 	// Allocate a chunk large enough to hold 'n' bytes, then update
 	// nextfree.  Make sure nextfree is kept aligned
@@ -155,12 +157,12 @@ mem_init(void)
 	// to initialize all fields of each struct PageInfo to 0.
 	// Your code goes here:
 	pages = (struct PageInfo*)boot_alloc(npages * sizeof(struct PageInfo));	//total size: 0x40000
-	memset(pages, 0, (npages * sizeof(struct PageInfo) + PGSIZE - 1)/PGSIZE*PGSIZE);
-	
+	memset(pages, 0, ROUNDUP(npages * sizeof(struct PageInfo), PGSIZE));
 	//////////////////////////////////////////////////////////////////////
 	// Make 'envs' point to an array of size 'NENV' of 'struct Env'.
 	// LAB 3: Your code here.
-
+	envs = (struct Env*)boot_alloc(NENV * sizeof(struct Env));
+	memset(envs, 0, ROUNDUP(NENV * sizeof(struct Env), PGSIZE));
 	//////////////////////////////////////////////////////////////////////
 	// Now that we've allocated the initial kernel data structures, we set
 	// up the list of free physical pages. Once we've done so, all further
@@ -189,7 +191,7 @@ mem_init(void)
 	//    - the new image at UENVS  -- kernel R, user R
 	//    - envs itself -- kernel RW, user NONE
 	// LAB 3: Your code here.
-
+	boot_map_region(kern_pgdir, UENVS, PTSIZE, PADDR(envs), PTE_U);
 	//////////////////////////////////////////////////////////////////////
 	// Use the physical memory that 'bootstack' refers to as the kernel
 	// stack.  The kernel stack grows down from virtual address KSTACKTOP.
@@ -237,8 +239,7 @@ mem_init(void)
 	cr0 |= CR0_PE|CR0_PG|CR0_AM|CR0_WP|CR0_NE|CR0_MP;
 	cr0 &= ~(CR0_TS|CR0_EM);
 	lcr0(cr0);
-
-	// Some more checks, only possible after kern_pgdir is installed.
+	// Some more checks, only possible aftern kern_pgdir is installed.
 	check_page_installed_pgdir();
 
 }
@@ -586,10 +587,27 @@ static uintptr_t user_mem_check_addr;
 // Returns 0 if the user program can access this range of addresses,
 // and -E_FAULT otherwise.
 //
+//just test
 int
 user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 {
+	cprintf("in %s\n", __FUNCTION__);
+	cprintf("the va 0x%x\n", va);
+	perm |= PTE_P;
 	// LAB 3: Your code here.
+	uint32_t i = (uint32_t)va; //buggy lab3 buggy
+	uint32_t end = (uint32_t)va + len;
+	for(; i < end; i=ROUNDDOWN(i+PGSIZE, PGSIZE)){
+		if((uint32_t)va > ULIM){
+			user_mem_check_addr = (uintptr_t)i;
+			return -E_FAULT;
+		}
+		pte_t *the_pte = pgdir_walk(env->env_pgdir, (void *)i, 0);
+		if(!(*the_pte & perm)){
+			user_mem_check_addr = (uintptr_t)i;
+			return -E_FAULT;
+		}
+	}
 
 	return 0;
 }
@@ -604,13 +622,14 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 void
 user_mem_assert(struct Env *env, const void *va, size_t len, int perm)
 {
+	cprintf("in %s\n", __FUNCTION__);
+	cprintf("the va 0x%x\n", va);
 	if (user_mem_check(env, va, len, perm | PTE_U) < 0) {
 		cprintf("[%08x] user_mem_check assertion failure for "
 			"va %08x\n", env->env_id, user_mem_check_addr);
 		env_destroy(env);	// may not return
 	}
 }
-
 
 // --------------------------------------------------------------
 // Checking functions.
