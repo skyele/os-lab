@@ -62,7 +62,6 @@ mon_kerninfo(int argc, char **argv, struct Trapframe *tf)
 int
 mon_backtrace(int argc, char **argv, struct Trapframe *tf)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// Your code here.
 	uint32_t *the_ebp = (uint32_t *)read_ebp();
 	while(the_ebp != NULL){

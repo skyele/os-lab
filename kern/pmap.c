@@ -591,8 +591,6 @@ static uintptr_t user_mem_check_addr;
 int
 user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 {
-	cprintf("in %s\n", __FUNCTION__);
-	cprintf("the va 0x%x\n", va);
 	perm |= PTE_P;
 	// LAB 3: Your code here.
 	uint32_t i = (uint32_t)va; //buggy lab3 buggy
@@ -622,8 +620,6 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 void
 user_mem_assert(struct Env *env, const void *va, size_t len, int perm)
 {
-	cprintf("in %s\n", __FUNCTION__);
-	cprintf("the va 0x%x\n", va);
 	if (user_mem_check(env, va, len, perm | PTE_U) < 0) {
 		cprintf("[%08x] user_mem_check assertion failure for "
 			"va %08x\n", env->env_id, user_mem_check_addr);

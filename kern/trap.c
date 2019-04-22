@@ -84,23 +84,23 @@ trap_init(void)
 	extern void SIMDERR_HANDLER();
 	extern void SYSCALL_HANDLER(); //just test
 	// LAB 3: Your code here.
-	SETGATE(idt[T_DIVIDE], 0, GD_KT, DIVIDE_HANDLER, 0);
-	SETGATE(idt[T_DEBUG], 0, GD_KT, DEBUG_HANDLER, 0);
-	SETGATE(idt[T_NMI], 0, GD_KT, NMI_HANDLER, 0);
-	SETGATE(idt[T_BRKPT], 0, GD_KT, BRKPT_HANDLER, 3);
-	SETGATE(idt[T_OFLOW], 0, GD_KT, OFLOW_HANDLER, 3);
-	SETGATE(idt[T_BOUND], 0, GD_KT, BOUND_HANDLER, 3);
-	SETGATE(idt[T_ILLOP], 0, GD_KT, ILLOP_HANDLER, 0);
-	SETGATE(idt[T_DEVICE], 0, GD_KT, DEVICE_HANDLER, 0);
-	SETGATE(idt[T_DBLFLT], 0, GD_KT, DBLFLT_HANDLER, 0);
-	SETGATE(idt[T_TSS], 0, GD_KT, TSS_HANDLER, 0);
-	SETGATE(idt[T_SEGNP], 0, GD_KT, SEGNP_HANDLER, 0);
-	SETGATE(idt[T_STACK], 0, GD_KT, STACK_HANDLER, 0);
-	SETGATE(idt[T_GPFLT], 0, GD_KT, GPFLT_HANDLER, 0);
-	SETGATE(idt[T_PGFLT], 0, GD_KT, PGFLT_HANDLER, 0);
-	SETGATE(idt[T_FPERR], 0, GD_KT, FPERR_HANDLER, 0);
-	SETGATE(idt[T_ALIGN], 0, GD_KT, ALIGN_HANDLER, 0);
-	SETGATE(idt[T_MCHK], 0, GD_KT, MCHK_HANDLER, 0);
+	SETGATE(idt[T_DIVIDE] , 0, GD_KT, DIVIDE_HANDLER , 0);
+	SETGATE(idt[T_DEBUG]  , 0, GD_KT, DEBUG_HANDLER  , 0);
+	SETGATE(idt[T_NMI]    , 0, GD_KT, NMI_HANDLER    , 0);
+	SETGATE(idt[T_BRKPT]  , 0, GD_KT, BRKPT_HANDLER  , 3);
+	SETGATE(idt[T_OFLOW]  , 0, GD_KT, OFLOW_HANDLER  , 3);
+	SETGATE(idt[T_BOUND]  , 0, GD_KT, BOUND_HANDLER  , 3);
+	SETGATE(idt[T_ILLOP]  , 0, GD_KT, ILLOP_HANDLER  , 0);
+	SETGATE(idt[T_DEVICE] , 0, GD_KT, DEVICE_HANDLER , 0);
+	SETGATE(idt[T_DBLFLT] , 0, GD_KT, DBLFLT_HANDLER , 0);
+	SETGATE(idt[T_TSS]    , 0, GD_KT, TSS_HANDLER    , 0);
+	SETGATE(idt[T_SEGNP]  , 0, GD_KT, SEGNP_HANDLER  , 0);
+	SETGATE(idt[T_STACK]  , 0, GD_KT, STACK_HANDLER  , 0);
+	SETGATE(idt[T_GPFLT]  , 0, GD_KT, GPFLT_HANDLER  , 0);
+	SETGATE(idt[T_PGFLT]  , 0, GD_KT, PGFLT_HANDLER  , 0);
+	SETGATE(idt[T_FPERR]  , 0, GD_KT, FPERR_HANDLER  , 0);
+	SETGATE(idt[T_ALIGN]  , 0, GD_KT, ALIGN_HANDLER  , 0);
+	SETGATE(idt[T_MCHK]   , 0, GD_KT, MCHK_HANDLER   , 0);
 	SETGATE(idt[T_SIMDERR], 0, GD_KT, SIMDERR_HANDLER, 0);
 	// SETGATE(idt[T_SYSCALL], 1, GD_KT, SYSCALL_HANDLER, 3);	//just test
 	// < 32 : exception /////////// >= 32 : interrupt
@@ -185,7 +185,6 @@ print_regs(struct PushRegs *regs)
 static void
 trap_dispatch(struct Trapframe *tf)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// Handle processor exceptions.
 	// LAB 3: Your code here.
 	cprintf("the trapno %d\n", tf->tf_trapno);
@@ -219,7 +218,6 @@ trap_dispatch(struct Trapframe *tf)
 void
 trap(struct Trapframe *tf)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// The environment may have set DF and some versions
 	// of GCC rely on DF being clear
 	asm volatile("cld" ::: "cc");
@@ -259,7 +257,6 @@ trap(struct Trapframe *tf)
 void
 page_fault_handler(struct Trapframe *tf)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	uint32_t fault_va;
 
 	// Read processor's CR2 register to find the faulting address

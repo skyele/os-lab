@@ -162,6 +162,7 @@ env_setup_vm(struct Env *e)
 	int i;
 	struct PageInfo *p = NULL;
 
+	// panic("env_alloc: %e\n", -E_NO_MEM);
 	// Allocate a page for the page directory
 	if (!(p = page_alloc(ALLOC_ZERO)))
 		return -E_NO_MEM;

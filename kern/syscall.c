@@ -17,7 +17,6 @@
 static void
 sys_cputs(const char *s, size_t len)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// Check that the user has permission to read memory [s, s+len).
 	// Destroy the environment if not.
 	// LAB 3: Your code here.
@@ -31,7 +30,6 @@ sys_cputs(const char *s, size_t len)
 static int
 sys_cgetc(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	return cons_getc();
 }
 
@@ -39,7 +37,6 @@ sys_cgetc(void)
 static envid_t
 sys_getenvid(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	return curenv->env_id;
 }
 
@@ -51,7 +48,6 @@ sys_getenvid(void)
 static int
 sys_env_destroy(envid_t envid)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	int r;
 	struct Env *e;
 
@@ -68,7 +64,6 @@ sys_env_destroy(envid_t envid)
 static int
 sys_map_kernel_page(void* kpage, void* va)
 {
-	cprintf("in %s\n", __FUNCTION__);
     int r;
     struct PageInfo* p = pa2page(PADDR(kpage));
     if (p == NULL)
@@ -79,7 +74,6 @@ sys_map_kernel_page(void* kpage, void* va)
 
 static int
 sys_sbrk(uint32_t inc){
-	cprintf("in %s\n", __FUNCTION__);
 	uint32_t mod = ((uint32_t)curenv->env_sbrk)%PGSIZE;
 	if(inc < PGSIZE){
 		if((mod + inc) < PGSIZE){
