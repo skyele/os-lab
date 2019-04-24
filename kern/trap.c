@@ -197,11 +197,10 @@ trap_dispatch(struct Trapframe *tf)
 			monitor(tf);
 			break;
 		case T_SYSCALL:
-			tf->tf_regs.reg_eax = syscall(tf->tf_regs.reg_eax, tf->tf_regs.reg_edx, tf->tf_regs.reg_ecx, tf->tf_regs.reg_ebx, tf->tf_regs.reg_edi, tf->tf_regs.reg_esi);
+			tf->tf_regs.reg_eax = syscall(tf->tf_regs.reg_eax, tf->tf_regs.reg_edx, 
+									tf->tf_regs.reg_ecx, tf->tf_regs.reg_ebx, 
+										tf->tf_regs.reg_edi, tf->tf_regs.reg_esi);
 			break;
-		// case T_GPFLT:
-		// 	cprintf("in T_GPFLT\n");
-		// 	break;
 		default:
 			// Unexpected trap: The user process or the kernel has a bug.
 			print_trapframe(tf);
