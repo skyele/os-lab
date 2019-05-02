@@ -20,9 +20,8 @@ sys_cputs(const char *s, size_t len)
 {
 	// Check that the user has permission to read memory [s, s+len).
 	// Destroy the environment if not.
-
 	// LAB 3: Your code here.
-
+	user_mem_assert(curenv, s, len, PTE_U);
 	// Print the string supplied by the user.
 	cprintf("%.*s", len, s);
 }
@@ -275,10 +274,26 @@ sys_map_kernel_page(void* kpage, void* va)
 }
 
 static int
-sys_sbrk(uint32_t inc)
-{
-    // LAB3: your code here.
-    return 0;
+sys_sbrk(uint32_t inc){
+	uint32_t mod = ((uint32_t)curenv->env_sbrk)%PGSIZE;
+	if(inc < PGSIZE){
+		if((mod + inc) < PGSIZE){
+			curenv->env_sbrk+=inc;
+			return curenv->env_sbrk;
+		}
+	}
+	int i = ROUNDDOWN((uint32_t)curenv->env_sbrk, PGSIZE);
+	int end = ROUNDUP((uint32_t)curenv->env_sbrk + inc, PGSIZE);
+	for(; i < end; i+=PGSIZE){
+		struct PageInfo * page = page_alloc(ALLOC_ZERO);
+		if(!page)
+			panic("there is no page\n");
+		int ret = page_insert(curenv->env_pgdir, page, (void*)((uint32_t)i), PTE_U | PTE_W);
+		if(ret)
+			panic("there is error in insert");
+	}
+	curenv->env_sbrk+=inc;
+	return curenv->env_sbrk;
 }
 
 // Dispatches to the correct kernel function, passing the arguments.
@@ -288,12 +303,26 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// Call the function corresponding to the 'syscallno' parameter.
 	// Return any appropriate return value.
 	// LAB 3: Your code here.
-
-	panic("syscall not implemented");
-
-	switch (syscallno) {
-	default:
-		return -E_INVAL;
+	switch (syscallno)
+	{
+		case SYS_cputs:
+			sys_cputs((const char*)a1, (size_t)a2);
+			return 0;
+		case SYS_cgetc:
+			return sys_cgetc();
+		case SYS_getenvid:
+			return sys_getenvid();
+		case SYS_env_destroy:
+			return sys_env_destroy((envid_t)a1);
+		case SYS_map_kernel_page:
+			return sys_map_kernel_page((void*) a1, (void*) a2);
+		case SYS_sbrk:
+			return sys_sbrk(a1);
+		case NSYSCALLS:
+			panic("what NSYSCALLSsssssssssssssssssssssssss\n");
+		default:
+			return -E_INVAL;
 	}
+
 }
 
