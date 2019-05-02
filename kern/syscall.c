@@ -66,6 +66,7 @@ sys_env_destroy(envid_t envid)
 static void
 sys_yield(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	sched_yield();
 }
 
@@ -320,9 +321,11 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			return sys_sbrk(a1);
 		case NSYSCALLS:
 			panic("what NSYSCALLSsssssssssssssssssssssssss\n");
+		case SYS_yield:
+			sys_yield();
+			panic("haha?\n");
 		default:
 			return -E_INVAL;
 	}
-
 }
 

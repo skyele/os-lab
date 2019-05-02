@@ -82,14 +82,20 @@ spin_lock(struct spinlock *lk)
 void
 spin_unlock(struct spinlock *lk)
 {
+	// cprintf("in %s\n", __FUNCTION__);
 #ifdef DEBUG_SPINLOCK
+	// cprintf("in debug spinlock\n");
 	if (!holding(lk)) {
+		// cprintf("in if\n");
 		int i;
 		uint32_t pcs[10];
+		// cprintf("123\n");
 		// Nab the acquiring EIP chain before it gets released
 		memmove(pcs, lk->pcs, sizeof pcs);
+		// cprintf("3322211\n");
 		cprintf("CPU %d cannot release %s: held by CPU %d\nAcquired at:", 
 			cpunum(), lk->name, lk->cpu->cpu_id);
+		// cprintf("4444444\n");
 		for (i = 0; i < 10 && pcs[i]; i++) {
 			struct Eipdebuginfo info;
 			if (debuginfo_eip(pcs[i], &info) >= 0)
@@ -102,15 +108,15 @@ spin_unlock(struct spinlock *lk)
 		}
 		panic("spin_unlock");
 	}
-
 	lk->pcs[0] = 0;
 	lk->cpu = 0;
 #endif
-
+	// cprintf("in endif\n");
 	// The xchg instruction is atomic (i.e. uses the "lock" prefix) with
 	// respect to any other instruction which references the same memory.
 	// x86 CPUs will not reorder loads/stores across locked instructions
 	// (vol 3, 8.2.2). Because xchg() is implemented using asm volatile,
 	// gcc will not reorder C statements across the xchg.
 	xchg(&lk->locked, 0);
+	// cprintf("return in %s\n", __FUNCTION__);
 }

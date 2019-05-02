@@ -29,7 +29,21 @@ sched_yield(void)
 	// below to halt the cpu.
 
 	// LAB 4: Your code here.
+	
+	// cprintf("in %s\n", __FUNCTION__);
+	int cur_tone = curenv == NULL?0:ENVX(curenv->env_id);
 
+	int count = 0;
+	for(int i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
+		if(envs[i].env_status == ENV_RUNNABLE){
+			// cprintf("find! return!\n");
+			env_run(&envs[i]);
+		}
+	}
+	// cprintf("must find sthing running\n");
+	if(curenv && curenv->env_status == ENV_RUNNING)
+		env_run(curenv);
+	// cprintf("sched_halt()\n");
 	// sched_halt never returns
 	sched_halt();
 }

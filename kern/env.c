@@ -538,13 +538,20 @@ env_run(struct Env *e)
 	//	e->env_tf to sensible values.
 
 	// LAB 3: Your code here.
-	if(curenv)
+	cprintf("in %s\n", __FUNCTION__);
+	if(curenv){
+		assert(curenv->env_status == ENV_RUNNING);
 		curenv->env_status = ENV_RUNNABLE;
+	}
+	assert(curenv != e);
 	curenv = e;
 	curenv->env_status = ENV_RUNNING;
 	curenv->env_runs++;
+	cprintf("ha 1\n");
 	lcr3(PADDR(curenv->env_pgdir));
-
+	cprintf("ha 2\n");
+	unlock_kernel(); //lab4 bug?
+	cprintf("ha 3\n");
 	env_pop_tf(&curenv->env_tf);
 	//panic("env_run not yet implemented");
 }
