@@ -66,7 +66,6 @@ sys_env_destroy(envid_t envid)
 static void
 sys_yield(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	sched_yield();
 }
 

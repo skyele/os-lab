@@ -228,7 +228,6 @@ trap_dispatch(struct Trapframe *tf)
 	// interrupt using lapic_eoi() before calling the scheduler!
 	// LAB 4: Your code here.
 
-	cprintf("the trapno %d\n", tf->tf_trapno);
 	switch (tf->tf_trapno)
 	{
 		case T_PGFLT:
