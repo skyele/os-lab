@@ -109,13 +109,13 @@ trap_init(void)
 	SETGATE(idt[T_ALIGN]  , 0, GD_KT, ALIGN_HANDLER  , 0);
 	SETGATE(idt[T_MCHK]   , 0, GD_KT, MCHK_HANDLER   , 0);
 	SETGATE(idt[T_SIMDERR], 0, GD_KT, SIMDERR_HANDLER, 0);
-	// SETGATE(idt[T_SYSCALL], 1, GD_KT, SYSCALL_HANDLER, 3);	//just test
+	SETGATE(idt[T_SYSCALL], 1, GD_KT, SYSCALL_HANDLER, 3);	//just test
 	// < 32 : exception /////////// >= 32 : interrupt
-	extern void sysenter_handler();
+	// extern void sysenter_handler();
 
-	wrmsr(0x174, GD_KT , 0);//IA32_SYSENTER_CS
-	wrmsr(0x175, KSTACKTOP, 0);//IA32_SYSENTER_ESP
-	wrmsr(0x176, sysenter_handler, 0);//IA32_SYSENTER_EIP
+	// wrmsr(0x174, GD_KT , 0);//IA32_SYSENTER_CS
+	// wrmsr(0x175, KSTACKTOP, 0);//IA32_SYSENTER_ESP
+	// wrmsr(0x176, sysenter_handler, 0);//IA32_SYSENTER_EIP
 	// Per-CPU setup 
 	trap_init_percpu();
 }
@@ -152,9 +152,9 @@ trap_init_percpu(void)
 	// Setup a TSS so that we get the right stack
 	// when we trap to the kernel.
 	int i = cpunum();
-	ts.ts_esp0 = KSTACKTOP - i * (KSTKSIZE + KSTKGAP);
-	ts.ts_ss0 = GD_KD;
-	ts.ts_iomb = sizeof(struct Taskstate);
+	(thiscpu->cpu_ts).ts_esp0 = KSTACKTOP - i * (KSTKSIZE + KSTKGAP);
+	(thiscpu->cpu_ts).ts_ss0 = GD_KD;
+	(thiscpu->cpu_ts).ts_iomb = sizeof(struct Taskstate);
 
 	// Initialize the TSS slot of the gdt.
 	// gdt[GD_TSS0 >> 3] = SEG16(STS_T32A, (uint32_t) (&ts),

@@ -65,7 +65,7 @@
 	TRAPHANDLER(	 ALIGN_HANDLER    , T_ALIGN  )
 	TRAPHANDLER_NOEC(MCHK_HANDLER     , T_MCHK   )
 	TRAPHANDLER_NOEC(SIMDERR_HANDLER  , T_SIMDERR)
-	; TRAPHANDLER_NOEC(SYSCALL_HANDLER, T_SYSCALL) /* just test*/
+	TRAPHANDLER_NOEC(SYSCALL_HANDLER  , T_SYSCALL) /* just test*/
 
 /*
  * Lab 3: Your code here for _alltraps
@@ -86,15 +86,15 @@ _alltraps:
 	pushl %esp 
 	call trap
 
-.global sysenter_handler
-sysenter_handler:
-	pushl %esi 
-	pushl %edi
-	pushl %ebx
-	pushl %ecx 
-	pushl %edx
-	pushl %eax
-	call syscall
-	movl %esi, %edx
-	movl %ebp, %ecx 
-	sysexit
+; .global sysenter_handler
+; sysenter_handler:
+; 	pushl %esi 
+; 	pushl %edi
+; 	pushl %ebx
+; 	pushl %ecx 
+; 	pushl %edx
+; 	pushl %eax
+; 	call syscall
+; 	movl %esi, %edx
+; 	movl %ebp, %ecx 
+; 	sysexit
