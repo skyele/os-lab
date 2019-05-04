@@ -461,6 +461,7 @@ env_free(struct Env *e)
 	e->env_status = ENV_FREE;
 	e->env_link = env_free_list;
 	env_free_list = e;
+	cprintf("after %s\n", __FUNCTION__);
 }
 
 //

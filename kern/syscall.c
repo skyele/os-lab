@@ -241,22 +241,28 @@ sys_page_map(envid_t srcenvid, void *srcva,
 		return -E_INVAL;
 	// LAB 4: Your code here.
 	struct Env* src_env;
+	cprintf("1\n");
 	int ret = envid2env(srcenvid, &src_env, 1);
 	if(ret < 0)
 		return ret;
 	struct Env* dst_env;
+	cprintf("2\n");
 	ret = envid2env(dstenvid, &dst_env, 1);
 	if(ret < 0)
 		return ret;
 	pte_t *pte_store;
-	struct PageInfo* src_page = page_lookup(src_env->env_pgdir, srcva, &pte_store);
+	cprintf("3\n");
+	struct PageInfo* src_page = page_lookup(src_env->env_pgdir, srcva, 
+			&pte_store);
 	if(src_page == NULL)
 		return -E_INVAL;
 	if(perm & PTE_W){
 		if((*pte_store & PTE_W) == 0)
 			return -E_INVAL;
 	}
-	ret = page_insert(dst_env->env_pgdir, src_page, (void *)dstenvid, perm);
+	cprintf("4\n");
+	ret = page_insert(dst_env->env_pgdir, src_page, (void *)dstva, perm);
+	cprintf("5\n");
 	if(ret < 0)
 		return ret;
 	return 0;
@@ -393,7 +399,8 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// Call the function corresponding to the 'syscallno' parameter.
 	// Return any appropriate return value.
 	// LAB 3: Your code here.
-	lock_kernel();
+	// lock_kernel();
+	cprintf("in %s\n", __FUNCTION__);
 	int ret = 0;
 	switch (syscallno)
 	{
@@ -444,6 +451,6 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		default:
 			ret = -E_INVAL;
 	}
-	unlock_kernel();
+	// unlock_kernel();
 	return ret;
 }

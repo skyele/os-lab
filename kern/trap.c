@@ -227,7 +227,7 @@ trap_dispatch(struct Trapframe *tf)
 	// Handle clock interrupts. Don't forget to acknowledge the
 	// interrupt using lapic_eoi() before calling the scheduler!
 	// LAB 4: Your code here.
-
+	cprintf("the trapno %d\n", tf->tf_trapno);
 	switch (tf->tf_trapno)
 	{
 		case T_PGFLT:
@@ -266,6 +266,7 @@ trap(struct Trapframe *tf)
 {
 	// The environment may have set DF and some versions
 	// of GCC rely on DF being clear
+	cprintf("in %s\n", __FUNCTION__);
 	asm volatile("cld" ::: "cc");
 
 	// Halt the CPU if some other CPU has called panic()
