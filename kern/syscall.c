@@ -22,6 +22,7 @@ sys_cputs(const char *s, size_t len)
 	// Check that the user has permission to read memory [s, s+len).
 	// Destroy the environment if not.
 	// LAB 3: Your code here.
+	// cprintf("the char %c\n", s[0]);
 	user_mem_assert(curenv, s, len, PTE_U);
 	// Print the string supplied by the user.
 	cprintf("%.*s", len, s);
@@ -84,7 +85,6 @@ sys_exofork(void)
 	// will appear to return 0.
 
 	// LAB 4: Your code here.
-	cprintf("in %s\n", __FUNCTION__);
 	struct Env *e;
 	int ret = env_alloc(&e, curenv->env_id);
 	if(ret < 0)
@@ -113,7 +113,6 @@ sys_env_set_status(envid_t envid, int status)
 	// envid's status.
 
 	// LAB 4: Your code here.
-	cprintf("in %s\n", __FUNCTION__);
 	switch (status)
 	{
 		case ENV_RUNNABLE:
@@ -143,9 +142,16 @@ sys_env_set_status(envid_t envid, int status)
 static int
 sys_env_set_pgfault_upcall(envid_t envid, void *func)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// LAB 4: Your code here.
-	panic("sys_env_set_pgfault_upcall not implemented");
+	struct Env* e;
+	int ret = envid2env(envid, &e, 1);
+	if(ret < 0){
+		cprintf("in %s something went wrong\n", __FUNCTION__);
+		return ret;
+	}
+	e->env_pgfault_upcall = func;
+	return 0;
+	// panic("sys_env_set_pgfault_upcall not implemented");
 }
 
 // Allocate a page of memory and map it at 'va' with permission
@@ -175,7 +181,7 @@ sys_page_alloc(envid_t envid, void *va, int perm)
 	//   allocated!
 
 	// LAB 4: Your code here.
-	cprintf("in %s\n", __FUNCTION__);
+	// assert(envid != 0);
 	if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
 		return -E_INVAL;
 	if(!(perm & (PTE_U | PTE_P)))
@@ -226,7 +232,6 @@ sys_page_map(envid_t srcenvid, void *srcva,
 	//   parameters for correctness.
 	//   Use the third argument to page_lookup() to
 	//   check the current permissions on the page.
-	cprintf("in %s\n", __FUNCTION__);
 	if(!(perm & (PTE_U | PTE_P)))
 		return -E_INVAL;
 	if((((perm ^ PTE_U ^ PTE_P) | PTE_AVAIL | PTE_W) ^ PTE_AVAIL ^ PTE_W) != 0)
@@ -241,17 +246,14 @@ sys_page_map(envid_t srcenvid, void *srcva,
 		return -E_INVAL;
 	// LAB 4: Your code here.
 	struct Env* src_env;
-	cprintf("1\n");
 	int ret = envid2env(srcenvid, &src_env, 1);
 	if(ret < 0)
 		return ret;
 	struct Env* dst_env;
-	cprintf("2\n");
 	ret = envid2env(dstenvid, &dst_env, 1);
 	if(ret < 0)
 		return ret;
 	pte_t *pte_store;
-	cprintf("3\n");
 	struct PageInfo* src_page = page_lookup(src_env->env_pgdir, srcva, 
 			&pte_store);
 	if(src_page == NULL)
@@ -260,9 +262,7 @@ sys_page_map(envid_t srcenvid, void *srcva,
 		if((*pte_store & PTE_W) == 0)
 			return -E_INVAL;
 	}
-	cprintf("4\n");
 	ret = page_insert(dst_env->env_pgdir, src_page, (void *)dstva, perm);
-	cprintf("5\n");
 	if(ret < 0)
 		return ret;
 	return 0;
@@ -280,7 +280,6 @@ static int
 sys_page_unmap(envid_t envid, void *va)
 {
 	// Hint: This function is a wrapper around page_remove().
-	cprintf("in %s\n", __FUNCTION__);
 	if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
 		return -E_INVAL;
 	struct Env* env;
@@ -334,7 +333,6 @@ sys_page_unmap(envid_t envid, void *va)
 static int
 sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// LAB 4: Your code here.
 	panic("sys_ipc_try_send not implemented");
 }
@@ -400,7 +398,6 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// Return any appropriate return value.
 	// LAB 3: Your code here.
 	// lock_kernel();
-	cprintf("in %s\n", __FUNCTION__);
 	int ret = 0;
 	switch (syscallno)
 	{
@@ -447,6 +444,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_ipc_recv:
 			ret = sys_ipc_recv((void *)a1);
+			break;
+		case SYS_env_set_pgfault_upcall:
+			ret = sys_env_set_pgfault_upcall((envid_t)a1, (void *)a2);
 			break;
 		default:
 			ret = -E_INVAL;

@@ -5,8 +5,11 @@
 void
 handler(struct UTrapframe *utf)
 {
+	cprintf("in faultdie %s\n", __FUNCTION__);
 	void *addr = (void*)utf->utf_fault_va;
+	cprintf("1ha?\n");
 	uint32_t err = utf->utf_err;
+	cprintf("2ha?\n");
 	cprintf("i faulted at va %x, err %x\n", addr, err & 7);
 	sys_env_destroy(sys_getenvid());
 }

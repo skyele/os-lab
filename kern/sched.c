@@ -30,29 +30,28 @@ sched_yield(void)
 
 	// LAB 4: Your code here.
 	
-	cprintf("in %s\n", __FUNCTION__);
 	int cur_tone = curenv == NULL?0:ENVX(curenv->env_id);
-	cprintf("the cur_tone %d\n", cur_tone);
 	int count = 0;
-	for(int i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
-		//cprintf("i %d status %d\n", i, envs[i].env_status);
+	int i;
+	for(i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
 		if(envs[i].env_status == ENV_RUNNABLE){
-			cprintf("find! return!\n");
 			env_run(&envs[i]);
 		}
 	}
-	cprintf("the cur_tone %d ENVX(cur_tone + 1) %d\n", cur_tone, ENVX(cur_tone + 1));
-	cprintf("must find sthing running\n");
+	if(!curenv && i == cur_tone && envs[i].env_status == ENV_RUNNABLE)
+		env_run(&envs[i]);
 	if(curenv && curenv->env_status == ENV_RUNNING)
 		env_run(curenv);
-	cprintf("sched_halt()\n");
+	// if(!curenv)
+	// 	cprintf("the curenv is null\n");
+	
 	// sched_halt never returns
 	// sched_halt();
 	//lab4 bug?
 	// For debugging and testing purposes, if there are no
 	// runnable environments other than the idle environments,
 	// drop into the kernel monitor.
-	int i;
+	
 	for (i = 0; i < NENV; i++) {
 		if ( 
 		    (envs[i].env_status == ENV_RUNNABLE ||
@@ -81,7 +80,6 @@ void
 sched_halt(void)
 {
 	int i;
-	cprintf("in %s\n", __FUNCTION__);
 	// For debugging and testing purposes, if there are no runnable
 	// environments in the system, then drop into the kernel monitor.
 	for (i = 0; i < NENV; i++) {

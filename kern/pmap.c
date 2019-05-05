@@ -680,12 +680,12 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 	uint32_t i = (uint32_t)va; //buggy lab3 buggy
 	uint32_t end = (uint32_t)va + len;
 	for(; i < end; i=ROUNDDOWN(i+PGSIZE, PGSIZE)){
-		if((uint32_t)va > ULIM){
+		if((uint32_t)va >= ULIM){
 			user_mem_check_addr = (uintptr_t)i;
 			return -E_FAULT;
 		}
 		pte_t *the_pte = pgdir_walk(env->env_pgdir, (void *)i, 0);
-		if(!(*the_pte & perm)){
+		if(!the_pte || (*the_pte & perm) != perm){//lab4 bug
 			user_mem_check_addr = (uintptr_t)i;
 			return -E_FAULT;
 		}
