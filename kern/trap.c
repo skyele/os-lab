@@ -90,6 +90,25 @@ trap_init(void)
 	extern void MCHK_HANDLER();
 	extern void SIMDERR_HANDLER();
 	extern void SYSCALL_HANDLER(); //just test
+
+	extern void TIMER_HANDLER();
+	extern void KBD_HANDLER();
+	extern void SECOND_HANDLER();
+	extern void THIRD_HANDLER();
+	extern void SERIAL_HANDLER();
+	extern void FIFTH_HANDLER();
+	extern void SIXTH_HANDLER();
+	extern void SPURIOUS_HANDLER();
+	extern void EIGHTH_HANDLER();
+	extern void NINTH_HANDLER();
+	extern void TENTH_HANDLER();
+	extern void ELEVEN_HANDLER();
+	extern void TWELVE_HANDLER();
+	extern void THIRTEEN_HANDLER();
+	extern void IDE_HANDLER();
+	extern void FIFTEEN_HANDLER();
+	extern void ERROR_HANDLER();
+	
 	// LAB 3: Your code here.
 	SETGATE(idt[T_DIVIDE] , 0, GD_KT, DIVIDE_HANDLER , 0);
 	SETGATE(idt[T_DEBUG]  , 0, GD_KT, DEBUG_HANDLER  , 0);
@@ -109,8 +128,27 @@ trap_init(void)
 	SETGATE(idt[T_ALIGN]  , 0, GD_KT, ALIGN_HANDLER  , 0);
 	SETGATE(idt[T_MCHK]   , 0, GD_KT, MCHK_HANDLER   , 0);
 	SETGATE(idt[T_SIMDERR], 0, GD_KT, SIMDERR_HANDLER, 0);
-	SETGATE(idt[T_SYSCALL], 1, GD_KT, SYSCALL_HANDLER, 3);	//just test
+	SETGATE(idt[T_SYSCALL], 0, GD_KT, SYSCALL_HANDLER, 3);	//just test
 	// < 32 : exception /////////// >= 32 : interrupt
+	SETGATE(idt[IRQ_OFFSET + IRQ_TIMER]    , 0, GD_KT, TIMER_HANDLER	, 0);	
+	SETGATE(idt[IRQ_OFFSET + IRQ_KBD]	   , 0, GD_KT, KBD_HANDLER		, 0);
+	SETGATE(idt[IRQ_OFFSET + 2]			   , 0, GD_KT, SECOND_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 3]			   , 0, GD_KT, THIRD_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + IRQ_SERIAL]   , 0, GD_KT, SERIAL_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 5]			   , 0, GD_KT, FIFTH_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 6]			   , 0, GD_KT, SIXTH_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + IRQ_SPURIOUS] , 0, GD_KT, SPURIOUS_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 8]			   , 0, GD_KT, EIGHTH_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 9]			   , 0, GD_KT, NINTH_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 10]	   	   , 0, GD_KT, TENTH_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 11]		   , 0, GD_KT, ELEVEN_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 12]		   , 0, GD_KT, TWELVE_HANDLER	, 0);
+	SETGATE(idt[IRQ_OFFSET + 13]		   , 0, GD_KT, THIRTEEN_HANDLER , 0);
+	SETGATE(idt[IRQ_OFFSET + IRQ_IDE]	   , 0, GD_KT, IDE_HANDLER		, 0);
+	SETGATE(idt[IRQ_OFFSET + 15]		   , 0, GD_KT, FIFTEEN_HANDLER  , 0);
+	SETGATE(idt[IRQ_OFFSET + IRQ_ERROR]	   , 0, GD_KT, ERROR_HANDLER	, 0);
+	//interrupt 0 or 1????????????????????????
+	
 	// extern void sysenter_handler();
 
 	// wrmsr(0x174, GD_KT , 0);//IA32_SYSENTER_CS
@@ -227,6 +265,12 @@ trap_dispatch(struct Trapframe *tf)
 	// Handle clock interrupts. Don't forget to acknowledge the
 	// interrupt using lapic_eoi() before calling the scheduler!
 	// LAB 4: Your code here.
+	
+	// cprintf("the trapno %d\n", tf->tf_trapno);
+	// if(tf->tf_trapno >= IRQ_OFFSET&&tf->tf_trapno < T_SYSCALL){
+	// 	cprintf("the trapno %d\n", tf->tf_trapno);
+	// }
+	// cprintf("the trapno %d\n", tf->tf_trapno);
 	switch (tf->tf_trapno)
 	{
 		case T_PGFLT:
@@ -240,12 +284,77 @@ trap_dispatch(struct Trapframe *tf)
 									tf->tf_regs.reg_ecx, tf->tf_regs.reg_ebx, 
 										tf->tf_regs.reg_edi, tf->tf_regs.reg_esi);
 			break;
+		case IRQ_OFFSET + IRQ_TIMER:
+			lapic_eoi();
+			sched_yield();
+			return;
+		case IRQ_OFFSET + IRQ_KBD:
+			cprintf("IRQ_KBD interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 2:
+			cprintf("2 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 3:
+			cprintf("3 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + IRQ_SERIAL:
+			cprintf("IRQ_SERIAL interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 5:
+			cprintf("5 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 6:
+			cprintf("6 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
 		case IRQ_OFFSET + IRQ_SPURIOUS:
+			cprintf("in Spurious\n");
 			// Handle spurious interrupts
 			// The hardware sometimes raises these because of noise on the
 			// IRQ line or other reasons. We don't care.
 			cprintf("Spurious interrupt on irq 7\n");
-			print_trapframe(tf);
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 8:
+			cprintf("8 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 9:
+			cprintf("9 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 10:
+			cprintf("10 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 11:
+			cprintf("11 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 12:
+			cprintf("12 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 13:
+			cprintf("13 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + IRQ_IDE:
+			cprintf("IRQ_IDE interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + 15:
+			cprintf("15 interrupt on irq 7\n");
+			// print_trapframe(tf);
+			return;
+		case IRQ_OFFSET + IRQ_ERROR:
+			cprintf("IRQ_ERROR interrupt on irq 7\n");
+			// print_trapframe(tf);
 			return;
 		default:
 			// Unexpected trap: The user process or the kernel has a bug.
@@ -263,6 +372,7 @@ trap_dispatch(struct Trapframe *tf)
 void
 trap(struct Trapframe *tf)
 {
+	// asm volatile("cli\n");//lab4 bug?
 	// The environment may have set DF and some versions
 	// of GCC rely on DF being clear
 	asm volatile("cld" ::: "cc");
@@ -280,7 +390,6 @@ trap(struct Trapframe *tf)
 	// fails, DO NOT be tempted to fix it by inserting a "cli" in
 	// the interrupt path.
 	assert(!(read_eflags() & FL_IF));
-
 	if ((tf->tf_cs & 3) == 3) {
 		// Trapped from user mode.
 		// Acquire the big kernel lock before doing any
@@ -389,7 +498,7 @@ page_fault_handler(struct Trapframe *tf)
 		env_run(curenv);
 	}
 	cprintf("[%08x] user fault va %08x ip %08x\n",
-		curenv->env_id, fault_va, tf->tf_eip);
+	curenv->env_id, fault_va, tf->tf_eip);
 	print_trapframe(tf);
 	env_destroy(curenv);
 }

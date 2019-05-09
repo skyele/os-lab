@@ -13,15 +13,6 @@ extern void _pgfault_upcall(void);
 // Pointer to currently installed C-language pgfault handler.
 void (*_pgfault_handler)(struct UTrapframe *utf);
 
-void testxixi(){
-	cprintf("in pfentry.S\n");
-	cprintf("in pfentry.S\n");
-	cprintf("in pfentry.S\n");
-	cprintf("in pfentry.S\n");
-	cprintf("in pfentry.S\n");
-
-}
-
 //
 // Set the page fault handler function.
 // If there isn't one yet, _pgfault_handler will be 0.

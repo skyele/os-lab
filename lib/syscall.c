@@ -7,7 +7,6 @@ static inline int32_t
 syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
 {
 	int32_t ret;
-
 	// Generic system call: pass system call number in AX,
 	// up to five parameters in DX, CX, BX, DI, SI.
 	// Interrupt kernel with T_SYSCALL.
@@ -19,6 +18,10 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// The last clause tells the assembler that this can
 	// potentially change the condition codes and arbitrary
 	// memory locations.
+	// cprintf("????????\n");
+	// cprintf("in lib%s\n", __FUNCTION__);
+	// asm volatile("cli\n"); //lab4 bug? corresponding in /kern/syscall.c
+	// cprintf("the check %d\n", check);
 	asm volatile("int %1\n"
 		     : "=a" (ret)
 		     : "i" (T_SYSCALL),
@@ -29,6 +32,7 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		       "D" (a4),
 		       "S" (a5)
 		     : "cc", "memory");
+	// asm volatile("sti\n");//lab4 bug?
 	// asm volatile(
 	// 	"pushl %%ecx\n\t"
 	// 	"pushl %%edx\n\t"
@@ -52,12 +56,13 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// 	"popl %%edx\n\t"
 	// 	"popl %%ecx\n\t"
 	// 	:   "=a"(ret)
-	// 	:   "a"(num),
+	// 	:   "a"(num),xit
 	// 		"d"(a1),
 	// 		"c"(a2),
 	// 		"b"(a3),
 	// 		"D"(a4)
-	// 	:   "cc", "memory");
+	// 	:   "cc", "memory");xit
+	// cprintf("the check %d\n",check);
 	if(check && ret > 0)
 		panic("syscall %d returned %d (> 0)", num, ret);
 

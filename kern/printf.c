@@ -31,7 +31,6 @@ cprintf(const char *fmt, ...)
 	va_start(ap, fmt);
 	cnt = vcprintf(fmt, ap);
 	va_end(ap);
-
 	return cnt;
 }
 
