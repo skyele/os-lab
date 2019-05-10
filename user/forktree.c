@@ -13,7 +13,8 @@ forkchild(const char *cur, char branch)
 	if (strlen(cur) >= DEPTH)
 		return;
 	snprintf(nxt, DEPTH+1, "%s%c", cur, branch);
-	if (fork() == 0) {
+	// if (fork() == 0) {
+	if (sfork() == 0) {	//lab4 challenge!
 		forktree(nxt);
 		exit();
 	}

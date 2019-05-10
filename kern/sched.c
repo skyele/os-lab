@@ -30,13 +30,7 @@ sched_yield(void)
 
 	// LAB 4: Your code here.
 	int i;
-	if(!curenv){
-		for(i = 0 ; i < NENV; i++)
-     		if(envs[i].env_status == ENV_RUNNABLE) {
-		  		env_run(&envs[i]);
-	  		}
-	}
-	else{
+	if(curenv){
 		envid_t cur_tone = ENVX(curenv->env_id);
 		for(i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
 			if(envs[i].env_status == ENV_RUNNABLE){
@@ -46,50 +40,13 @@ sched_yield(void)
 		if(curenv->env_status == ENV_RUNNING)
 			env_run(curenv);
 	}
-	// int cur_tone = curenv == NULL?0:ENVX(curenv->env_id);
-	// int count = 0;
-	// int i;
-	// for(i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
-	// 	if(envs[i].env_status == ENV_RUNNABLE){
-
-	// 		env_run(&envs[i]);
-	// 	}
-	// }
-	// if(!curenv && i == cur_tone && envs[i].env_status == ENV_RUNNABLE){
-
-	// 	env_run(&envs[i]);
-	// }
-	// if(curenv && curenv->env_status == ENV_RUNNING){
-
-	// 	env_run(curenv);
-	// }
-	// // sched_halt never returns
-	cprintf("before sched_halt()\n");
+	else{
+		for(i = 0 ; i < NENV; i++)
+     		if(envs[i].env_status == ENV_RUNNABLE) {
+		  		env_run(&envs[i]);
+	  		}
+	}
 	sched_halt();
-	/////////////////////////////////
-// 	// cprintf("%d: give up cpu", curenv->env_id);
-// 	int i;
-//   if(!curenv){
-//     for(i = 0 ; i < NENV; i++)
-//       if(envs[i].env_status == ENV_RUNNABLE) {
-// 		//   cprintf("%d: get cpu", envs[i].env_id);
-// 		  env_run(&envs[i]);
-// 	  }
-//   }else{
-//     envid_t env_id = ENVX(curenv->env_id);
-//     for(i = (env_id + 1) % NENV; i != env_id; i = (i + 1) % NENV)
-//       if(envs[i].env_status == ENV_RUNNABLE){
-// 		//   cprintf("%d: get cpu", envs[i].env_id);
-// 		  env_run(&envs[i]);
-// 	  }
-//     if(curenv->env_status == ENV_RUNNING){
-// 		//   cprintf("%d: get cpu", curenv->env_id);
-// 		  env_run(curenv);
-// 	  }
-//   }
-
-// 	// sched_halt never returns
-// sched_halt();
 }
 
 // Halt this CPU when there is nothing to do. Wait until the
