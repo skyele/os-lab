@@ -8,7 +8,6 @@ extern void umain(int argc, char **argv);
 const volatile struct Env *thisenv;
 const char *binaryname = "<unknown>";
 
-//LAB4 new functionality
 extern const volatile struct Env envs[NENV];
 const volatile inline struct Env* getthisenv(){
         return &envs[ENVX(sys_getenvid())];

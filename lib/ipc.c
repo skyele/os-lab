@@ -1,6 +1,12 @@
 // User-level IPC library routines
 
 #include <inc/lib.h>
+// #include <lib/libmain.c>
+
+extern const volatile struct Env envs[NENV];
+const volatile inline struct Env* getthisenv(){
+        return &envs[ENVX(sys_getenvid())];
+} 
 
 // Receive a value via IPC and return it.
 // If 'pg' is nonnull, then any page sent by the sender will be mapped at
@@ -24,7 +30,7 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 {
 	// LAB 4: Your code here.
 	// panic("ipc_recv not implemented");
-
+	// cprintf("in %s\n", __FUNCTION__);
 	int ret;
 	if(!pg)
 		pg = (void *)UTOP;
@@ -37,11 +43,14 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 		return ret;
 	}
 	if(from_env_store){
+		// *from_env_store = getthisenv()->env_ipc_from;
 		*from_env_store = thisenv->env_ipc_from;
 	}
 	if(perm_store){
+		// *perm_store = getthisenv()->env_ipc_perm;
 		*perm_store = thisenv->env_ipc_perm;
 	}
+	// return getthisenv()->env_ipc_value;
 	return thisenv->env_ipc_value;
 }
 
