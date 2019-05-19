@@ -214,9 +214,9 @@ grade:
 
 handin: tarball
 	@echo
-	@echo "Please upload your tar file to ftp(in os's lab4 webpage)"
+	@echo "Please upload your tar file to ftp(in os's lab5 webpage)"
 	@echo
-	@echo "For example, if your student id is 123456, then replace <student id>.tar.gz to 123456.tar.gz"
+	@echo "For example, if your student id is 123456, then rename lab5-handin.tar.gz to 123456.tar.gz"
 
 #handin-prep:
 #	@./handin-prep
