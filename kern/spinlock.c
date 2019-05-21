@@ -102,11 +102,10 @@ spin_unlock(struct spinlock *lk)
 		}
 		panic("spin_unlock");
 	}
-
 	lk->pcs[0] = 0;
 	lk->cpu = 0;
 #endif
-
+	// cprintf("in endif\n");
 	// The xchg instruction is atomic (i.e. uses the "lock" prefix) with
 	// respect to any other instruction which references the same memory.
 	// x86 CPUs will not reorder loads/stores across locked instructions

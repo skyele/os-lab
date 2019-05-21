@@ -25,7 +25,14 @@ i386_init(void)
 	// Can't call cprintf until after we do this!
 	cons_init();
 
-	cprintf("6828 decimal is %o octal!\n", 6828);
+	//cprintf("6828 decimal is %o octal!%n\n%n", 6828, &chnum1, &chnum2);
+	cprintf("pading space in the right to number 22: %-8d.\n", 22);
+	//cprintf("chnum1: %d chnum2: %d\n", chnum1, chnum2);
+	cprintf("%n", NULL);
+	//memset(ntest, 0xd, sizeof(ntest) - 1);
+	//cprintf("%s%n", ntest, &chnum1); 
+	//cprintf("chnum1: %d\n", chnum1);
+	cprintf("show me the sign: %+d, %+d\n", 1024, -1024);
 
 	// Lab 2 memory management initialization functions
 	mem_init();
@@ -43,7 +50,7 @@ i386_init(void)
 
 	// Acquire the big kernel lock before waking up APs
 	// Your code here:
-
+	lock_kernel();
 	// Starting non-boot CPUs
 	boot_aps();
 
@@ -102,6 +109,7 @@ void
 mp_main(void)
 {
 	// We are in high EIP now, safe to switch to kern_pgdir 
+
 	lcr3(PADDR(kern_pgdir));
 	cprintf("SMP: CPU %d starting\n", cpunum());
 
@@ -109,15 +117,15 @@ mp_main(void)
 	env_init_percpu();
 	trap_init_percpu();
 	xchg(&thiscpu->cpu_status, CPU_STARTED); // tell boot_aps() we're up
-
 	// Now that we have finished some basic setup, call sched_yield()
 	// to start running processes on this CPU.  But make sure that
 	// only one CPU can enter the scheduler at a time!
 	//
 	// Your code here:
-
+	lock_kernel();
+	sched_yield();
 	// Remove this after you finish Exercise 6
-	for (;;);
+	//for (;;);
 }
 
 /*

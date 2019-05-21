@@ -9,11 +9,14 @@
 void
 _panic(const char *file, int line, const char *fmt, ...)
 {
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	va_list ap;
 
 	va_start(ap, fmt);
 
 	// Print the panic message
+	// cprintf("[%08x] user panic in %s at %s:%d: ",
+	// 	sys_getenvid(), binaryname, file, line);
 	cprintf("[%08x] user panic in %s at %s:%d: ",
 		sys_getenvid(), binaryname, file, line);
 	vcprintf(fmt, ap);

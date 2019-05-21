@@ -6,6 +6,7 @@
 void
 handler(struct UTrapframe *utf)
 {
+	cprintf("in faultallocbadddddddddddddddddddddd %s\n", __FUNCTION__);
 	int r;
 	void *addr = (void*)utf->utf_fault_va;
 
@@ -19,6 +20,10 @@ handler(struct UTrapframe *utf)
 void
 umain(int argc, char **argv)
 {
+	cprintf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+	cprintf("before set_pgfault_handler() in %s\n", __FUNCTION__);
 	set_pgfault_handler(handler);
+	cprintf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	cprintf("before sys_cputs() in %s\n", __FUNCTION__);
 	sys_cputs((char*)0xDEADBEEF, 4);
 }
