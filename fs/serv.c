@@ -207,14 +207,38 @@ serve_set_size(envid_t envid, struct Fsreq_set_size *req)
 int
 serve_read(envid_t envid, union Fsipc *ipc)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	struct Fsreq_read *req = &ipc->read;
 	struct Fsret_read *ret = &ipc->readRet;
 
 	if (debug)
 		cprintf("serve_read %08x %08x %08x\n", envid, req->req_fileid, req->req_n);
 
+	// struct OpenFile* open_file;
+	// int r;
+	// r =	openfile_lookup(envid, req->req_fileid, &open_file);
+	// if(r < 0)
+	// 	return r;
+	// r = file_read(open_file->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), open_file->o_fd->fd_offset);
+	// if(r < 0)
+	// 	return r;
+
+	// open_file->o_fd->fd_offset += r;
 	// Lab 5: Your code here:
-	return 0;
+	struct OpenFile *o;
+	int r;
+
+	if ((r = openfile_lookup(envid, req->req_fileid, &o)) < 0){
+		cprintf("serve_read wrong 1 %d\n", r);
+		return r;
+	}
+
+	if((r = file_read(o->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), o->o_fd->fd_offset)) < 0){
+		cprintf("serve_read wrong 2 %d\n", r);
+		return r;
+	}
+	o->o_fd->fd_offset += r;
+	return r;
 }
 
 
@@ -294,6 +318,7 @@ fshandler handlers[] = {
 void
 serve(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	uint32_t req, whom;
 	int perm, r;
 	void *pg;

@@ -54,18 +54,4 @@ UVPT: 0xef400000 -281018368
 PDX(UVPT): 0x3bd 957
 in check_page_free_list
 check_page_free_list() succeeded!
-in check_page_alloc
-check_page_alloc() succeeded!
-in check_page
-check_page() succeeded!
-after check_page()
-in boot_map_region
-in boot_map_region
-in boot_map_region_large
-PTSIZE: 400000
-size/PTSIZE: 64
-0
-large page installed!
-check_kern_pgdir() succeeded!
-1
-qemu-system-i386: terminating on signal 15 from pid 83801 (make)
+
