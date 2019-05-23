@@ -40,7 +40,6 @@ block_is_free(uint32_t blockno)
 void
 free_block(uint32_t blockno)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	// Blockno zero is the null pointer of block numbers.
 	if (blockno == 0)
 		panic("attempt to free zero block");
@@ -64,13 +63,13 @@ alloc_block(void)
 
 	// LAB 5: Your code here.
 	// panic("alloc_block not implemented");
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	uint32_t blockno;
 	int r;
 	//1 - free, 0 - used
 	for(blockno = 0; blockno < super->s_nblocks; blockno++){
 		if(block_is_free(blockno)){
-			bitmap[blockno/32] ^= 1<<(blockno%32);//lab5 bug
+			// bitmap[blockno/32] ^= 1<<(blockno%32);//lab5 bug
+			bitmap[blockno/32] &= ~(1<<(blockno%32));
 			flush_block(&bitmap[blockno/32]);
 			return blockno;
 		}
@@ -108,7 +107,6 @@ check_bitmap(void)
 void
 fs_init(void)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	static_assert(sizeof(struct File) == 256);
 
 	// Find a JOS disk.  Use the second IDE disk (number 1) if available
@@ -147,7 +145,6 @@ fs_init(void)
 static int
 file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool alloc)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r;
 	if(filebno >= NDIRECT + NINDIRECT)
 		return -E_INVAL;
@@ -159,7 +156,7 @@ file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool all
 				return -E_NOT_FOUND;
 			r = alloc_block();
 			if(r < 0)
-				return -E_NO_DISK;
+				return r;
 			memset(diskaddr(r), 0, BLKSIZE);
 			f->f_indirect = r;
 			flush_block(diskaddr(r));
@@ -183,7 +180,6 @@ file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool all
 int
 file_get_block(struct File *f, uint32_t filebno, char **blk)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
     // LAB 5: Your code here.
 	uint32_t *ppdiskbno;
    	int r;
@@ -195,7 +191,7 @@ file_get_block(struct File *f, uint32_t filebno, char **blk)
 	if(!*ppdiskbno){
 		r = alloc_block();
 		if(r < 0)
-			return -E_NO_DISK;
+			return r;
 		*ppdiskbno = r;
 	}
 	*blk = diskaddr(*ppdiskbno);
@@ -281,7 +277,6 @@ skip_slash(const char *p)
 static int
 walk_path(const char *path, struct File **pdir, struct File **pf, char *lastelem)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	const char *p;
 	char name[MAXNAMELEN];
 	struct File *dir, *f;
@@ -338,7 +333,6 @@ walk_path(const char *path, struct File **pdir, struct File **pf, char *lastelem
 int
 file_create(const char *path, struct File **pf)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	char name[MAXNAMELEN];
 	int r;
 	struct File *dir, *f;
@@ -361,7 +355,6 @@ file_create(const char *path, struct File **pf)
 int
 file_open(const char *path, struct File **pf)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	cprintf("the path %s\n", path);
 	return walk_path(path, 0, pf, 0);
 }
@@ -372,7 +365,6 @@ file_open(const char *path, struct File **pf)
 ssize_t
 file_read(struct File *f, void *buf, size_t count, off_t offset)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r, bn;
 	off_t pos;
 	char *blk;
@@ -402,7 +394,6 @@ file_read(struct File *f, void *buf, size_t count, off_t offset)
 int
 file_write(struct File *f, const void *buf, size_t count, off_t offset)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r, bn;
 	off_t pos;
 	char *blk;

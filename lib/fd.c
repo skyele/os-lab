@@ -73,7 +73,6 @@ fd_alloc(struct Fd **fd_store)
 int
 fd_lookup(int fdnum, struct Fd **fd_store)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	struct Fd *fd;
 
 	if (fdnum < 0 || fdnum >= MAXFD) {
@@ -135,7 +134,6 @@ static struct Dev *devtab[] =
 int
 dev_lookup(int dev_id, struct Dev **dev)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int i;
 	for (i = 0; devtab[i]; i++)
 		if (devtab[i]->dev_id == dev_id) {
@@ -205,7 +203,6 @@ err:
 ssize_t
 read(int fdnum, void *buf, size_t n)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r;
 	struct Dev *dev;
 	struct Fd *fd;
@@ -240,7 +237,6 @@ readn(int fdnum, void *buf, size_t n)
 ssize_t
 write(int fdnum, const void *buf, size_t n)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r;
 	struct Dev *dev;
 	struct Fd *fd;
@@ -275,7 +271,6 @@ seek(int fdnum, off_t offset)
 int
 ftruncate(int fdnum, off_t newsize)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r;
 	struct Dev *dev;
 	struct Fd *fd;

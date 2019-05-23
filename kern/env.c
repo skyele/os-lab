@@ -404,7 +404,6 @@ env_create(uint8_t *binary, enum EnvType type)
 
 	// If this is the file server (type == ENV_TYPE_FS) give it I/O privileges.
 	// LAB 5: Your code here.
-	cprintf("in %s\n", __FUNCTION__);
 	struct Env *e;
 	int ret = env_alloc(&e, 0);
 	if(ret)

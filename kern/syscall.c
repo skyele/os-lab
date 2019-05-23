@@ -165,7 +165,6 @@ static int
 sys_env_set_pgfault_upcall(envid_t envid, void *func)
 {
 	// LAB 4: Your code here.
-	// cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	struct Env* e;
 	int ret = envid2env(envid, &e, 1);
 	if(ret < 0){
@@ -292,7 +291,6 @@ sys_page_map(envid_t srcenvid, void *srcva,
 static int
 sys_page_unmap(envid_t envid, void *va)
 {
-	// cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	// Hint: This function is a wrapper around page_remove().
 
 	if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
@@ -351,7 +349,6 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 {
 	// // LAB 4: Your code here.
 	// // panic("sys_ipc_try_send not implemented");
-	cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	
 	int ret;
 	struct Env* dst_env;
@@ -467,7 +464,6 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// cprintf("try to get lock\n");
 	// lock_kernel();
 	// asm volatile("cli\n");
-	// cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	int ret = 0;
 	switch (syscallno)
 	{

@@ -75,42 +75,60 @@ pgfault(struct UTrapframe *utf)
 static int
 duppage(envid_t envid, unsigned pn)
 {
-	int r;
-	//lab5 bug?
-	if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_SHARE)) == (PTE_P | PTE_U | PTE_SHARE)){
-		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
-							uvpt[pn] & PTE_SYSCALL);
-		if(r < 0)
-			panic("sys_page_map() panic\n");
-		return 0;
-	}
-	if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_W)) == (PTE_P | PTE_U | PTE_W)){
-		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
-						PTE_P | PTE_U | PTE_COW);
-		if(r < 0)
-			panic("sys_page_map() panic\n");
-		r = sys_page_map(0, (void *)(pn * PGSIZE), 0, (void *)(pn * PGSIZE),
-						 PTE_P | PTE_U | PTE_COW);
-		if(r < 0)
-			panic("sys_page_map() panic\n");
-		return 0;
-	}
-	if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_COW)) == (PTE_P | PTE_U | PTE_COW)){
-		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
-						PTE_P | PTE_U | PTE_COW);
-		if(r < 0)
-			panic("sys_page_map() panic\n");
-		return 0;
-	}
-	if(((uvpt[pn]) & (PTE_P | PTE_U)) == (PTE_P | PTE_U)){
-		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
-						PTE_P | PTE_U);
-		if(r < 0)
-			panic("sys_page_map() panic\n");
-	}
+	cprintf("in %s\n", __FUNCTION__);
+	// int r;
+	// //lab5 bug?
+	// if((uvpt[pn]) & PTE_SHARE){
+	// 	r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
+	// 						uvpt[pn] & PTE_SYSCALL);
+	// 	if(r < 0)
+	// 		panic("sys_page_map() panic\n");
+	// 	return 0;
+	// }
+	// if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_W)) == (PTE_P | PTE_U | PTE_W)){
+	// 	r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
+	// 					PTE_P | PTE_U | PTE_COW);
+	// 	if(r < 0)
+	// 		panic("sys_page_map() panic\n");
+	// 	r = sys_page_map(0, (void *)(pn * PGSIZE), 0, (void *)(pn * PGSIZE),
+	// 					 PTE_P | PTE_U | PTE_COW);
+	// 	if(r < 0)
+	// 		panic("sys_page_map() panic\n");
+	// 	return 0;
+	// }
+	// if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_COW)) == (PTE_P | PTE_U | PTE_COW)){
+	// 	r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
+	// 					PTE_P | PTE_U | PTE_COW);
+	// 	if(r < 0)
+	// 		panic("sys_page_map() panic\n");
+	// 	return 0;
+	// }
+	// if(((uvpt[pn]) & (PTE_P | PTE_U)) == (PTE_P | PTE_U)){
+	// 	r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
+	// 					PTE_P | PTE_U);
+	// 	if(r < 0)
+	// 		panic("sys_page_map() panic\n");
+	// }
 
-	// LAB 4: Your code here.
-	// panic("duppage not implemented");
+	// // LAB 4: Your code here.
+	// // panic("duppage not implemented");
+	// return 0;
+
+
+	void * addr = (void *)(pn * PGSIZE);
+	int r;
+	if (uvpt[pn] & PTE_SHARE) {
+		if((r = sys_page_map((envid_t)0, addr, envid, addr, uvpt[pn] & PTE_SYSCALL)) < 0)
+		panic("sys_page_map: %e\n", r);
+	}else if (uvpt[pn] & (PTE_W | PTE_COW)) {
+		if((r = sys_page_map((envid_t)0, addr, envid, addr, PTE_U | PTE_P | PTE_COW) < 0))
+		panic("sys_page_map: %e\n", r);
+		if((r = sys_page_map((envid_t)0, addr, 0    , addr, PTE_U | PTE_P | PTE_COW) < 0))
+		panic("sys_page_map: %e\n", r);
+	} else {
+		if((r = sys_page_map((envid_t)0, addr, envid, addr, PTE_U | PTE_P )) < 0)
+		panic("sys_page_map: %e\n", r);
+	}
 	return 0;
 }
 
@@ -133,7 +151,6 @@ duppage(envid_t envid, unsigned pn)
 envid_t
 fork(void)
 {
-	// cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int ret;
 	set_pgfault_handler(pgfault);
 	envid_t child_envid = sys_exofork();
@@ -166,7 +183,6 @@ fork(void)
 int
 sfork(void)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	// panic("sfork not implemented");
 	// envid_t child_envid = sys_exofork();
 	// return -E_INVAL;

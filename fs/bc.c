@@ -84,9 +84,11 @@ flush_block(void *addr)
 	addr = ROUNDDOWN(addr, PGSIZE);
 	bool is_map = va_is_mapped(addr);
 	bool is_dir = va_is_dirty(addr);
-	if(!is_map | !is_dir)
+	if(!is_map || !is_dir)
 		return;
-	ide_write(blockno * BLKSECTS, addr, BLKSECTS);
+	r = ide_write(blockno * BLKSECTS, addr, BLKSECTS);
+	if(r < 0)
+		panic("the ide_write panic!\n");
 	r = sys_page_map(0, addr, 0, addr, PTE_SYSCALL);
 	if(r < 0)
 		panic("the sys_page_map panic!\n");

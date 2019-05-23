@@ -87,11 +87,9 @@ openfile_alloc(struct OpenFile **o)
 int
 openfile_lookup(envid_t envid, uint32_t fileid, struct OpenFile **po)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	struct OpenFile *o;
 
 	o = &opentab[fileid % MAXOPEN];
-	cprintf("%d: the page ref is %d\n", thisenv->env_id, pageref(o->o_fd));
 	if (pageref(o->o_fd) <= 1 || o->o_fileid != fileid)
 		return -E_INVAL;
 	*po = o;
@@ -209,7 +207,6 @@ serve_set_size(envid_t envid, struct Fsreq_set_size *req)
 int
 serve_read(envid_t envid, union Fsipc *ipc)
 {
-	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	struct Fsreq_read *req = &ipc->read;
 	struct Fsret_read *ret = &ipc->readRet;
 
