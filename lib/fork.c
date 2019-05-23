@@ -76,6 +76,14 @@ static int
 duppage(envid_t envid, unsigned pn)
 {
 	int r;
+	//lab5 bug?
+	if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_SHARE)) == (PTE_P | PTE_U | PTE_SHARE)){
+		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
+							uvpt[pn] & PTE_SYSCALL);
+		if(r < 0)
+			panic("sys_page_map() panic\n");
+		return 0;
+	}
 	if(((uvpt[pn]) & (PTE_P | PTE_U | PTE_W)) == (PTE_P | PTE_U | PTE_W)){
 		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
 						PTE_P | PTE_U | PTE_COW);

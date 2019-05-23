@@ -287,17 +287,15 @@ trap_dispatch(struct Trapframe *tf)
 			sched_yield();
 			return;
 		case IRQ_OFFSET + IRQ_KBD:
-			cprintf("IRQ_KBD interrupt on irq 7\n");
-			// print_trapframe(tf);
-			return;
+			kbd_intr();
+			break;
 		case IRQ_OFFSET + 2:
 			cprintf("2 interrupt on irq 7\n");
 			// print_trapframe(tf);
 			return;
 		case IRQ_OFFSET + 3:
-			cprintf("3 interrupt on irq 7\n");
-			// print_trapframe(tf);
-			return;
+			serial_intr();
+			break;
 		case IRQ_OFFSET + IRQ_SERIAL:
 			cprintf("IRQ_SERIAL interrupt on irq 7\n");
 			// print_trapframe(tf);

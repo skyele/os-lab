@@ -216,31 +216,17 @@ serve_read(envid_t envid, union Fsipc *ipc)
 	if (debug)
 		cprintf("serve_read %08x %08x %08x\n", envid, req->req_fileid, req->req_n);
 
-	// struct OpenFile* open_file;
-	// int r;
-	// r =	openfile_lookup(envid, req->req_fileid, &open_file);
-	// if(r < 0)
-	// 	return r;
-	// r = file_read(open_file->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), open_file->o_fd->fd_offset);
-	// if(r < 0)
-	// 	return r;
-
-	// open_file->o_fd->fd_offset += r;
-	// Lab 5: Your code here:
-	struct OpenFile *o;
+	struct OpenFile* open_file;
 	int r;
+	r =	openfile_lookup(envid, req->req_fileid, &open_file);
+	if(r < 0)
+		return r;
+	r = file_read(open_file->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), open_file->o_fd->fd_offset);
+	if(r < 0)
+		return r;
 
-	if ((r = openfile_lookup(envid, req->req_fileid, &o)) < 0){
-		cprintf("serve_read wrong 1 %d\n", r);
-		return r;
-	}
-	cprintf("%d: req->req_n: %d sizeof(ret->ret_buf): %d\n",thisenv->env_id, req->req_n, sizeof(ret->ret_buf));
-	if((r = file_read(o->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), o->o_fd->fd_offset)) < 0){
-		cprintf("serve_read wrong 2 %d\n", r);
-		return r;
-	}
-	o->o_fd->fd_offset += r;
-	cprintf("%d: return in %s the r: %d\n", thisenv->env_id, __FUNCTION__, r);
+	open_file->o_fd->fd_offset += r;
+	// Lab 5: Your code here:
 	return r;
 }
 
@@ -255,8 +241,22 @@ serve_write(envid_t envid, struct Fsreq_write *req)
 	if (debug)
 		cprintf("serve_write %08x %08x %08x\n", envid, req->req_fileid, req->req_n);
 
+	struct OpenFile* open_file;
+	int r;
+	r =	openfile_lookup(envid, req->req_fileid, &open_file);
+	if(r < 0)
+		return r;
+	//lab5 bug?
+	r = file_write(open_file->o_file, req->req_buf, 
+			req->req_n, open_file->o_fd->fd_offset);
+	if(r < 0)
+		return r;
+
+	open_file->o_fd->fd_offset += r;
+	return r;
 	// LAB 5: Your code here.
-	panic("serve_write not implemented");
+
+	// panic("serve_write not implemented");
 }
 
 // Stat ipc->stat.req_fileid.  Return the file's struct Stat to the

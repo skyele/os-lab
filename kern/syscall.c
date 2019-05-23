@@ -141,7 +141,16 @@ sys_env_set_trapframe(envid_t envid, struct Trapframe *tf)
 	// LAB 5: Your code here.
 	// Remember to check whether the user has supplied us with a good
 	// address!
-	panic("sys_env_set_trapframe not implemented");
+	struct Env* e;
+	int r;
+	r = envid2env(envid, &e, 0);
+	if(r < 0)
+		return r;
+	e->env_tf = *tf;
+	e->env_tf.tf_cs |= 3;
+	e->env_tf.tf_eflags |= FL_IF;
+	return 0;
+	// panic("sys_env_set_trapframe not implemented");
 }
 
 // Set the page fault upcall for 'envid' by modifying the corresponding struct
@@ -285,27 +294,18 @@ sys_page_unmap(envid_t envid, void *va)
 {
 	// cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	// Hint: This function is a wrapper around page_remove().
-	//lab5 replace
-	// if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
-	// 	return -E_INVAL;
-	// struct Env* env;
-	// int ret = envid2env(envid, &env, 1);
-	// if(ret < 0)
-	// 	return ret;
-	// page_remove(env->env_pgdir, va);
-	// return 0;
+
+	if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
+		return -E_INVAL;
+	struct Env* env;
+	int ret = envid2env(envid, &env, 1);
+	if(ret < 0)
+		return ret;
+	page_remove(env->env_pgdir, va);
+	return 0;
 
 	// LAB 4: Your code here.
 	// panic("sys_page_unmap not implemented");
-
-	struct Env *e;
-	int r;
-	if (((uintptr_t)va) >= UTOP || PGOFF(va))
-		return -E_INVAL;
-	if ((r = envid2env(envid, &e, 1)) < 0)
-		return r;
-	page_remove(e->env_pgdir, va);
-	return 0;
 }
 
 // Try to send 'value' to the target env 'envid'.
@@ -353,87 +353,42 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 	// // panic("sys_ipc_try_send not implemented");
 	cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	
-	// int ret;
-	// struct Env* dst_env;
-	// ret = envid2env(envid, &dst_env, 0);
-	// if(ret < 0){
-	// 	cprintf("send 1\n");
-	// 	return ret;
-	// }
-	// if(!dst_env->env_ipc_recving){
-	// 	cprintf("send 2\n");
-	// 	return -E_IPC_NOT_RECV;
-	// }
-	
-	// if(srcva < (void *)UTOP){	//lab4 bug?{
-	// 	if((uint32_t)srcva%PGSIZE != 0){
-	// 		cprintf("send 3\n");
-	// 		return -E_INVAL;
-	// 	}
-	// 	if((perm & (PTE_U | PTE_P)) != (PTE_U | PTE_P)){
-	// 		cprintf("send 4\n");
-	// 		return -E_INVAL;
-	// 	}
-
-	// 	if(perm & ~PTE_SYSCALL){
-	// 		cprintf("send 5\n");
-	// 		return -E_INVAL;		
-	// 	}
-	// 	pte_t *pte;
-	// 	struct PageInfo* page = page_lookup(curenv->env_pgdir, srcva, &pte);
-	// 	if(!page){
-	// 		cprintf("send 6\n");
-	// 		return -E_INVAL;		
-	// 	}
-	// 	if((*pte & perm) != perm){
-	// 		cprintf("the *pte & perm: %x and the perm: %x\n", *pte & perm, perm);
-	// 		cprintf("send 7\n");
-	// 		return -E_INVAL;		
-	// 	}
-	// 	if(dst_env->env_ipc_dstva < (void *)UTOP){
-	// 		ret = page_insert(dst_env->env_pgdir, page, dst_env->env_ipc_dstva, perm);
-	// 		if(ret < 0){
-	// 			cprintf("send 8\n");
-	// 			return ret;
-	// 		}
-	// 	}
-	// }
-
-	// dst_env->env_ipc_recving = 0;
-	// dst_env->env_ipc_from = curenv->env_id;
-	// dst_env->env_ipc_value = value;
-	// dst_env->env_ipc_perm = srcva == (void *)UTOP ? 0 : perm;
-	// dst_env->env_status = ENV_RUNNABLE;
-	// dst_env->env_tf.tf_regs.reg_eax = 0;
-
-	//how to detect is there are enough memory in srcva?
-	
-	struct Env *e;
-	int r;
-	if((r = envid2env(envid, &e, 0) ) < 0)
-		return r;
-	if(!e->env_ipc_recving)
+	int ret;
+	struct Env* dst_env;
+	ret = envid2env(envid, &dst_env, 0);
+	if(ret < 0)
+		return ret;
+	if(!dst_env->env_ipc_recving)
 		return -E_IPC_NOT_RECV;
-	if(srcva < (void*)UTOP){
-		if(PGOFF(srcva) || (perm & (PTE_U | PTE_P)) != (PTE_U | PTE_P) || (perm & (~PTE_SYSCALL)))
-		return -E_INVAL;
+	
+	if(srcva < (void *)UTOP){	//lab4 bug?{
+		if((uint32_t)srcva%PGSIZE != 0)
+			return -E_INVAL;
+		if((perm & (PTE_U | PTE_P)) != (PTE_U | PTE_P))
+			return -E_INVAL;
+		if(perm & ~PTE_SYSCALL)
+			return -E_INVAL;		
 		pte_t *pte;
-		struct PageInfo *pg;
-		if(!(pg = page_lookup(curenv->env_pgdir, srcva, &pte)))
-		return -E_INVAL;
+		struct PageInfo* page = page_lookup(curenv->env_pgdir, srcva, &pte);
+		if(!page)
+			return -E_INVAL;		
 		if((perm & PTE_W) && !(*pte & PTE_W))
-		return -E_INVAL;
-		if(e->env_ipc_dstva < (void *)UTOP){
-		if((r = page_insert(e->env_pgdir, pg, e->env_ipc_dstva, perm)) < 0)
-			return r;
+			return -E_INVAL;
+		if(dst_env->env_ipc_dstva < (void *)UTOP){
+			ret = page_insert(dst_env->env_pgdir, page, dst_env->env_ipc_dstva, perm);
+			if(ret < 0)
+				return ret;
 		}
 	}
-	e->env_ipc_recving        = 0;
-	e->env_ipc_from           = curenv->env_id;
-	e->env_ipc_value          = value;
-	e->env_ipc_perm           = perm;
-	e->env_status             = ENV_RUNNABLE;
-	e->env_tf.tf_regs.reg_eax = 0;
+
+	dst_env->env_ipc_recving = 0;
+	dst_env->env_ipc_from = curenv->env_id;
+	dst_env->env_ipc_value = value;
+	dst_env->env_ipc_perm = srcva == (void *)UTOP ? 0 : perm;
+	dst_env->env_status = ENV_RUNNABLE;
+	dst_env->env_tf.tf_regs.reg_eax = 0;
+
+	//how to detect is there are enough memory in srcva?
 
 	return 0;
 }
@@ -455,26 +410,17 @@ sys_ipc_recv(void *dstva)
 	// LAB 4: Your code here.
 	// panic("sys_ipc_recv not implemented");
 
-	// int ret;
+	int ret;
 	
-	// if(dstva < (void *)UTOP){
-	// 	if((uint32_t)dstva % PGSIZE != 0)
-	// 		return -E_INVAL;
-	// }
-	// curenv->env_ipc_recving = 1;
-	// curenv->env_ipc_dstva = dstva;
-	// curenv->env_status = ENV_NOT_RUNNABLE;
-	// sched_yield();
-	// return 0;
-
-	if(!(dstva < (void*)UTOP) || !PGOFF(dstva)){
-		curenv->env_ipc_recving = 1;
-		curenv->env_ipc_dstva   = dstva;
-		curenv->env_status      = ENV_NOT_RUNNABLE;
-		sched_yield();
-		return 0;
+	if(dstva < (void *)UTOP){
+		if((uint32_t)dstva % PGSIZE != 0)
+			return -E_INVAL;
 	}
-	return -E_INVAL;
+	curenv->env_ipc_recving = 1;
+	curenv->env_ipc_dstva = dstva;
+	curenv->env_status = ENV_NOT_RUNNABLE;
+	sched_yield();
+	return 0;
 }
 
 static int
@@ -571,6 +517,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_env_set_pgfault_upcall:
 			ret = sys_env_set_pgfault_upcall((envid_t)a1, (void *)a2);
+			break;
+		case SYS_env_set_trapframe:
+			ret = sys_env_set_trapframe((envid_t)a1, (struct Trapframe*)a2);
 			break;
 		default:
 			ret = -E_INVAL;
