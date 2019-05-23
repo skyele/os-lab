@@ -64,7 +64,7 @@ alloc_block(void)
 
 	// LAB 5: Your code here.
 	// panic("alloc_block not implemented");
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	uint32_t blockno;
 	int r;
 	//1 - free, 0 - used
@@ -108,7 +108,7 @@ check_bitmap(void)
 void
 fs_init(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	static_assert(sizeof(struct File) == 256);
 
 	// Find a JOS disk.  Use the second IDE disk (number 1) if available
@@ -147,7 +147,7 @@ fs_init(void)
 static int
 file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool alloc)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r;
 	if(filebno >= NDIRECT + NINDIRECT)
 		return -E_INVAL;
@@ -183,7 +183,7 @@ file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool all
 int
 file_get_block(struct File *f, uint32_t filebno, char **blk)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
     // LAB 5: Your code here.
 	uint32_t *ppdiskbno;
    	int r;
@@ -281,7 +281,7 @@ skip_slash(const char *p)
 static int
 walk_path(const char *path, struct File **pdir, struct File **pf, char *lastelem)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	const char *p;
 	char name[MAXNAMELEN];
 	struct File *dir, *f;
@@ -338,7 +338,7 @@ walk_path(const char *path, struct File **pdir, struct File **pf, char *lastelem
 int
 file_create(const char *path, struct File **pf)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	char name[MAXNAMELEN];
 	int r;
 	struct File *dir, *f;
@@ -361,7 +361,7 @@ file_create(const char *path, struct File **pf)
 int
 file_open(const char *path, struct File **pf)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	cprintf("the path %s\n", path);
 	return walk_path(path, 0, pf, 0);
 }
@@ -372,7 +372,7 @@ file_open(const char *path, struct File **pf)
 ssize_t
 file_read(struct File *f, void *buf, size_t count, off_t offset)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r, bn;
 	off_t pos;
 	char *blk;
@@ -402,7 +402,7 @@ file_read(struct File *f, void *buf, size_t count, off_t offset)
 int
 file_write(struct File *f, const void *buf, size_t count, off_t offset)
 {
-	cprintf("in %s\n", __FUNCTION__);
+	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
 	int r, bn;
 	off_t pos;
 	char *blk;

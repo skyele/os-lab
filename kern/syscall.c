@@ -207,7 +207,6 @@ sys_page_alloc(envid_t envid, void *va, int perm)
 	struct PageInfo* page = page_alloc(ALLOC_ZERO);
 	if(page == NULL)
 		return -E_NO_MEM;
-	page->pp_ref++;//lab4 bug?
 	memset(page2kva(page), 0, PGSIZE);
 	ret = page_insert(e->env_pgdir, page, va, perm);
 	if(ret < 0){
@@ -286,16 +285,27 @@ sys_page_unmap(envid_t envid, void *va)
 {
 	// cprintf("%d: in %s\n", curenv->env_id, __FUNCTION__);
 	// Hint: This function is a wrapper around page_remove().
-	if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
-		return -E_INVAL;
-	struct Env* env;
-	int ret = envid2env(envid, &env, 1);
-	if(ret < 0)
-		return ret;
-	page_remove(env->env_pgdir, va);
-	return 0;
+	//lab5 replace
+	// if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
+	// 	return -E_INVAL;
+	// struct Env* env;
+	// int ret = envid2env(envid, &env, 1);
+	// if(ret < 0)
+	// 	return ret;
+	// page_remove(env->env_pgdir, va);
+	// return 0;
+
 	// LAB 4: Your code here.
 	// panic("sys_page_unmap not implemented");
+
+	struct Env *e;
+	int r;
+	if (((uintptr_t)va) >= UTOP || PGOFF(va))
+		return -E_INVAL;
+	if ((r = envid2env(envid, &e, 1)) < 0)
+		return r;
+	page_remove(e->env_pgdir, va);
+	return 0;
 }
 
 // Try to send 'value' to the target env 'envid'.

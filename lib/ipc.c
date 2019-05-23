@@ -66,7 +66,7 @@ void
 ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 {	
 	cprintf("%d: in %s\n", thisenv->env_id, __FUNCTION__);
-	cprintf("the envid: %d the val: %ud the pg 0x%x\n", to_env, val, pg);
+	cprintf("%d: the val: %ud the pg 0x%x\n", to_env, val, pg);
 	int ret;
 	if(!pg)
 		pg = (void *)UTOP;
