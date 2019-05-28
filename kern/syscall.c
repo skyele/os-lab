@@ -292,7 +292,7 @@ static int
 sys_page_unmap(envid_t envid, void *va)
 {
 	// Hint: This function is a wrapper around page_remove().
-
+	// cprintf("in %s the va: 0x%x\n", __FUNCTION__, va);
 	if((uint32_t)va >= UTOP || ((uint32_t)va)%PGSIZE != 0)
 		return -E_INVAL;
 	struct Env* env;

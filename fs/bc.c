@@ -1,6 +1,9 @@
 
 #include "fs.h"
 
+static int block_in_use = 0;
+static int water_line = 32;
+
 // Return the virtual address of this disk block.
 void*
 diskaddr(uint32_t blockno)
@@ -24,24 +27,39 @@ va_is_dirty(void *va)
 	return (uvpt[PGNUM(va)] & PTE_D) != 0;
 }
 
+// Is this virtual address accessed?
+bool
+va_is_accessed(void *va)
+{
+	return (uvpt[PGNUM(va)] & PTE_A) != 0;
+}
+
+void 
+va_clear_access_bit(void *va)
+{
+	sys_page_map(0, va, 0, va, uvpt[PGNUM(va)] & PTE_SYSCALL);
+	// sys_page_map(0, va, 0, va, PTE_SYSCALL);
+}
+
 // Fault any disk block that is read in to memory by
 // loading it from disk.
 static void
 bc_pgfault(struct UTrapframe *utf)
 {
+	cprintf("in %s\n", __FUNCTION__);
+	while(block_in_use >= water_line)
+		bc_evict(0);
+	// cprintf("the DISKMAP: 0x%x DISKMAP+DISKSIZE: 0x%x\n", DISKMAP, DISKMAP+DISKSIZE);
 	void *addr = (void *) utf->utf_fault_va;
 	uint32_t blockno = ((uint32_t)addr - DISKMAP) / BLKSIZE;
 	int r;
-
 	// Check that the fault was within the block cache region
 	if (addr < (void*)DISKMAP || addr >= (void*)(DISKMAP + DISKSIZE))
 		panic("page fault in FS: eip %08x, va %08x, err %04x",
 		      utf->utf_eip, addr, utf->utf_err);
-
 	// Sanity check the block number.
 	if (super && blockno >= super->s_nblocks)
 		panic("reading non-existent block %08x\n", blockno);
-
 	// Allocate a page in the disk map region, read the contents
 	// of the block from the disk into that page.
 	// Hint: first round addr to page boundary. fs/ide.c has code to read
@@ -49,15 +67,17 @@ bc_pgfault(struct UTrapframe *utf)
 	//
 	// LAB 5: you code here:
 	addr = ROUNDDOWN(addr, PGSIZE);
+	cprintf("block_in_use: %d, water_line: %d\n", block_in_use, water_line);
+	
 	r = sys_page_alloc(0, addr, PTE_P|PTE_U|PTE_W);
 	if(r < 0)
 		panic("the sys_page_alloc panic!\n");
+	block_in_use++;		
 	ide_read(blockno * BLKSECTS, addr, BLKSECTS);
 	// Clear the dirty bit for the disk block page since we just read the
 	// block from disk
 	if ((r = sys_page_map(0, addr, 0, addr, uvpt[PGNUM(addr)] & PTE_SYSCALL)) < 0)
 		panic("in bc_pgfault, sys_page_map: %e", r);
-
 	// Check that the block we read was allocated. (exercise for
 	// the reader: why do we do this *after* reading the block
 	// in?)
@@ -164,3 +184,37 @@ bc_init(void)
 	memmove(&super, diskaddr(1), sizeof super);
 }
 
+void 
+bc_evict(void* now_addr)
+{
+	int r;
+	// first unaccess 
+	for(int i = 3; i < super->s_nblocks; i++){
+		void *addr = diskaddr(i);
+		if(va_is_mapped(addr)){
+			if(va_is_accessed(addr)){
+				if(va_is_dirty(addr))
+					flush_block(addr);
+				if((r = sys_page_unmap(0, addr)) < 0)
+					panic("sys_page_unmap panic\n");
+				block_in_use--;
+				return;
+			}
+		}
+		va_clear_access_bit(addr);
+	}
+	//second access
+	for(int i = 3; i < super->s_nblocks; i++){
+		void *addr = diskaddr(i);
+		if(va_is_mapped(addr)){
+			if(va_is_dirty(addr))
+				flush_block(addr);
+			if((r = sys_page_unmap(0, addr)) < 0)
+				panic("sys_page_unmap panic\n");
+			va_clear_access_bit(addr);
+			block_in_use--;
+			return;
+		}
+		va_clear_access_bit(addr);
+	}
+}

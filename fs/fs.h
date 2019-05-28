@@ -25,8 +25,11 @@ int	ide_write(uint32_t secno, const void *src, size_t nsecs);
 void*	diskaddr(uint32_t blockno);
 bool	va_is_mapped(void *va);
 bool	va_is_dirty(void *va);
+bool    va_is_accessed(void *va);
+void    va_clear_access_bit(void *va);
 void	flush_block(void *addr);
 void	bc_init(void);
+void    bc_evict(void*);
 
 /* fs.c */
 void	fs_init(void);

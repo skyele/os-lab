@@ -8,6 +8,7 @@ static char *msg = "This is the NEW message of the day!\n\n";
 void
 fs_test(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	struct File *f;
 	int r;
 	char *blk;

@@ -115,6 +115,7 @@ devfile_read(struct Fd *fd, void *buf, size_t n)
 	// filling fsipcbuf.read with the request arguments.  The
 	// bytes read will be written back to fsipcbuf by the file
 	// system server.
+	cprintf("in %s\n", __FUNCTION__);
 	int r;
 
 	fsipcbuf.read.req_fileid = fd->fd_file.id;

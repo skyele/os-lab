@@ -195,6 +195,7 @@ file_get_block(struct File *f, uint32_t filebno, char **blk)
 		*ppdiskbno = r;
 	}
 	*blk = diskaddr(*ppdiskbno);
+	cprintf("the block get %d block to read\n", *ppdiskbno);
 	return 0;
 	// panic("file_get_block not implemented");
 }
@@ -365,24 +366,27 @@ file_open(const char *path, struct File **pf)
 ssize_t
 file_read(struct File *f, void *buf, size_t count, off_t offset)
 {
+	cprintf("in %s\n", __FUNCTION__);
+	cprintf("the count: %d\n", count);
 	int r, bn;
 	off_t pos;
 	char *blk;
 
-	if (offset >= f->f_size)
+	if (offset >= f->f_size){
+		cprintf("1?\n");
 		return 0;
+	}
 
 	count = MIN(count, f->f_size - offset);
-
 	for (pos = offset; pos < offset + count; ) {
 		if ((r = file_get_block(f, pos / BLKSIZE, &blk)) < 0)
 			return r;
 		bn = MIN(BLKSIZE - pos % BLKSIZE, offset + count - pos);
 		memmove(buf, blk + pos % BLKSIZE, bn);
+		cprintf("the buf: %d\n", *(int *)buf);
 		pos += bn;
 		buf += bn;
 	}
-
 	return count;
 }
 
