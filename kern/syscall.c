@@ -12,6 +12,7 @@
 #include <kern/console.h>
 #include <kern/sched.h>
 #include <kern/time.h>
+#include <kern/e1000.h>
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
@@ -300,6 +301,26 @@ sys_time_msec(void)
 {
 	// LAB 6: Your code here.
 	panic("sys_time_msec not implemented");
+}
+
+int
+sys_net_send(const void *buf, uint32_t len)
+{
+	// LAB 6: Your code here.
+	// Check the user permission to [buf, buf + len]
+	// Call e1000_tx to send the packet
+	// Hint: e1000_tx only accept kernel virtual address
+	return -1;
+}
+
+int
+sys_net_recv(void *buf, uint32_t len)
+{
+	// LAB 6: Your code here.
+	// Check the user permission to [buf, buf + len]
+	// Call e1000_rx to fill the buffer
+	// Hint: e1000_rx only accept kernel virtual address
+	return -1;
 }
 
 // Dispatches to the correct kernel function, passing the arguments.
