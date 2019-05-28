@@ -46,7 +46,6 @@ va_clear_access_bit(void *va)
 static void
 bc_pgfault(struct UTrapframe *utf)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	while(block_in_use >= water_line)
 		bc_evict(0);
 	// cprintf("the DISKMAP: 0x%x DISKMAP+DISKSIZE: 0x%x\n", DISKMAP, DISKMAP+DISKSIZE);
@@ -67,7 +66,6 @@ bc_pgfault(struct UTrapframe *utf)
 	//
 	// LAB 5: you code here:
 	addr = ROUNDDOWN(addr, PGSIZE);
-	cprintf("block_in_use: %d, water_line: %d\n", block_in_use, water_line);
 	
 	r = sys_page_alloc(0, addr, PTE_P|PTE_U|PTE_W);
 	if(r < 0)
