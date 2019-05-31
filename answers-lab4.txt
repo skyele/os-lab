@@ -1,13 +1,13 @@
 Exercise 1. Implement mmio_map_region in kern/pmap.c . To see how this is used, look at the beginning of lapic_init in kern/lapic.c . You'll have to do the next
 exercise, too, before the tests for mmio_map_region will run.
-	Í¨¹ıÔÄ¶Álapic_initº¯ÊıµÄ´úÂë£º
+	é€šè¿‡é˜…è¯»lapic_initå‡½æ•°çš„ä»£ç ï¼š
 lapic = mmio_map_region(lapicaddr, 4096);
-	Ò²¾ÍÊÇÔÚMMIOµÄĞéÄâµØÖ·Ö®ÉÏ£¬Îª´ÓÎïÀíµØÖ·lapicaddr¿ªÊ¼Ö®ºóµÄ4096¸ö×Ö½Ú£¬·ÖÅäÒ»Æ¬Á¬ĞøµÄĞéÄâµØÖ·¡£
-	Í¨¹ıµ÷ÓÃboot_map_region()º¯Êı£¬¿ÉÒÔ½«ÎïÀíµØÖ·paÖ®ºósize¸öbytes£¬Ó³Éäµ½´Ó³õÊ¼ÖµÎªMMIOµÄbaseĞéÄâµØÖ·¿Õ¼ä¡£ÆäÖĞÒªÖ÷ÒåµÄÊÇ£¬ÎÒÃÇĞèÒª×¢ÒâµÄÊÇ£¬ÓÉÓÚÕâÊÇlapicµÄio memory£¬Óë³£¹æµÄmemory²»Í¬¡£²»Í¬Ö®´¦ÔÚÓÚ£¬¶ÔÓÚ³£¹æµÄmemory£¬ÎÒÃÇÄ¬ÈÏcacheÖĞµÄÊı¾İÊÇ±ÈmemoryĞÂµÄ£¬Òò´Ë£¬cpu×ÜÊÇÏÈÔÚcacheÖĞ¶ÁÈ¡»º´æµÄmemoryµÄÊı¾İ¡£¶ø¶ÔÓÚlapicÕâÖÖmmioÓ³ÉäµÄmemory£¬memoryÖĞµÄÊı¾İÊÇ»á±ÈcacheÖĞ¸üĞÂµÄ£¬ÒòÎªËüµÄÊı¾İÖ±½ÓÀ´×ÔÓ²¼ş¡£Òò´ËÎÒÃÇÒªÏÔÊ¾µÄ¸æËßcpu£¬²»ÄÜ´ÓcacheÖĞ¶ÁÊı¾İ£¬Òò´ËĞèÒªÖÃÉÏÏàÓ¦µÄÎ»£ºPTE_PCD | PTE_PWT. 
+	ä¹Ÿå°±æ˜¯åœ¨MMIOçš„è™šæ‹Ÿåœ°å€ä¹‹ä¸Šï¼Œä¸ºä»ç‰©ç†åœ°å€lapicaddrå¼€å§‹ä¹‹åçš„4096ä¸ªå­—èŠ‚ï¼Œåˆ†é…ä¸€ç‰‡è¿ç»­çš„è™šæ‹Ÿåœ°å€ã€‚
+	é€šè¿‡è°ƒç”¨boot_map_region()å‡½æ•°ï¼Œå¯ä»¥å°†ç‰©ç†åœ°å€paä¹‹åsizeä¸ªbytesï¼Œæ˜ å°„åˆ°ä»åˆå§‹å€¼ä¸ºMMIOçš„baseè™šæ‹Ÿåœ°å€ç©ºé—´ã€‚å…¶ä¸­è¦ä¸»ä¹‰çš„æ˜¯ï¼Œæˆ‘ä»¬éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œç”±äºè¿™æ˜¯lapicçš„io memoryï¼Œä¸å¸¸è§„çš„memoryä¸åŒã€‚ä¸åŒä¹‹å¤„åœ¨äºï¼Œå¯¹äºå¸¸è§„çš„memoryï¼Œæˆ‘ä»¬é»˜è®¤cacheä¸­çš„æ•°æ®æ˜¯æ¯”memoryæ–°çš„ï¼Œå› æ­¤ï¼Œcpuæ€»æ˜¯å…ˆåœ¨cacheä¸­è¯»å–ç¼“å­˜çš„memoryçš„æ•°æ®ã€‚è€Œå¯¹äºlapicè¿™ç§mmioæ˜ å°„çš„memoryï¼Œmemoryä¸­çš„æ•°æ®æ˜¯ä¼šæ¯”cacheä¸­æ›´æ–°çš„ï¼Œå› ä¸ºå®ƒçš„æ•°æ®ç›´æ¥æ¥è‡ªç¡¬ä»¶ã€‚å› æ­¤æˆ‘ä»¬è¦æ˜¾ç¤ºçš„å‘Šè¯‰cpuï¼Œä¸èƒ½ä»cacheä¸­è¯»æ•°æ®ï¼Œå› æ­¤éœ€è¦ç½®ä¸Šç›¸åº”çš„ä½ï¼šPTE_PCD | PTE_PWT. 
 
 Exercise 2. Read boot_aps() and mp_main() in kern/init.c , and the assembly
 code in kern/mpentry.S . Make sure you understand the control flow transfer during the bootstrap of APs. Then modify your implementation of page_init() in kern/pmap.c to avoid adding the page at MPENTRY_PADDR to the free list, so that we can safely copy and run AP bootstrap code at that physical address. Your code should pass the updated check_page_free_list() test (but might fail the updated check_kern_pgdir() test, which we will fix soon).
-	Ö»ÒªÔÚpage_init()ÖĞ¶ÔÓÚpagesµÄ³õÊ¼»¯ÖĞ£¬¼ÓÈë¶ÔÓÚµØÖ·ÎªMPENTRY_PADDRÊ±£¬²»Òª°ÑÕâÆ¬µØÖ·¼ÓÈëpage_free_list¼´¿É¡£´úÂëÈçÏÂ£º
+	åªè¦åœ¨page_init()ä¸­å¯¹äºpagesçš„åˆå§‹åŒ–ä¸­ï¼ŒåŠ å…¥å¯¹äºåœ°å€ä¸ºMPENTRY_PADDRæ—¶ï¼Œä¸è¦æŠŠè¿™ç‰‡åœ°å€åŠ å…¥page_free_listå³å¯ã€‚ä»£ç å¦‚ä¸‹ï¼š
 else if(i == MPENTRY_PADDR/PGSIZE){
 	pages[i].pp_ref = 1;
 	pages[i].pp_link = NULL;
@@ -18,17 +18,17 @@ Question
 kern/mpentry.S is compiled and linked to run above KERNBASE just like
 everything else in the kernel, what is the purpose of macro MPBOOTPHYS ? Why is it necessary in kern/mpentry.S but not in boot/boot.S ? In other words, what could go wrong if it were omitted in kern/mpentry.S ?
 Hint: recall the differences between the link address and the load address that we have discussed in Lab 1.
-	MPBOOTPHYSÓÃÓÚ¼ÆËãsymbolµÄ¾ø¶ÔµØÖ·¡£ÒòÎªÁ´½ÓÊ±µØÖ·²¢²»Ò»¶¨µÈÓÚ¼ÓÔØÊ±µØÖ·£¬Òò´Ë²»ÄÜÒÀ¿¿Á´½ÓÆ÷À´¼ÆËãÕâ¸öµØÖ·¡£
+	MPBOOTPHYSç”¨äºè®¡ç®—symbolçš„ç»å¯¹åœ°å€ã€‚å› ä¸ºé“¾æ¥æ—¶åœ°å€å¹¶ä¸ä¸€å®šç­‰äºåŠ è½½æ—¶åœ°å€ï¼Œå› æ­¤ä¸èƒ½ä¾é é“¾æ¥å™¨æ¥è®¡ç®—è¿™ä¸ªåœ°å€ã€‚
 
 Exercise 3. Modify mem_init_mp() (in kern/pmap.c ) to map per-CPU stacks starting at KSTACKTOP , as shown in inc/memlayout.h . The size of each stack is KSTKSIZE
-	ÎªÁËÖ§³Ösymmetric multiple processor£¬ÎÒÃÇĞèÒª¶Ô²»Í¬µÄcpu·ÖÅä²»Í¬µÄÕ»¡£ÔÄ¶Ámemorylayout.hÖĞµÄ´úÂë£¬ÔÚKSTACKTOPµÄÏÂÃæÒÑ¾­Îª²»Í¬µÄcpuÔ¤ÁôÁËÕ»¿Õ¼ä£¬Òò´Ë£¬ÔÚmem_init_mpÖĞ£¬Ö±½Óµ÷ÓÃboot_map_regionÎªÃ¿Ò»¸östack·ÖÅäÒ»¸öÎïÀíÒ³¼´¿É¡£´úÂëÈçÏÂ£º
+	ä¸ºäº†æ”¯æŒsymmetric multiple processorï¼Œæˆ‘ä»¬éœ€è¦å¯¹ä¸åŒçš„cpuåˆ†é…ä¸åŒçš„æ ˆã€‚é˜…è¯»memorylayout.hä¸­çš„ä»£ç ï¼Œåœ¨KSTACKTOPçš„ä¸‹é¢å·²ç»ä¸ºä¸åŒçš„cpué¢„ç•™äº†æ ˆç©ºé—´ï¼Œå› æ­¤ï¼Œåœ¨mem_init_mpä¸­ï¼Œç›´æ¥è°ƒç”¨boot_map_regionä¸ºæ¯ä¸€ä¸ªstackåˆ†é…ä¸€ä¸ªç‰©ç†é¡µå³å¯ã€‚ä»£ç å¦‚ä¸‹ï¼š
 for(int i = 0; i < NCPU; i++){
 	boot_map_region(kern_pgdir, KSTACKTOP - i * (KSTKSIZE + KSTKGAP) - KSTKSIZE,
 	KSTKSIZE, PADDR((percpu_kstacks[i])), PTE_W);
 }
 
 Exercise 4. The code in trap_init_percpu() ( kern/trap.c ) initializes the TSS and TSS descriptor for the BSP. It worked in Lab 3, but is incorrect when running on other CPUs. Change the code so that it can work on all CPUs. (Note: your new code should not use the global ts variable any more.)
-	lab3ÖĞµÄtrap_init_percpu£¬ÊÇÖ»Òª·şÎñÒ»¸öcpu¼´¿É¡£Òò´ËtsºÍstackÖ»Òª³õÊ¼»¯cpu0µÄ¼´¿É¡£µ«ÊÇµ½SMPÖĞ£¬¶àºËµÄÇé¾°ÏÂ£¬ÕâÖÖÓ²±àÂë·½Ê½²»ÔÙºÏÊÊ£¬ÎÒÃÇĞèÒªÍ¨¹ıthiscpu->cpu_tsÀ´Ö¸´úµ±Ç°cpuµÄts¡£Í¬Ê±tssÒ²ĞèÒªĞŞ¸Ä³ÉÎª¶ÔÓ¦Ã¿Ò»¸öcpuµÄtss¡£Ò²¼´½«GD_TSS0Ìæ»»ÎªGD_TSS0 + (cpunum() << 3)¼´¿É¡£ÔÚÌæ»»¹ıºó£¬´úÂëÈçÏÂ£º
+	lab3ä¸­çš„trap_init_percpuï¼Œæ˜¯åªè¦æœåŠ¡ä¸€ä¸ªcpuå³å¯ã€‚å› æ­¤tså’Œstackåªè¦åˆå§‹åŒ–cpu0çš„å³å¯ã€‚ä½†æ˜¯åˆ°SMPä¸­ï¼Œå¤šæ ¸çš„æƒ…æ™¯ä¸‹ï¼Œè¿™ç§ç¡¬ç¼–ç æ–¹å¼ä¸å†åˆé€‚ï¼Œæˆ‘ä»¬éœ€è¦é€šè¿‡thiscpu->cpu_tsæ¥æŒ‡ä»£å½“å‰cpuçš„tsã€‚åŒæ—¶tssä¹Ÿéœ€è¦ä¿®æ”¹æˆä¸ºå¯¹åº”æ¯ä¸€ä¸ªcpuçš„tssã€‚ä¹Ÿå³å°†GD_TSS0æ›¿æ¢ä¸ºGD_TSS0 + (cpunum() << 3)å³å¯ã€‚åœ¨æ›¿æ¢è¿‡åï¼Œä»£ç å¦‚ä¸‹ï¼š
 int i = cpunum();
 (thiscpu->cpu_ts).ts_esp0 = KSTACKTOP - i * (KSTKSIZE + KSTKGAP);
 (thiscpu->cpu_ts).ts_ss0 = GD_KD;
@@ -42,16 +42,16 @@ lidt(&idt_pd);
 
 Exercise 5. Apply the big kernel lock as described above, by calling lock_kernel()
 and unlock_kernel() at the proper locations.
-	ÔÚ¶àºËÇéĞÎÏÂ£¬ÓÉÓÚÄÚºË±»Ó³ÉäÎªÍ¬Ò»ÎïÀíµØÖ·£¬Òò´ËÎÒÃÇĞèÒªÓÃlockÀ´±£»¤kernelµÄÖ´ĞĞ¡£ÏµÍ³µÄspinlockÊµÏÖÎªÎÒÃÇÌá¹©ÁËlock_kernel()ºÍunlock_kernelµÄº¯ÊıÊµÏÖ£¬¹©ÎÒÃÇÄÃËøºÍ·ÅËø¡£ÄÇÃ´¾ßÌå¼ÓËøºÍ·ÅËøµÄÎ»ÖÃÔÚÄÄÄØ£¿ÍøÕ¾ÒÑ¾­¸ø³öÁË¾ßÌåÎ»ÖÃ£¬ËûÃÇ·Ö±ğÔÚ
-1.i386_init(),ĞèÒªÔÚBSP»½ĞÑÆäËûcpuÇ°ÄÃËø
-2.ĞèÒªÔÚmp_mainÖĞ£¬³õÊ¼»¯apÖ®ºóÄÃËø
-3.ĞèÒªÔÚtrap()º¯ÊıÖĞ£¬È·¶¨ÊÇÔÚÓÃ»§Ì¬´¥·¢µÄtrapµÄÇé¿öÏÂÄÃËø¡£
-4.ĞèÒªÔÚenv_run()º¯ÊıÖĞ£¬ÔÚÇĞ»»µ½ÓÃ»§Ì¬Ö®Ç°·ÅËø¡£
+	åœ¨å¤šæ ¸æƒ…å½¢ä¸‹ï¼Œç”±äºå†…æ ¸è¢«æ˜ å°„ä¸ºåŒä¸€ç‰©ç†åœ°å€ï¼Œå› æ­¤æˆ‘ä»¬éœ€è¦ç”¨lockæ¥ä¿æŠ¤kernelçš„æ‰§è¡Œã€‚ç³»ç»Ÿçš„spinlockå®ç°ä¸ºæˆ‘ä»¬æä¾›äº†lock_kernel()å’Œunlock_kernelçš„å‡½æ•°å®ç°ï¼Œä¾›æˆ‘ä»¬æ‹¿é”å’Œæ”¾é”ã€‚é‚£ä¹ˆå…·ä½“åŠ é”å’Œæ”¾é”çš„ä½ç½®åœ¨å“ªå‘¢ï¼Ÿç½‘ç«™å·²ç»ç»™å‡ºäº†å…·ä½“ä½ç½®ï¼Œä»–ä»¬åˆ†åˆ«åœ¨
+1.i386_init(),éœ€è¦åœ¨BSPå”¤é†’å…¶ä»–cpuå‰æ‹¿é”
+2.éœ€è¦åœ¨mp_mainä¸­ï¼Œåˆå§‹åŒ–apä¹‹åæ‹¿é”
+3.éœ€è¦åœ¨trap()å‡½æ•°ä¸­ï¼Œç¡®å®šæ˜¯åœ¨ç”¨æˆ·æ€è§¦å‘çš„trapçš„æƒ…å†µä¸‹æ‹¿é”ã€‚
+4.éœ€è¦åœ¨env_run()å‡½æ•°ä¸­ï¼Œåœ¨åˆ‡æ¢åˆ°ç”¨æˆ·æ€ä¹‹å‰æ”¾é”ã€‚
 
 Question 2. It seems that using the big kernel lock guarantees that only one CPU can run the kernel code at a time. Why do we still need separate kernel stacks for each CPU?
 Describe a scenario in which using a shared kernel stack will go wrong, even with the protection of the big kernel lock
-1.	Èç¹ûĞèÒªkernel±ä³É¿É¶àÏß³ÌÔËĞĞ»òÕß¿ÉÒÔ±»ÖĞ¶ÏµÄ£¬ÄÇÃ´ÎÒÃÇĞèÒª²»Í¬µÄÕ»À´±£´æµ±Ç°cpuµÄÔËĞĞ×´Ì¬¡£
-2.	Èç¹ûĞèÒªÖ§³ÖÏß³ÌÔÚºË¼äµÄÇ¨ÒÆ£¬ÕâÑùÒ²ĞèÒª¶à¸öcpustack¡£
+1.	å¦‚æœéœ€è¦kernelå˜æˆå¯å¤šçº¿ç¨‹è¿è¡Œæˆ–è€…å¯ä»¥è¢«ä¸­æ–­çš„ï¼Œé‚£ä¹ˆæˆ‘ä»¬éœ€è¦ä¸åŒçš„æ ˆæ¥ä¿å­˜å½“å‰cpuçš„è¿è¡ŒçŠ¶æ€ã€‚
+2.	å¦‚æœéœ€è¦æ”¯æŒçº¿ç¨‹åœ¨æ ¸é—´çš„è¿ç§»ï¼Œè¿™æ ·ä¹Ÿéœ€è¦å¤šä¸ªcpustackã€‚
 
 Exercise 6. Implement round-robin scheduling in sched_yield() as described above. Don't forget to modify syscall() to dispatch sys_yield() .
 Make sure to invoke sched_yield() in mp_main .
@@ -72,7 +72,7 @@ Back in environment 00001002, iteration 1.
 ...
 After the yield programs exit, there will be no runnable environment in the system, the
 scheduler should invoke the JOS kernel monitor. If any of this does not happen, then fix your code before proceeding.
-	ÈçºÎÊµÏÖround-robinµÄµ÷¶È²ßÂÔÄØ£¿ÄÇ¾ÍÊÇÔÚÃ¿´Îµ÷ÓÃenv_runµÄÊ±ºò£¬ÕÒµ½ÏÂÒ»¸östatusÎªENV_RUNNABLEµÄenvÈ¥ÅÜ¡£¾ßÌå´úÂëÈçÏÂ£º			int i;
+	å¦‚ä½•å®ç°round-robinçš„è°ƒåº¦ç­–ç•¥å‘¢ï¼Ÿé‚£å°±æ˜¯åœ¨æ¯æ¬¡è°ƒç”¨env_runçš„æ—¶å€™ï¼Œæ‰¾åˆ°ä¸‹ä¸€ä¸ªstatusä¸ºENV_RUNNABLEçš„envå»è·‘ã€‚å…·ä½“ä»£ç å¦‚ä¸‹ï¼š			int i;
 if(curenv){
 	envid_t cur_tone = ENVX(curenv->env_id);
 	for(i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
@@ -90,15 +90,15 @@ else{
 	  	}
 }
 sched_halt();
-	¸ù¾İÌáÊ¾£¬ÎÒÃÇÊ×ÏÈĞèÒªÅĞ¶Ï£¬µ±Ç°ÊÇ·ñÒÑ¾­ÓĞenvironmentÔÚÔËĞĞ¡£Èç¹ûÃ»ÓĞ£¬Ôò±éÀúÕû¸öenvsÊı×é£¬ÕÒµ½statusÎªENV_RUNNABLEµÄenvironmentÀ´Ö´ĞĞ¾ÍĞĞ¡£Èç¹ûÓĞ£¬ÄÇÃ´¾Í´ÓÕâ¸öenv¿ªÊ¼ÍùºóÃæ²éÑ¯¼´¿É¡£
-µ«ÊÇÔÚ×öround-robinµÄÊ±ºò£¬ÎÒ·¢ÏÖ×Ü³öÏÖÎŞÏŞÖØÆôµÄÇé¿ö£¬¶¨Î»ºó·¢ÏÖ£¬ÊÇÔ­À´µÄboot_map_region_largeÒıÈëµÄÎÊÌâ¡£Ö±½Ó½«boot_map_region_largeÌæ»»³Éboot_map_region¼´¿É¡£
+	æ ¹æ®æç¤ºï¼Œæˆ‘ä»¬é¦–å…ˆéœ€è¦åˆ¤æ–­ï¼Œå½“å‰æ˜¯å¦å·²ç»æœ‰environmentåœ¨è¿è¡Œã€‚å¦‚æœæ²¡æœ‰ï¼Œåˆ™éå†æ•´ä¸ªenvsæ•°ç»„ï¼Œæ‰¾åˆ°statusä¸ºENV_RUNNABLEçš„environmentæ¥æ‰§è¡Œå°±è¡Œã€‚å¦‚æœæœ‰ï¼Œé‚£ä¹ˆå°±ä»è¿™ä¸ªenvå¼€å§‹å¾€åé¢æŸ¥è¯¢å³å¯ã€‚
+ä½†æ˜¯åœ¨åšround-robinçš„æ—¶å€™ï¼Œæˆ‘å‘ç°æ€»å‡ºç°æ— é™é‡å¯çš„æƒ…å†µï¼Œå®šä½åå‘ç°ï¼Œæ˜¯åŸæ¥çš„boot_map_region_largeå¼•å…¥çš„é—®é¢˜ã€‚ç›´æ¥å°†boot_map_region_largeæ›¿æ¢æˆboot_map_regionå³å¯ã€‚
 
 Question 3. In your implementation of env_run() you should have called lcr3() . Before and after the call to lcr3() , your code makes references (at least it should) to the variable e , the argument to env_run . Upon loading the %cr3 register, the addressing context used by the MMU is instantly changed. But a virtual address (namely e ) has meaning relative to a given address context--the address context specifies the physical address to which the virtual address maps. Why can the pointer e be dereferenced both before and after the addressing switch?
-	ÒòÎªeµÄĞéÄâµØÖ·ÔÚÄÚºËÇøÓò£¬¶øËùÓĞenvµÄÄÚºËÇøÓòÓ³Éä¶¼ÏàÍ¬£¬Òò´ËÔÚlcr3Ö®ºó½âÒıÓÃÒ²ÊÇÍ¬ÑùµÄÖµ¡£
+	å› ä¸ºeçš„è™šæ‹Ÿåœ°å€åœ¨å†…æ ¸åŒºåŸŸï¼Œè€Œæ‰€æœ‰envçš„å†…æ ¸åŒºåŸŸæ˜ å°„éƒ½ç›¸åŒï¼Œå› æ­¤åœ¨lcr3ä¹‹åè§£å¼•ç”¨ä¹Ÿæ˜¯åŒæ ·çš„å€¼ã€‚
 
 4. Whenever the kernel switches from one environment to another, it must ensure the old environment's registers are saved so they can be restored properly later. Why? Where does this happen?
-	ÒòÎªÔÚÎÒÃÇµÄosÊµÏÖÀï£¬envÊÇĞèÒª²»¶Ï±»µ÷¶ÈµÄ£¬Òò´Ë£¬ÔÚµ÷¶Èµ½ËüµÄÊ±ºò£¬ĞèÒª½Ó×ÅÉÏÒ»´Î±»´ò¶ÏÖ´ĞĞµÄµØ·½¼ÌĞøÖ´ĞĞ£¬Òò´Ë±»´ò¶ÏµÄÊ±ºòĞèÒª±£´æµ±Ç°×´Ì¬£¬Òò´ËĞèÒªsave old env¡¯s registers.
-	µ±Ò»¸öenv´ÓÓÃ»§Ì¬µ½ÄÚºËÌ¬µÄÊ±ºò£¬ËüµÄregister±»±£´æÔÚtrapframeµÄÊı¾İ½á¹¹ÖĞ¡£Õâ¸öÂß¼­ÊÇÔÚ_alltrapsÖĞ±»ÊµÏÖµÄ¡£¶øµ±envĞèÒª±»»Ö¸´µÄÊ±ºò£¬ÔÚÇĞ»»»ØÓÃ»§Ì¬µÄÊ±ºò£¬ÎÒÃÇµ÷ÓÃenv_pop_tfº¯ÊıÀ´»Ö¸´¼Ä´æÆ÷¡£
+	å› ä¸ºåœ¨æˆ‘ä»¬çš„oså®ç°é‡Œï¼Œenvæ˜¯éœ€è¦ä¸æ–­è¢«è°ƒåº¦çš„ï¼Œå› æ­¤ï¼Œåœ¨è°ƒåº¦åˆ°å®ƒçš„æ—¶å€™ï¼Œéœ€è¦æ¥ç€ä¸Šä¸€æ¬¡è¢«æ‰“æ–­æ‰§è¡Œçš„åœ°æ–¹ç»§ç»­æ‰§è¡Œï¼Œå› æ­¤è¢«æ‰“æ–­çš„æ—¶å€™éœ€è¦ä¿å­˜å½“å‰çŠ¶æ€ï¼Œå› æ­¤éœ€è¦save old envâ€™s registers.
+	å½“ä¸€ä¸ªenvä»ç”¨æˆ·æ€åˆ°å†…æ ¸æ€çš„æ—¶å€™ï¼Œå®ƒçš„registerè¢«ä¿å­˜åœ¨trapframeçš„æ•°æ®ç»“æ„ä¸­ã€‚è¿™ä¸ªé€»è¾‘æ˜¯åœ¨_alltrapsä¸­è¢«å®ç°çš„ã€‚è€Œå½“envéœ€è¦è¢«æ¢å¤çš„æ—¶å€™ï¼Œåœ¨åˆ‡æ¢å›ç”¨æˆ·æ€çš„æ—¶å€™ï¼Œæˆ‘ä»¬è°ƒç”¨env_pop_tfå‡½æ•°æ¥æ¢å¤å¯„å­˜å™¨ã€‚
 
 Exercise 7. Implement the system calls described above in kern/syscall.c and make
 sure syscall() calls them. You will need to use various functions in kern/pmap.c
@@ -106,12 +106,12 @@ and kern/env.c , particularly envid2env() . For now, whenever you call
 envid2env() , pass 1 in the checkperm parameter. Be sure you check for any invalid
 system call arguments, returning -E_INVAL in that case. Test your JOS kernel with
 user/dumbfork and make sure it works before proceeding.
-	ÏÖÔÚĞèÒª×öµÄÊÇÊµÏÖÏµÍ³µ÷ÓÃº¯Êı¡£
-	Ê×ÏÈÒªĞ´µÄÊÇsys_exoforkº¯Êı¡£¸Ãº¯ÊıµÄ×÷ÓÃÊÇ£ºÊ¹ÓÃenv_allocÀ´»ñµÃÒ»¸öĞÂµÄenvironment¡£ÓÉÓÚÊÇforkµ÷ÓÃµÄ£¬ÄÇÃ´new environmentÓ¦¸ÃºÍ¾ÉµÄenvÓĞÍ¬ÑùµÄ¼Ä´æÆ÷¶Ñ¡£Î¨Ò»²»Í¬µÄÊÇfork»á·µ»ØÁ½´Î£¬ÄÇÃ´·µ»ØÖµ·Ö±ğÊÇfork²úÉúµÄenvµÄenv_id,¶øÔÚsys_exoforkÖĞ£¬ÎÒÃÇĞèÒª½«env_tf.tf_regs.reg_eax¸³Öµ³É0£¬Ö»ÓĞÕâÑù²ÅÄÜforkµÄÁ½´Î·µ»Ø£¬½á¹û²»Í¬¡£
-	½ÓÏÂÀ´ÊÇsys_env_set_statusº¯Êı¡£Õâ¸öº¯Êı¹ËÃûË¼Òå£¬ÒâË¼ÆäÊµ¾ÍÊÇÍ¨¹ıÏµÍ³µ÷ÓÃ£¬½«Ä³i¸öenvµÄstatus¸³ÖµÎªsys_env_set_statusº¯ÊıµÄ²ÎÊıstatus¡£
-sys_page_allocÏµÍ³µ÷ÓÃ¡£Ê×ÏÈÍ¨¹ıpage_alloc·ÖÅäÒ»¸öÎïÀíÒ³£¬È»ºóÊ¹ÓÃpage_insertº¯Êı£¬½«vaÓ³Éäµ½¶ÔÓ¦µÄpage£¬ÆäÈ¨ÏŞÎªperm¡£
-	sys_page_mapº¯ÊıµÄÓïÒåÊÇ½«Î»ÓÚÔ´envµÄsrcvaµØÖ·´¦µÄÎïÀíÒ³Ó³Éäµ½Ä¿µÄenvµÄdstvaµØÖ·´¦¡£Òò´Ë£¬ÎÒÃÇÊ×ÏÈĞèÒªÊ¹ÓÃpage_lookupº¯ÊıÀ´ÕÒµ½srcva¶ÔÓ¦µÄÎïÀíÒ³£¬È»ºóÍ¨¹ıµ÷ÓÃpage_insertº¯Êı½«dstvaÓ³Éäµ½¶ÔÓ¦ÎïÀíÒ³¡£
-sys_page_unmapº¯ÊıÓïÒåÊÇ½â³ıenvid¶ÔÓ¦ĞéÄâµØÖ·vaÓëÒ»ÎïÀíÒ³µÄÓ³Éä¡£¹Ø¼üÊÇÊ¹ÓÃpage_removeÀ´½â³ı°ó¶¨¡£ÕâÀï´úÂëÈçÏÂ£º
+	ç°åœ¨éœ€è¦åšçš„æ˜¯å®ç°ç³»ç»Ÿè°ƒç”¨å‡½æ•°ã€‚
+	é¦–å…ˆè¦å†™çš„æ˜¯sys_exoforkå‡½æ•°ã€‚è¯¥å‡½æ•°çš„ä½œç”¨æ˜¯ï¼šä½¿ç”¨env_allocæ¥è·å¾—ä¸€ä¸ªæ–°çš„environmentã€‚ç”±äºæ˜¯forkè°ƒç”¨çš„ï¼Œé‚£ä¹ˆnew environmentåº”è¯¥å’Œæ—§çš„envæœ‰åŒæ ·çš„å¯„å­˜å™¨å †ã€‚å”¯ä¸€ä¸åŒçš„æ˜¯forkä¼šè¿”å›ä¸¤æ¬¡ï¼Œé‚£ä¹ˆè¿”å›å€¼åˆ†åˆ«æ˜¯forkäº§ç”Ÿçš„envçš„env_id,è€Œåœ¨sys_exoforkä¸­ï¼Œæˆ‘ä»¬éœ€è¦å°†env_tf.tf_regs.reg_eaxèµ‹å€¼æˆ0ï¼Œåªæœ‰è¿™æ ·æ‰èƒ½forkçš„ä¸¤æ¬¡è¿”å›ï¼Œç»“æœä¸åŒã€‚
+	æ¥ä¸‹æ¥æ˜¯sys_env_set_statuså‡½æ•°ã€‚è¿™ä¸ªå‡½æ•°é¡¾åæ€ä¹‰ï¼Œæ„æ€å…¶å®å°±æ˜¯é€šè¿‡ç³»ç»Ÿè°ƒç”¨ï¼Œå°†æŸiä¸ªenvçš„statusèµ‹å€¼ä¸ºsys_env_set_statuså‡½æ•°çš„å‚æ•°statusã€‚
+sys_page_allocç³»ç»Ÿè°ƒç”¨ã€‚é¦–å…ˆé€šè¿‡page_allocåˆ†é…ä¸€ä¸ªç‰©ç†é¡µï¼Œç„¶åä½¿ç”¨page_insertå‡½æ•°ï¼Œå°†vaæ˜ å°„åˆ°å¯¹åº”çš„pageï¼Œå…¶æƒé™ä¸ºpermã€‚
+	sys_page_mapå‡½æ•°çš„è¯­ä¹‰æ˜¯å°†ä½äºæºenvçš„srcvaåœ°å€å¤„çš„ç‰©ç†é¡µæ˜ å°„åˆ°ç›®çš„envçš„dstvaåœ°å€å¤„ã€‚å› æ­¤ï¼Œæˆ‘ä»¬é¦–å…ˆéœ€è¦ä½¿ç”¨page_lookupå‡½æ•°æ¥æ‰¾åˆ°srcvaå¯¹åº”çš„ç‰©ç†é¡µï¼Œç„¶åé€šè¿‡è°ƒç”¨page_insertå‡½æ•°å°†dstvaæ˜ å°„åˆ°å¯¹åº”ç‰©ç†é¡µã€‚
+sys_page_unmapå‡½æ•°è¯­ä¹‰æ˜¯è§£é™¤envidå¯¹åº”è™šæ‹Ÿåœ°å€vaä¸ä¸€ç‰©ç†é¡µçš„æ˜ å°„ã€‚å…³é”®æ˜¯ä½¿ç”¨page_removeæ¥è§£é™¤ç»‘å®šã€‚è¿™é‡Œä»£ç å¦‚ä¸‹ï¼š
 
 struct Env* env;
 int ret = envid2env(envid, &env, 1);
@@ -120,12 +120,12 @@ if(ret < 0)
 page_remove(env->env_pgdir, va);
 	return 0;
 
-	ĞèÒª×¢ÒâµÄÊÇ£¬ÔÚÊµÏÖÕâĞ©ÏµÍ³µ÷ÓÃÊ±£¬ĞèÒªÆµ·±µÄÊ¹ÓÃenvid2env()º¯Êı£¬¶ÔÓÚ´Ëº¯ÊıµÄcheckperm£¬ÔÚÊµÏÖµÄ¹ı³ÌÖĞ¶¼ÒªÖÃÎª1.
+	éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œåœ¨å®ç°è¿™äº›ç³»ç»Ÿè°ƒç”¨æ—¶ï¼Œéœ€è¦é¢‘ç¹çš„ä½¿ç”¨envid2env()å‡½æ•°ï¼Œå¯¹äºæ­¤å‡½æ•°çš„checkpermï¼Œåœ¨å®ç°çš„è¿‡ç¨‹ä¸­éƒ½è¦ç½®ä¸º1.
 
 Exercise 8. Implement the sys_env_set_pgfault_upcall system call. Be sure to
 enable permission checking when looking up the environment ID of the target
 environment, since this is a "dangerous" system call.
-	sys_env_set_pgfault_upcallÏµÍ³µ÷ÓÃµÄÊµÏÖ£¬ÓÉÓÚÆäÖĞÉæ¼°µ½Ê¹ÓÃenvid2envº¯Êı£¬ÎÒÃÇĞèÒª¹Ø×¢checkperm²ÎÊı¡£ÕâÀïÎÒÃÇĞèÒª½«ÆäÖÃÎª1¡£È»ºó½«func¸³Öµ¸ø¶ÔÓ¦envµÄenv_pgfault_upcall×Ö¶Î¼´¿É¡£´úÂëÈçÏÂ£º
+	sys_env_set_pgfault_upcallç³»ç»Ÿè°ƒç”¨çš„å®ç°ï¼Œç”±äºå…¶ä¸­æ¶‰åŠåˆ°ä½¿ç”¨envid2envå‡½æ•°ï¼Œæˆ‘ä»¬éœ€è¦å…³æ³¨checkpermå‚æ•°ã€‚è¿™é‡Œæˆ‘ä»¬éœ€è¦å°†å…¶ç½®ä¸º1ã€‚ç„¶åå°†funcèµ‹å€¼ç»™å¯¹åº”envçš„env_pgfault_upcallå­—æ®µå³å¯ã€‚ä»£ç å¦‚ä¸‹ï¼š
 struct Env* e;
 int ret = envid2env(envid, &e, 1);
 if(ret < 0){
@@ -135,9 +135,9 @@ e->env_pgfault_upcall = func;
 return 0;
 
 Exercise 9. Implement the code in page_fault_handler in kern/trap.c required to dispatch page faults to the user-mode handler. Be sure to take appropriate precautions when writing into the exception stack. (What happens if the user environment runs out of pace on the exception stack?)
-	Ê×ÏÈ£¬½áºÏÎÄµµ£¬ÎÒÃÇÁË½âµ½Õâ¸öpage_fault_handlerÊÇ¿ÉÒÔ±»Ñ­»·µ÷ÓÃµÄ£¬Òò´ËÇø·ÖÊÇÇ¶Ì×µ÷ÓÃ£¬»¹ÊÇ·ÇÇ¶Ì×µ÷ÓÃ¡£ÓÉÓÚUXSTACKTOPµÄÒì³£Õ»Ö»ÓĞÒ»¸öpage£¬Òò´ËÈç¹ûÊÇÇ¶Ì×µ÷ÓÃµÄ£¬ÄÇÃ´µ±Ç°espÓëUXSTACKTOPµÄÆ«ÒÆÓ¦¸ÃĞ¡ÓÚÒ»¸öpage size¡£ÓÉ´Ë¼´¿ÉÇø·Ö£¬ÊÇ·ñÊÇµİ¹éµ÷ÓÃ¡£
-	È»ºó£¬ÎÒÃÇÅĞ¶Ï£¬Èç¹ûpagefaultÊÇÓÃ»§Ì¬²úÉúµÄ¡£½«µ±Ç°µÄtf¸³Öµ¸ø¶ÔÓ¦utf£¬È»ºó½«eipÉèÖÃÎªenv_pgfault_upcall£¬ÓÉ´ËÖ´ĞĞ¶ÔÓ¦µÄhandler´úÂë¡£
-¾ßÌå´úÂëÈçÏÂ£º
+	é¦–å…ˆï¼Œç»“åˆæ–‡æ¡£ï¼Œæˆ‘ä»¬äº†è§£åˆ°è¿™ä¸ªpage_fault_handleræ˜¯å¯ä»¥è¢«å¾ªç¯è°ƒç”¨çš„ï¼Œå› æ­¤åŒºåˆ†æ˜¯åµŒå¥—è°ƒç”¨ï¼Œè¿˜æ˜¯éåµŒå¥—è°ƒç”¨ã€‚ç”±äºUXSTACKTOPçš„å¼‚å¸¸æ ˆåªæœ‰ä¸€ä¸ªpageï¼Œå› æ­¤å¦‚æœæ˜¯åµŒå¥—è°ƒç”¨çš„ï¼Œé‚£ä¹ˆå½“å‰espä¸UXSTACKTOPçš„åç§»åº”è¯¥å°äºä¸€ä¸ªpage sizeã€‚ç”±æ­¤å³å¯åŒºåˆ†ï¼Œæ˜¯å¦æ˜¯é€’å½’è°ƒç”¨ã€‚
+	ç„¶åï¼Œæˆ‘ä»¬åˆ¤æ–­ï¼Œå¦‚æœpagefaultæ˜¯ç”¨æˆ·æ€äº§ç”Ÿçš„ã€‚å°†å½“å‰çš„tfèµ‹å€¼ç»™å¯¹åº”utfï¼Œç„¶åå°†eipè®¾ç½®ä¸ºenv_pgfault_upcallï¼Œç”±æ­¤æ‰§è¡Œå¯¹åº”çš„handlerä»£ç ã€‚
+å…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 if(curenv->env_pgfault_upcall){
 	struct UTrapframe* utf;
 	if((uint32_t)(UXSTACKTOP - tf->tf_esp) < PGSIZE)
@@ -161,17 +161,17 @@ Exercise 10. Implement the _pgfault_upcall routine in lib/pfentry.S . The
 interesting part is returning to the original point in the user code that caused the page
 fault. You'll return directly there, without going back through the kernel. The hard part is
 simultaneously switching stacks and re-loading the EIP.
-	ÕâÀïÒªÊµÏÖÒ»¸ö»ã±à¡£ÓïÒåÊÇÔÚÄÚºË´¦ÀíÍêpage faultÏµÍ³µ÷ÓÃºó£¬·µ»ØÓÃ»§Ì¬Ö®Ç°µÄ×¼±¸¹¤×÷¡£¸ù¾İexercise9ÎÒÃÇ½ÓÏÂÀ´ĞèÒªÖ´ĞĞµÄÊÇpage_fault_handlerµÄ´úÂë£¬Ö®Ç°Ò²ÔÚÕ»ÉÏ¹¹ÔìÁËÒ»¸öutfÊı¾İ½á¹¹£¬ÏÖÔÚĞèÒªÀûÓÃËü·µ»Øµ½ÓÃ»§Ì¬µÄpage_fault_handler´úÂëÂß¼­ÖĞ¡£
-	¸ù¾İÌáÊ¾£¬ÎÒÃÇÊ×ÏÈÒª°ÑeipÑ¹Èëµ½utf±£´æµÄespÖĞ¡£²Ù×÷ÈçÏÂ£º
+	è¿™é‡Œè¦å®ç°ä¸€ä¸ªæ±‡ç¼–ã€‚è¯­ä¹‰æ˜¯åœ¨å†…æ ¸å¤„ç†å®Œpage faultç³»ç»Ÿè°ƒç”¨åï¼Œè¿”å›ç”¨æˆ·æ€ä¹‹å‰çš„å‡†å¤‡å·¥ä½œã€‚æ ¹æ®exercise9æˆ‘ä»¬æ¥ä¸‹æ¥éœ€è¦æ‰§è¡Œçš„æ˜¯page_fault_handlerçš„ä»£ç ï¼Œä¹‹å‰ä¹Ÿåœ¨æ ˆä¸Šæ„é€ äº†ä¸€ä¸ªutfæ•°æ®ç»“æ„ï¼Œç°åœ¨éœ€è¦åˆ©ç”¨å®ƒè¿”å›åˆ°ç”¨æˆ·æ€çš„page_fault_handlerä»£ç é€»è¾‘ä¸­ã€‚
+	æ ¹æ®æç¤ºï¼Œæˆ‘ä»¬é¦–å…ˆè¦æŠŠeipå‹å…¥åˆ°utfä¿å­˜çš„espä¸­ã€‚æ“ä½œå¦‚ä¸‹ï¼š
 movl 0x28(%esp), %ebx 
 movl 0x30(%esp), %eax 
 subl $0x4, %eax 
 movl %ebx, (%eax)
 movl %eax, 0x30(%esp)
-	0x28¶ÔÓ¦µÄÊÇutfÖĞeipµÄÎ»ÖÃ£¬0x30¶ÔÓ¦µÄÊÇutfÖĞespµÄÎ»ÖÃ£¬subl 	0x4, %eaxÎªÌîÈëeip×ö×¼±¸¡£movl %eax, 0x30(%esp)ÔòÊÇ¸üĞÂutfÖĞespµÄÖµ¡£
-	¸ù¾İ×¢ÊÍ£¬½ÓÏÂÀ´ÎÒÃÇĞèÒªrestore trap-time registers£¬ÓÉÓÚÓĞutf_fault_vaºÍutf_err£¬ĞèÒªÏÈaddl $0x8, %espÌø¹ıËûÃÇ£¬È»ºóÔÚpopal£¬½«¼Ä´æÆ÷»Ø¸´¡£
-	ÕâÀïÊ¹ÓÃaddl $0x4, %esp Ìø¹ıeip£¬È»ºópopfl»Ö¸´eflagsµÄÖµ¡£
-	È»ºóµ±Ç°Ö¸ÏòÊÇutfµÄesp×Ö¶Î£¬Ö±½Ópopl %espÀ´Ö´ĞĞ»»Õ»²Ù×÷£¬ÓÉÓÚÖ®Ç°µÄeipÒÑ¾­Ñ¹ÈëÕ»£¬µ÷ÓÃret¼´¿ÉĞŞ¸Äeip£¬Ö´ĞĞhandlerÂß¼­¡£ÍêÕû´úÂëÈçÏÂ£º
+	0x28å¯¹åº”çš„æ˜¯utfä¸­eipçš„ä½ç½®ï¼Œ0x30å¯¹åº”çš„æ˜¯utfä¸­espçš„ä½ç½®ï¼Œsubl 	0x4, %eaxä¸ºå¡«å…¥eipåšå‡†å¤‡ã€‚movl %eax, 0x30(%esp)åˆ™æ˜¯æ›´æ–°utfä¸­espçš„å€¼ã€‚
+	æ ¹æ®æ³¨é‡Šï¼Œæ¥ä¸‹æ¥æˆ‘ä»¬éœ€è¦restore trap-time registersï¼Œç”±äºæœ‰utf_fault_vaå’Œutf_errï¼Œéœ€è¦å…ˆaddl $0x8, %espè·³è¿‡ä»–ä»¬ï¼Œç„¶ååœ¨popalï¼Œå°†å¯„å­˜å™¨å›å¤ã€‚
+	è¿™é‡Œä½¿ç”¨addl $0x4, %esp è·³è¿‡eipï¼Œç„¶åpopflæ¢å¤eflagsçš„å€¼ã€‚
+	ç„¶åå½“å‰æŒ‡å‘æ˜¯utfçš„espå­—æ®µï¼Œç›´æ¥popl %espæ¥æ‰§è¡Œæ¢æ ˆæ“ä½œï¼Œç”±äºä¹‹å‰çš„eipå·²ç»å‹å…¥æ ˆï¼Œè°ƒç”¨retå³å¯ä¿®æ”¹eipï¼Œæ‰§è¡Œhandleré€»è¾‘ã€‚å®Œæ•´ä»£ç å¦‚ä¸‹ï¼š
 pushl %esp			
 movl _pgfault_handler, %eax
 call *%eax
@@ -192,21 +192,21 @@ popl %esp
 ret
 
 Exercise 11. Finish set_pgfault_handler() in lib/pgfault.c .
-	¸ù¾İ×¢ÊÍ£¬ÎÒÃÇÖªµÀ£¬µ±µÚÒ»´Îµ÷ÓÃ´Ëº¯ÊıÊ±£¬¼´_pgfault_handler==0Ê±£¬ĞèÒª×¢²áÒ»¸öhandler£¬²¢ÇÒ·ÖÅäÒ»¸öÒì³£´¦ÀíÕ»£¬²¢¸æËßÄÚºËµ÷ÓÃexercise10ÖĞÊµÏÖµÄ»ã±à¡£
-	½ÓÏÂÀ´ÊÇ·ÖÅäÒì³£´¦ÀíÕ»£¬Ê×ÏÈµ÷ÓÃsys_page_alloc£¬ÔÚUXSTACKTOP-PGSIZEµÄµØ·½·ÖÅäÒ»¸öPGSIZEµÄÒ³×÷ÎªÒì³£Õ»¡£
-	È»ºóµ÷ÓÃsys_env_set_pgfault_upcall£¬À´¸æËßÄÚºË£¬ÔÚpagefaultÒì³£·¢ÉúÊ±£¬µ÷ÓÃ_pgfault_upcall¼´Á·Ï°9ÊµÏÖµÄ»ã±à´úÂë¡£
+	æ ¹æ®æ³¨é‡Šï¼Œæˆ‘ä»¬çŸ¥é“ï¼Œå½“ç¬¬ä¸€æ¬¡è°ƒç”¨æ­¤å‡½æ•°æ—¶ï¼Œå³_pgfault_handler==0æ—¶ï¼Œéœ€è¦æ³¨å†Œä¸€ä¸ªhandlerï¼Œå¹¶ä¸”åˆ†é…ä¸€ä¸ªå¼‚å¸¸å¤„ç†æ ˆï¼Œå¹¶å‘Šè¯‰å†…æ ¸è°ƒç”¨exercise10ä¸­å®ç°çš„æ±‡ç¼–ã€‚
+	æ¥ä¸‹æ¥æ˜¯åˆ†é…å¼‚å¸¸å¤„ç†æ ˆï¼Œé¦–å…ˆè°ƒç”¨sys_page_allocï¼Œåœ¨UXSTACKTOP-PGSIZEçš„åœ°æ–¹åˆ†é…ä¸€ä¸ªPGSIZEçš„é¡µä½œä¸ºå¼‚å¸¸æ ˆã€‚
+	ç„¶åè°ƒç”¨sys_env_set_pgfault_upcallï¼Œæ¥å‘Šè¯‰å†…æ ¸ï¼Œåœ¨pagefaultå¼‚å¸¸å‘ç”Ÿæ—¶ï¼Œè°ƒç”¨_pgfault_upcallå³ç»ƒä¹ 9å®ç°çš„æ±‡ç¼–ä»£ç ã€‚
 
 Exercise 12. Implement fork , duppage and pgfault in lib/fork.c .
 Test your code with the forktree program. It should produce the following messages, with interspersed 'new env', 'free env', and 'exiting gracefully' messages. The messages may not appear in this order, and the environment IDs may be different.
-	ForkµÄÂß¼­ÊÇ£º
-	¸¸½ø³Ìµ÷ÓÃset_pgfault_handler½«pgfault×÷Îªpage fault´¥·¢Ê±µÄhandler¡£
-È»ºóÍ¨¹ıµ÷ÓÃsys_exofork´´½¨×Ó½ø³Ì¡£
-	Í¨¹ıÊ¶±ğsys_exoforkµÄ·µ»ØÖµ£¬À´·Ö±æµ±Ç°ÊÇÔËĞĞÔÚ×Ó½ø³Ì»¹ÊÇ¸¸½ø³Ì¡£
-Èç¹û·µ»ØÖµÊÇ0£¬ËµÃ÷ÔÚ×Ó½ø³Ì£¬ĞŞ¸Ä¶ÔÓ¦µÄthisenvÖ¸Õë¼´¿É·µ»Ø¡£
-	Èç¹û·Ç0£¬ËµÃ÷µ±Ç°´¦ÓÚ¸¸½ø³Ì£¬½«UTEXTµ½USTACKTOPÖ®¼äµÄËùÓĞpage¶¼duppageµ½×Ó½ø³Ì£¬¶øUXSTACKTOP²»ÄÜÊÇcopy on writeµÄ£¬ÒòÎªËü²»ÄÜcopy£¬Òò´ËĞèÒªµ÷ÓÃsys_page_allocÖØĞÂÎª×Ó½ø³Ì·ÖÅä¡£Í¬Ñù£¬µ÷ÓÃsys_env_set_pgfault_upcallÎª×Ó½ø³ÌÉèÖÃpage fault handler£¬µ÷ÓÃsys_env_set_status½«×Ó½ø³Ì×´Ì¬ÉèÖÃÎªRUNNABLE¼´¿É¡£
-	½Ó×ÅÊÇduppageµÄÊµÏÖ¡£ÕâÀïÖ÷ÒªÊÇµ÷ÓÃsys_page_map½«¸¸½ø³ÌµÄÎïÀíÒ³Ó³Éä¿½±´¸ø×Ó½ø³Ì¡£ÔÚ¿½±´µÄÊ±ºòĞèÒª½øĞĞÇø·Ö£¬Èç¹û¸¸½ø³Ì¶ÔÓ¦pteÊÇÓĞĞ´È¨ÏŞµÄ£¬ÄÇÃ´ÎÒÃÇĞèÒª½«¸¸×Ó½ø³ÌµÄpte¶¼ÉèÖÃÎªPTE_COW,Èç¹û¸¸½ø³Ì¶ÔÓ¦pteÖ»ÓĞ¶ÁÈ¨ÏŞ£¬ÄÇÃ´²»ĞèÒªÌØÊâ´¦Àí¡£
-	½ÓÏÂÀ´ÊÇÊµÏÖpgfaultº¯Êı£¬Ö÷ÒªÂß¼­ÊÇ£¬Èç¹û·¢ÉúpagefaultµÄÒ³µÄpteÊÇCOWµÄ£¬ÄÇÃ´ĞèÒª½«ËüÖØĞÂ·ÖÅäÒ»¸öĞÂµÄÎïÀíÒ³£¬½«ÄÚÈİ¿½±´½øÈ¥£¬ÔÙÖ´ĞĞĞ´²Ù×÷¡£ÓÉ´Ë¿É¼ûÆäÖ÷ÒªÂß¼­ÊÇ£¬ÏÈÅĞ¶ÏÈ¨ÏŞÎ»£¬½Ó×Åµ÷ÓÃsys_page_alloc·ÖÅäÒ»¸öĞÂµÄÎïÀíÒ³¡£ÓÉÓÚÎªÁË·ÀÖ¹ÖĞ¼ä×´Ì¬µÄ±©Â¶£¬ÎÒÃÇÏÈ·ÖÅäÒ»¸öÁÙÊ±Ò³£¬½«Êı¾İ¿½±´½øÈ¥¡£È»ºóÔÙµ÷ÓÃsys_page_mapĞŞ¸Ä¶ÔÓ¦addr´¦µÄÎïÀíÒ³Ó³Éä£¬Ö¸ÏòPFTEMP£¬Ö®ºóÔÙÍ¨¹ısys_page_unmapÊÍ·ÅPFTEMP¡£	
-	Ö÷ÒªÂß¼­ÈçÏÂ£º
+	Forkçš„é€»è¾‘æ˜¯ï¼š
+	çˆ¶è¿›ç¨‹è°ƒç”¨set_pgfault_handlerå°†pgfaultä½œä¸ºpage faultè§¦å‘æ—¶çš„handlerã€‚
+ç„¶åé€šè¿‡è°ƒç”¨sys_exoforkåˆ›å»ºå­è¿›ç¨‹ã€‚
+	é€šè¿‡è¯†åˆ«sys_exoforkçš„è¿”å›å€¼ï¼Œæ¥åˆ†è¾¨å½“å‰æ˜¯è¿è¡Œåœ¨å­è¿›ç¨‹è¿˜æ˜¯çˆ¶è¿›ç¨‹ã€‚
+å¦‚æœè¿”å›å€¼æ˜¯0ï¼Œè¯´æ˜åœ¨å­è¿›ç¨‹ï¼Œä¿®æ”¹å¯¹åº”çš„thisenvæŒ‡é’ˆå³å¯è¿”å›ã€‚
+	å¦‚æœé0ï¼Œè¯´æ˜å½“å‰å¤„äºçˆ¶è¿›ç¨‹ï¼Œå°†UTEXTåˆ°USTACKTOPä¹‹é—´çš„æ‰€æœ‰pageéƒ½duppageåˆ°å­è¿›ç¨‹ï¼Œè€ŒUXSTACKTOPä¸èƒ½æ˜¯copy on writeçš„ï¼Œå› ä¸ºå®ƒä¸èƒ½copyï¼Œå› æ­¤éœ€è¦è°ƒç”¨sys_page_allocé‡æ–°ä¸ºå­è¿›ç¨‹åˆ†é…ã€‚åŒæ ·ï¼Œè°ƒç”¨sys_env_set_pgfault_upcallä¸ºå­è¿›ç¨‹è®¾ç½®page fault handlerï¼Œè°ƒç”¨sys_env_set_statuså°†å­è¿›ç¨‹çŠ¶æ€è®¾ç½®ä¸ºRUNNABLEå³å¯ã€‚
+	æ¥ç€æ˜¯duppageçš„å®ç°ã€‚è¿™é‡Œä¸»è¦æ˜¯è°ƒç”¨sys_page_mapå°†çˆ¶è¿›ç¨‹çš„ç‰©ç†é¡µæ˜ å°„æ‹·è´ç»™å­è¿›ç¨‹ã€‚åœ¨æ‹·è´çš„æ—¶å€™éœ€è¦è¿›è¡ŒåŒºåˆ†ï¼Œå¦‚æœçˆ¶è¿›ç¨‹å¯¹åº”pteæ˜¯æœ‰å†™æƒé™çš„ï¼Œé‚£ä¹ˆæˆ‘ä»¬éœ€è¦å°†çˆ¶å­è¿›ç¨‹çš„pteéƒ½è®¾ç½®ä¸ºPTE_COW,å¦‚æœçˆ¶è¿›ç¨‹å¯¹åº”pteåªæœ‰è¯»æƒé™ï¼Œé‚£ä¹ˆä¸éœ€è¦ç‰¹æ®Šå¤„ç†ã€‚
+	æ¥ä¸‹æ¥æ˜¯å®ç°pgfaultå‡½æ•°ï¼Œä¸»è¦é€»è¾‘æ˜¯ï¼Œå¦‚æœå‘ç”Ÿpagefaultçš„é¡µçš„pteæ˜¯COWçš„ï¼Œé‚£ä¹ˆéœ€è¦å°†å®ƒé‡æ–°åˆ†é…ä¸€ä¸ªæ–°çš„ç‰©ç†é¡µï¼Œå°†å†…å®¹æ‹·è´è¿›å»ï¼Œå†æ‰§è¡Œå†™æ“ä½œã€‚ç”±æ­¤å¯è§å…¶ä¸»è¦é€»è¾‘æ˜¯ï¼Œå…ˆåˆ¤æ–­æƒé™ä½ï¼Œæ¥ç€è°ƒç”¨sys_page_allocåˆ†é…ä¸€ä¸ªæ–°çš„ç‰©ç†é¡µã€‚ç”±äºä¸ºäº†é˜²æ­¢ä¸­é—´çŠ¶æ€çš„æš´éœ²ï¼Œæˆ‘ä»¬å…ˆåˆ†é…ä¸€ä¸ªä¸´æ—¶é¡µï¼Œå°†æ•°æ®æ‹·è´è¿›å»ã€‚ç„¶åå†è°ƒç”¨sys_page_mapä¿®æ”¹å¯¹åº”addrå¤„çš„ç‰©ç†é¡µæ˜ å°„ï¼ŒæŒ‡å‘PFTEMPï¼Œä¹‹åå†é€šè¿‡sys_page_unmapé‡Šæ”¾PFTEMPã€‚	
+	ä¸»è¦é€»è¾‘å¦‚ä¸‹ï¼š
 addr = ROUNDDOWN(addr, PGSIZE);
 int ret;
 ret = sys_page_alloc(0, (void *)PFTEMP, PTE_P | PTE_U | PTE_W);
@@ -216,7 +216,7 @@ ret = sys_page_unmap(0, (void *)PFTEMP);
 
 Exercise 13. Modify kern/trapentry.S and kern/trap.c to initialize the appropriate entries in the IDT and provide handlers for IRQs 0 through 15. Then modify the code in env_alloc() in kern/env.c to ensure that user environments are always run with interrupts enabled. 
 	Also uncomment the sti instruction in sched_halt() so that idle CPUs unmask interrupts. The processor never pushes an error code when invoking a hardware interrupt handler. You might want to re-read section 9.2 of the 80386 Reference Manual, or section 5.8 of the IA-32 Intel Architecture Software Developer's Manual, Volume 3 at this time.
-	ÓëÖ®Ç°µÄÒì³£×¢²áÀàËÆ£¬ÔÙtrapentry.SÓëtrap.cÖĞ×¢²áIDTÖĞµÄ´¦Àíhandler¡£
+	ä¸ä¹‹å‰çš„å¼‚å¸¸æ³¨å†Œç±»ä¼¼ï¼Œå†trapentry.Sä¸trap.cä¸­æ³¨å†ŒIDTä¸­çš„å¤„ç†handlerã€‚
 	TRAPHANDLER_NOEC(TIMER_HANDLER	  , IRQ_OFFSET + IRQ_TIMER)
 	TRAPHANDLER_NOEC(KBD_HANDLER	  , IRQ_OFFSET + IRQ_KBD)
 	TRAPHANDLER_NOEC(SECOND_HANDLER	  , IRQ_OFFSET + 2)
@@ -252,24 +252,24 @@ Exercise 13. Modify kern/trapentry.S and kern/trap.c to initialize the appropria
 	SETGATE(idt[IRQ_OFFSET + IRQ_IDE]	   , 0, GD_KT, IDE_HANDLER		, 0);
 	SETGATE(idt[IRQ_OFFSET + 15]		   , 0, GD_KT, FIFTEEN_HANDLER  , 0);
 	SETGATE(idt[IRQ_OFFSET + IRQ_ERROR]	   , 0, GD_KT, ERROR_HANDLER	, 0);
-	ÕâÀïÇ§ÍòÒª×¢Òâ£¬SETGATEµÄµÚ¶ş¸ö²ÎÊıÒ»ÂÉ¶¼ÉèÖÃÎª0.ÒòÎª¸ù¾İSETGATEµÄ×¢½â£ºA subsequent IRET instruction restores IF to the value in the EFLAGS image on the stack. Èç¹ûÉèÖÃÎª1£¬ÄÇÃ´FL_IFÃ¿´ÎÔÙiretÖ®ºó¶¼»á±»ÖØÖÃ£¬Ôì³Ébug¡£
+	è¿™é‡Œåƒä¸‡è¦æ³¨æ„ï¼ŒSETGATEçš„ç¬¬äºŒä¸ªå‚æ•°ä¸€å¾‹éƒ½è®¾ç½®ä¸º0.å› ä¸ºæ ¹æ®SETGATEçš„æ³¨è§£ï¼šA subsequent IRET instruction restores IF to the value in the EFLAGS image on the stack. å¦‚æœè®¾ç½®ä¸º1ï¼Œé‚£ä¹ˆFL_IFæ¯æ¬¡å†iretä¹‹åéƒ½ä¼šè¢«é‡ç½®ï¼Œé€ æˆbugã€‚
 
 Exercise 14. Modify the kernel's trap_dispatch() function so that it calls
 sched_yield() to find and run a different environment whenever a clock interrupt takes place.
 You should now be able to get the user/spin test to work: the parent environment should fork off the child, sys_yield() to it a couple times but in each case regain control of the CPU after one time slice, and finally kill the child environment and terminate gracefully.
-	×îºóµÄexerciseÊÇ£¬ÔÚÊ±ÖÓÖĞ¶ÏÀ´ÁÙÊ±£¬µ÷ÓÃsched_yieldÀ´ÊµÏÖ½ø³ÌÇĞ»»£¬ÒıÈëÊ±¼äÆ¬¸ÅÄî¡£ÕâÀïÒ»¶¨¼ÇµÃÔÚµ÷ÓÃsched_yieldÖ®Ç°ĞèÒªµ÷ÓÃlapic_eoi()À´Í¨ÖªlapicÎÒÃÇ´¦ÀíÍêÖĞ¶ÏÁË¡£
+	æœ€åçš„exerciseæ˜¯ï¼Œåœ¨æ—¶é’Ÿä¸­æ–­æ¥ä¸´æ—¶ï¼Œè°ƒç”¨sched_yieldæ¥å®ç°è¿›ç¨‹åˆ‡æ¢ï¼Œå¼•å…¥æ—¶é—´ç‰‡æ¦‚å¿µã€‚è¿™é‡Œä¸€å®šè®°å¾—åœ¨è°ƒç”¨sched_yieldä¹‹å‰éœ€è¦è°ƒç”¨lapic_eoi()æ¥é€šçŸ¥lapicæˆ‘ä»¬å¤„ç†å®Œä¸­æ–­äº†ã€‚
 
 Exercise 15. Implement sys_ipc_recv and sys_ipc_try_send in kern/syscall.c .
 Read the comments on both before implementing them, since they have to work together. When you call envid2env in these routines, you should set the checkperm flag to 0, meaning that any environment is allowed to send IPC messages to any other environment, and the kernel does no special permission checking other than verifying that
 the target envid is valid. Then implement the ipc_recv and ipc_send functions in lib/ipc.c . Use the user/pingpong and user/primes functions to test your IPC mechanism. user/primes will generate for each prime number a new environment until JOS runs out of environments. You might find it interesting to read user/primes.c to see all the forking and IPC going on behind the scenes.
-	Ê×ÏÈÒªÊµÏÖµÄÊÇÏµÍ³µ÷ÓÃsys_ipc_recvºÍsys_ipc_send¡£
-	¶ÔÓÚsys_ipc_recv£¬¸ù¾İ×¢ÊÍ£¬ÎÒÃÇĞèÒªÊ¹ÓÃ¶ÔcurenvÏà¹ØµÄ×Ö¶Î½øĞĞĞŞ¸Ä¡£Ê×ÏÈÊÇenv_ipc_recving,½«Õâ¸ö×Ö¶ÎÉèÖÃÎª1£¬±íÊ¾µ±Ç°env´¦ÓÚµÈ´ı¾ÍÊÕmessageµÄ×´Ì¬¡£È»ºó½«statusÉèÖÃÎªENV_NOT_RUNNABLE,±íÊ¾²»Òª±»cpuµ÷¶È¡£²¢°Ñenv_ipc_dstvaÉèÖÃÎªdstva£¬Õâ¸ödstva±íÊ¾send pageĞèÒª±»Ó³Éäµ½µÄĞéÄâµØÖ·¡£¾ßÌå´úÂëÈçÏÂ£º
+	é¦–å…ˆè¦å®ç°çš„æ˜¯ç³»ç»Ÿè°ƒç”¨sys_ipc_recvå’Œsys_ipc_sendã€‚
+	å¯¹äºsys_ipc_recvï¼Œæ ¹æ®æ³¨é‡Šï¼Œæˆ‘ä»¬éœ€è¦ä½¿ç”¨å¯¹curenvç›¸å…³çš„å­—æ®µè¿›è¡Œä¿®æ”¹ã€‚é¦–å…ˆæ˜¯env_ipc_recving,å°†è¿™ä¸ªå­—æ®µè®¾ç½®ä¸º1ï¼Œè¡¨ç¤ºå½“å‰envå¤„äºç­‰å¾…å°±æ”¶messageçš„çŠ¶æ€ã€‚ç„¶åå°†statusè®¾ç½®ä¸ºENV_NOT_RUNNABLE,è¡¨ç¤ºä¸è¦è¢«cpuè°ƒåº¦ã€‚å¹¶æŠŠenv_ipc_dstvaè®¾ç½®ä¸ºdstvaï¼Œè¿™ä¸ªdstvaè¡¨ç¤ºsend pageéœ€è¦è¢«æ˜ å°„åˆ°çš„è™šæ‹Ÿåœ°å€ã€‚å…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 curenv->env_ipc_recving = 1;
 curenv->env_ipc_dstva = dstva;
 curenv->env_status = ENV_NOT_RUNNABLE;
 sched_yield();
 return 0;
-	¶ÔÓÚsys_ipc_send£¬ÒâÒåÊÇÒª·¢ËÍÒ»¸öpage¸øÁíÒ»¸öenv£¬È»ºóÁ½¸öenv¹²Ïíµ±Ç°page¡£ÔÚ·¢ÍêpageÖ®ºó£¬ĞèÒªĞŞ¸Ädst_env£¬Ò²¾ÍÊÇ½ÓÊÜenvµÄ×´Ì¬£¬¾ßÌå´úÂëÈçÏÂ£º
+	å¯¹äºsys_ipc_sendï¼Œæ„ä¹‰æ˜¯è¦å‘é€ä¸€ä¸ªpageç»™å¦ä¸€ä¸ªenvï¼Œç„¶åä¸¤ä¸ªenvå…±äº«å½“å‰pageã€‚åœ¨å‘å®Œpageä¹‹åï¼Œéœ€è¦ä¿®æ”¹dst_envï¼Œä¹Ÿå°±æ˜¯æ¥å—envçš„çŠ¶æ€ï¼Œå…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 dst_env->env_ipc_recving = 0;
 dst_env->env_ipc_from = curenv->env_id;
 dst_env->env_ipc_value = value;
@@ -277,8 +277,8 @@ dst_env->env_ipc_perm = srcva == (void *)UTOP ? 0 : perm;
 dst_env->env_status = ENV_RUNNABLE;
 dst_env->env_tf.tf_regs.reg_eax = 0;
 return 0;
-	kernelÌ¬µÄÏµÍ³µ÷ÓÃÊµÏÖÍêºó£¬½ÓÏÂÀ´¾ÍÊÇÒªÊµÏÖÓÃ»§Ì¬µÄÏà¹Øº¯Êı£¬·Ö±ğÊÇipc_recvºÍipc_send¡£
-	¶ÔÓÚipc_recv,pgÖ¸ÕëÖ¸ÏòµÄ¾ÍÊÇ½ÓÊÜµ½µÄpage£¬ĞèÒªÔÚÕâ¸öenvÏÂ±»Ó³Éäµ½µÄĞéÄâµØÖ·¡£From_env_store´æ´¢·¢ËÍµÄenvid£¬permstore´æ´¢½ÓÊÕµ½µÄpageµÄÈ¨ÏŞÎ»¡£×îºó·µ»Ø½ÓÊÜµ½µÄvalue¡£¾ßÌå´úÂëÈçÏÂ£º
+	kernelæ€çš„ç³»ç»Ÿè°ƒç”¨å®ç°å®Œåï¼Œæ¥ä¸‹æ¥å°±æ˜¯è¦å®ç°ç”¨æˆ·æ€çš„ç›¸å…³å‡½æ•°ï¼Œåˆ†åˆ«æ˜¯ipc_recvå’Œipc_sendã€‚
+	å¯¹äºipc_recv,pgæŒ‡é’ˆæŒ‡å‘çš„å°±æ˜¯æ¥å—åˆ°çš„pageï¼Œéœ€è¦åœ¨è¿™ä¸ªenvä¸‹è¢«æ˜ å°„åˆ°çš„è™šæ‹Ÿåœ°å€ã€‚From_env_storeå­˜å‚¨å‘é€çš„envidï¼Œpermstoreå­˜å‚¨æ¥æ”¶åˆ°çš„pageçš„æƒé™ä½ã€‚æœ€åè¿”å›æ¥å—åˆ°çš„valueã€‚å…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 int ret;
 if(!pg)
 	pg = (void *)UTOP;
@@ -297,7 +297,7 @@ if(perm_store){
 	*perm_store = getthisenv()->env_ipc_perm;
 }
 return getthisenv()->env_ipc_value;
-	¶ÔÓÚipc_sendº¯Êı£¬ËüÓĞËÄ¸ö²ÎÊı£¬to_env±íÊ¾½ÓÊÕµ±Ç°·¢ËÍµÄÏûÏ¢µÄenv£¬val±íÊ¾·¢ËÍµÄvalue£¬pg±íÊ¾Òª·¢ËÍµÄpage£¬perm±íÊ¾·¢ËÍµÄpgµÄÈ¨ÏŞ¡£ÓÉÓÚÎÒÃÇ·¢ËÍÕâ¸öÏûÏ¢µÄÊ±ºò£¬to_env»¹Ã»ÓĞ´¦ÓÚ½ÓÊÕĞÅÏ¢µÄ×´Ì¬£¬Òò´ËĞèÒªÓÃwhileÑ­»·½«·¢ËÍÏûÏ¢µÄÏµÍ³×´Ì¬°ü¹üÆğÀ´£¬È»ºó²»¶ÏÖØÊÔ¡£ÖØÊÔµÄ¹ı³ÌÖĞ£¬Ê¹ÓÃsys_yield()À´Ö÷¶¯ÊÍ·Åcpu£¬ÈÃcpu×ö¸üÓĞÒâÒåµÄÊÂÇé¡£¾ßÌå´úÂëÈçÏÂ£º
+	å¯¹äºipc_sendå‡½æ•°ï¼Œå®ƒæœ‰å››ä¸ªå‚æ•°ï¼Œto_envè¡¨ç¤ºæ¥æ”¶å½“å‰å‘é€çš„æ¶ˆæ¯çš„envï¼Œvalè¡¨ç¤ºå‘é€çš„valueï¼Œpgè¡¨ç¤ºè¦å‘é€çš„pageï¼Œpermè¡¨ç¤ºå‘é€çš„pgçš„æƒé™ã€‚ç”±äºæˆ‘ä»¬å‘é€è¿™ä¸ªæ¶ˆæ¯çš„æ—¶å€™ï¼Œto_envè¿˜æ²¡æœ‰å¤„äºæ¥æ”¶ä¿¡æ¯çš„çŠ¶æ€ï¼Œå› æ­¤éœ€è¦ç”¨whileå¾ªç¯å°†å‘é€æ¶ˆæ¯çš„ç³»ç»ŸçŠ¶æ€åŒ…è£¹èµ·æ¥ï¼Œç„¶åä¸æ–­é‡è¯•ã€‚é‡è¯•çš„è¿‡ç¨‹ä¸­ï¼Œä½¿ç”¨sys_yield()æ¥ä¸»åŠ¨é‡Šæ”¾cpuï¼Œè®©cpuåšæ›´æœ‰æ„ä¹‰çš„äº‹æƒ…ã€‚å…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 int ret;
 if(!pg)
 	pg = (void *)UTOP;
@@ -315,7 +315,7 @@ usual copy-on-write manner. Modify user/forktree.c to use sfork() instead of
 regular fork() . Also, once you have finished implementing IPC in part C, use your
 sfork() to run user/pingpongs . You will have to find a new way to provide the
 functionality of the global thisenv pointer.
-	Õâ¸öchallenge´ó¸Å¾ÍÊÇÒªĞŞ¸ÄforkµÄÓïÒå£¬Ö®Ç°µÄforkÊÇ°Ñ¸¸½ø³ÌµÄËùÓĞÓĞĞ´È¨ÏŞµÄpage¶¼ĞŞ¸Ä³ÉPTE_COWµÄ¡£ÕâÑùµÄ»°ÎŞ·¨ÊµÏÖenv¹²ÏíÄÚ´æ£¬ÒòÎªÒ»¸öenvµÄĞ´ÁíÒ»¸öenv¿´²»µ½¡£Òª×öµ½ÕâÒ»µã£¬Ö»ÒªÎÒÃÇÔ­·â²»¶¯µÄ°ÑÈ¨ÏŞÓ³Éä¸ø×Ó½ø³Ì£¬ÄÇÃ´ËûÃÇ¾Í¿ÉÒÔĞ´Í¬Ò»¸öĞéÄâµØÖ·¿Õ¼ä£¬±Ë´Ë¶¼ÄÜ¿´¼û¶Ô·½¡£³ıÁËustack²¿·Ö²»ÄÜÎŞÄÔÓ³Éä£¬ÆäËûÓ³Éä¹ØÏµ¶¼ºÍ¸¸½ø³ÌÏàÍ¬¡£¾ßÌå´úÂëÈçÏÂ£º
+	è¿™ä¸ªchallengeå¤§æ¦‚å°±æ˜¯è¦ä¿®æ”¹forkçš„è¯­ä¹‰ï¼Œä¹‹å‰çš„forkæ˜¯æŠŠçˆ¶è¿›ç¨‹çš„æ‰€æœ‰æœ‰å†™æƒé™çš„pageéƒ½ä¿®æ”¹æˆPTE_COWçš„ã€‚è¿™æ ·çš„è¯æ— æ³•å®ç°envå…±äº«å†…å­˜ï¼Œå› ä¸ºä¸€ä¸ªenvçš„å†™å¦ä¸€ä¸ªenvçœ‹ä¸åˆ°ã€‚è¦åšåˆ°è¿™ä¸€ç‚¹ï¼Œåªè¦æˆ‘ä»¬åŸå°ä¸åŠ¨çš„æŠŠæƒé™æ˜ å°„ç»™å­è¿›ç¨‹ï¼Œé‚£ä¹ˆä»–ä»¬å°±å¯ä»¥å†™åŒä¸€ä¸ªè™šæ‹Ÿåœ°å€ç©ºé—´ï¼Œå½¼æ­¤éƒ½èƒ½çœ‹è§å¯¹æ–¹ã€‚é™¤äº†ustackéƒ¨åˆ†ä¸èƒ½æ— è„‘æ˜ å°„ï¼Œå…¶ä»–æ˜ å°„å…³ç³»éƒ½å’Œçˆ¶è¿›ç¨‹ç›¸åŒã€‚å…·ä½“ä»£ç å¦‚ä¸‹ï¼š
 int ret;
 set_pgfault_handler(pgfault);
 envid_t child_envid = sys_exofork();
@@ -344,9 +344,9 @@ ret = sys_page_alloc(child_envid, (void *)(UXSTACKTOP - PGSIZE), PTE_P | PTE_U |
 	if(ret < 0)
 		panic("panic in sys_env_set_status()\n");
 	return child_envid;
-	ÎÄµµÌáÊ¾Ëµ£¬ÒªĞŞ¸Äµ±Ç°thisenvµÄ±íÊ¾·½Ê½£¬ÒòÎªÖ®Ç°µÄthisenvÊÇÔÚÎŞÄÔ¿½±´µÄµØÖ·ÇøÓòÄÚµÄ£¬Òò´Ë¸¸×Ó½ø³Ì¹²ÏíÍ¬Ò»¸öthisenv£¬µ¼ÖÂËüÃÇÖ¸ÏòÍ¬Ò»¸öenv£¬ËùÒÔ»á³öÎÊÌâ£¬Òò´ËÎÒÃÇĞŞ¸ÄthisenvµÄ±íÊ¾·½·¨£º
+	æ–‡æ¡£æç¤ºè¯´ï¼Œè¦ä¿®æ”¹å½“å‰thisenvçš„è¡¨ç¤ºæ–¹å¼ï¼Œå› ä¸ºä¹‹å‰çš„thisenvæ˜¯åœ¨æ— è„‘æ‹·è´çš„åœ°å€åŒºåŸŸå†…çš„ï¼Œå› æ­¤çˆ¶å­è¿›ç¨‹å…±äº«åŒä¸€ä¸ªthisenvï¼Œå¯¼è‡´å®ƒä»¬æŒ‡å‘åŒä¸€ä¸ªenvï¼Œæ‰€ä»¥ä¼šå‡ºé—®é¢˜ï¼Œå› æ­¤æˆ‘ä»¬ä¿®æ”¹thisenvçš„è¡¨ç¤ºæ–¹æ³•ï¼š
 extern const volatile struct Env envs[NENV];
 const volatile inline struct Env* getthisenv(){
         return &envs[ENVX(sys_getenvid())];
 }
-	Sys_getenvidÍ¨¹ıthiscpuÀ´µÃµ½µ±Ç°µÄenv£¬¶øthiscpu·µ»ØµÄenvidÖµ¾ÍÊÇ¸¸×Ó½ø³Ì¶ÔÓ¦µÄenvidÖµ£¬²»»á³ö´í¡£ĞŞ¸ÄpingpongsºÍipc_recvÖĞµÄthisenv±íÊ¾·½Ê½£¬¼´¿ÉÍ¨¹ıpingpongsµÄ²âÊÔ¡£
+	Sys_getenvidé€šè¿‡thiscpuæ¥å¾—åˆ°å½“å‰çš„envï¼Œè€Œthiscpuè¿”å›çš„envidå€¼å°±æ˜¯çˆ¶å­è¿›ç¨‹å¯¹åº”çš„envidå€¼ï¼Œä¸ä¼šå‡ºé”™ã€‚ä¿®æ”¹pingpongså’Œipc_recvä¸­çš„thisenvè¡¨ç¤ºæ–¹å¼ï¼Œå³å¯é€šè¿‡pingpongsçš„æµ‹è¯•ã€‚

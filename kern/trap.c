@@ -288,16 +288,16 @@ trap_dispatch(struct Trapframe *tf)
 			return;
 		case IRQ_OFFSET + IRQ_KBD:
 			kbd_intr();
-			break;
+			return;
 		case IRQ_OFFSET + 2:
 			cprintf("2 interrupt on irq 7\n");
 			// print_trapframe(tf);
 			return;
 		case IRQ_OFFSET + 3:
-			serial_intr();
+			cprintf("3 interrupt on irq 7\n");
 			break;
 		case IRQ_OFFSET + IRQ_SERIAL:
-			cprintf("IRQ_SERIAL interrupt on irq 7\n");
+			serial_intr();
 			// print_trapframe(tf);
 			return;
 		case IRQ_OFFSET + 5:

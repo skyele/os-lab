@@ -1,8 +1,8 @@
 
 #include "fs.h"
 
-static int block_in_use = 0;
-static int water_line = 32;
+static int time_clock_hdr = 0;
+#define CACHE_SIZE 15
 
 // Return the virtual address of this disk block.
 void*
@@ -34,20 +34,11 @@ va_is_accessed(void *va)
 	return (uvpt[PGNUM(va)] & PTE_A) != 0;
 }
 
-void 
-va_clear_access_bit(void *va)
-{
-	sys_page_map(0, va, 0, va, uvpt[PGNUM(va)] & PTE_SYSCALL);
-	// sys_page_map(0, va, 0, va, PTE_SYSCALL);
-}
-
 // Fault any disk block that is read in to memory by
 // loading it from disk.
 static void
 bc_pgfault(struct UTrapframe *utf)
 {
-	while(block_in_use >= water_line)
-		bc_evict(0);
 	// cprintf("the DISKMAP: 0x%x DISKMAP+DISKSIZE: 0x%x\n", DISKMAP, DISKMAP+DISKSIZE);
 	void *addr = (void *) utf->utf_fault_va;
 	uint32_t blockno = ((uint32_t)addr - DISKMAP) / BLKSIZE;
@@ -70,7 +61,6 @@ bc_pgfault(struct UTrapframe *utf)
 	r = sys_page_alloc(0, addr, PTE_P|PTE_U|PTE_W);
 	if(r < 0)
 		panic("the sys_page_alloc panic!\n");
-	block_in_use++;		
 	ide_read(blockno * BLKSECTS, addr, BLKSECTS);
 	// Clear the dirty bit for the disk block page since we just read the
 	// block from disk
@@ -81,6 +71,7 @@ bc_pgfault(struct UTrapframe *utf)
 	// in?)
 	if (bitmap && block_is_free(blockno))
 		panic("reading free block %08x\n", blockno);
+	bc_evict(addr);
 }
 
 // Flush the contents of the block containing VA out to disk if
@@ -186,33 +177,31 @@ void
 bc_evict(void* now_addr)
 {
 	int r;
-	// first unaccess 
-	for(int i = 3; i < super->s_nblocks; i++){
-		void *addr = diskaddr(i);
-		if(va_is_mapped(addr)){
-			if(va_is_accessed(addr)){
-				if(va_is_dirty(addr))
-					flush_block(addr);
-				if((r = sys_page_unmap(0, addr)) < 0)
-					panic("sys_page_unmap panic\n");
-				block_in_use--;
-				return;
-			}
-		}
-		va_clear_access_bit(addr);
-	}
-	//second access
-	for(int i = 3; i < super->s_nblocks; i++){
-		void *addr = diskaddr(i);
-		if(va_is_mapped(addr)){
-			if(va_is_dirty(addr))
-				flush_block(addr);
-			if((r = sys_page_unmap(0, addr)) < 0)
-				panic("sys_page_unmap panic\n");
-			va_clear_access_bit(addr);
-			block_in_use--;
+	static uintptr_t block_cache_array[CACHE_SIZE];
+	
+	while(true){
+		void *addr = (void *)block_cache_array[time_clock_hdr];
+		if(!addr){
+			block_cache_array[time_clock_hdr] = (uintptr_t)now_addr;
+			time_clock_hdr ++;
+			time_clock_hdr = time_clock_hdr % CACHE_SIZE;
 			return;
 		}
-		va_clear_access_bit(addr);
+		if(va_is_accessed(addr)){
+			r = sys_clear_access_bit(0, addr);
+			if(r < 0)
+				panic("sys_clear_access_bit is panic!\n");
+		}
+		else{
+			if(va_is_dirty(addr)){
+				flush_block(addr);
+			}
+			block_cache_array[time_clock_hdr] = (uintptr_t)now_addr;
+			time_clock_hdr ++;
+			time_clock_hdr = time_clock_hdr % CACHE_SIZE;
+			return;
+		}
+		time_clock_hdr ++;
+		time_clock_hdr = time_clock_hdr % CACHE_SIZE;
 	}
 }

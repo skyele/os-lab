@@ -454,6 +454,21 @@ sys_sbrk(uint32_t inc){
 	return curenv->env_sbrk;
 }
 
+static int 
+sys_clear_access_bit(envid_t envid, void *va){
+	int ret;
+	struct Env* env;
+	ret = envid2env(envid, &env, 0);
+	if(ret < 0)
+		return ret;
+	pte_t *pte_store;
+	struct PageInfo* page = page_lookup(env->env_pgdir, va, &pte_store);
+	if(page == NULL)
+		return -E_INVAL;
+	*pte_store |= PTE_A;
+	*pte_store ^= PTE_A;
+	return 0;
+}
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -516,6 +531,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_env_set_trapframe:
 			ret = sys_env_set_trapframe((envid_t)a1, (struct Trapframe*)a2);
+			break;
+		case SYS_clear_access_bit:
+			ret = sys_clear_access_bit((envid_t) a1, (void *) a2);
 			break;
 		default:
 			ret = -E_INVAL;

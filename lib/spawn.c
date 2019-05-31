@@ -22,6 +22,7 @@ static int copy_shared_pages(envid_t child);
 int
 spawn(const char *prog, const char **argv)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	unsigned char elf_buf[512];
 	struct Trapframe child_tf;
 	envid_t child;
@@ -153,6 +154,7 @@ error:
 int
 spawnl(const char *prog, const char *arg0, ...)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	// We calculate argc by advancing the args until we hit NULL.
 	// The contract of the function guarantees that the last
 	// argument will always be NULL, and that none of the other
@@ -189,6 +191,7 @@ spawnl(const char *prog, const char *arg0, ...)
 static int
 init_stack(envid_t child, const char **argv, uintptr_t *init_esp)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	size_t string_size;
 	int argc, i, r;
 	char *string_store;
@@ -304,30 +307,14 @@ map_segment(envid_t child, uintptr_t va, size_t memsz,
 static int
 copy_shared_pages(envid_t child)
 {
-	// int r;
-	// if(child == 0){
-	// 	thisenv = &envs[ENVX(sys_getenvid())];
-	// 	return 0;
-	// }
-	// for(uintptr_t i = UTEXT; i < USTACKTOP; i+=PGSIZE){
-	// 	if((uvpd[PDX(i)] & PTE_P) && ((uvpt[PGNUM(i)] & (PTE_P | PTE_SHARE)) == (PTE_P | PTE_SHARE)))
-	// 		if((r = sys_page_map((envid_t)0, (void *)i, child, (void *)i, uvpt[PGNUM(i)] & PTE_SYSCALL)) < 0)
-    //     		panic("sys_page_map: %e\n", r);
-	// }
-	// // LAB 5: Your code here.
-	// return 0;
-
-	//lab5 replace
-	uintptr_t addr;
+	cprintf("in %s\n", __FUNCTION__);
 	int r;
-	// We're the parent.
-	// Do the same mapping in child's process as parent
-	// Search from UTEXT to USTACKTOP map the PTE_P | PTE_U | PTE_SHARE page
-	for (addr = UTEXT; addr < USTACKTOP; addr += PGSIZE)
-		if ((uvpd[PDX(addr)] & PTE_P) && (uvpt[PGNUM(addr)] & (PTE_P | PTE_U | PTE_SHARE)) == (PTE_P | PTE_U | PTE_SHARE)){
-		if((r = sys_page_map((envid_t)0, (void *)addr, child, (void *)addr, uvpt[PGNUM(addr)] & PTE_SYSCALL)) < 0)
-			panic("sys_page_map: %e\n", r);
-		}
+	for(uintptr_t i = UTEXT; i < USTACKTOP; i+=PGSIZE){
+		if((uvpd[PDX(i)] & PTE_P) && ((uvpt[PGNUM(i)] & (PTE_P | PTE_U | PTE_SHARE)) == (PTE_P | PTE_U | PTE_SHARE)))
+			if((r = sys_page_map((envid_t)0, (void *)i, child, (void *)i, uvpt[PGNUM(i)] & PTE_SYSCALL)) < 0)
+        		panic("sys_page_map: %e\n", r);
+	}
+	// LAB 5: Your code here.
 	return 0;
 }
 

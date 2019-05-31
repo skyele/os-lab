@@ -160,3 +160,9 @@ sys_sbrk(uint32_t inc)
 {
 	return syscall(SYS_sbrk, 0, (uint32_t)inc, (uint32_t)0, 0, 0, 0);
 }
+
+int
+sys_clear_access_bit(envid_t envid, void *va)
+{
+	return syscall(SYS_clear_access_bit, 1, envid, (uint32_t) va, 0, 0, 0);
+}

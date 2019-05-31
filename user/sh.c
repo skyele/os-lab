@@ -56,7 +56,6 @@ again:
 
 			// LAB 5: Your code here.
 			// panic("< redirection not implemented");
-			cprintf("in dup!!!! the t is %s\n", t);
 			if ((fd = open(t, O_RDONLY|O_CREAT)) < 0) {
 				cprintf("open %s for read: %e", t, fd);
 				exit();

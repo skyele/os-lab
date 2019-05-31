@@ -82,7 +82,6 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 		*env_store = curenv;
 		return 0;
 	}
-
 	// Look up the Env structure via the index part of the envid,
 	// then check the env_id field in that struct Env
 	// to ensure that the envid is not stale
