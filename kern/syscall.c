@@ -11,12 +11,9 @@
 #include <kern/syscall.h>
 #include <kern/console.h>
 #include <kern/sched.h>
-<<<<<<< HEAD
 #include <kern/time.h>
 #include <kern/e1000.h>
-=======
 #include <kern/spinlock.h>
->>>>>>> lab5
 
 // Print a string to the system console.
 // The string is exactly 'len' characters long.
