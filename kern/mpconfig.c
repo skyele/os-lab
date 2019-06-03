@@ -9,6 +9,7 @@
 #include <inc/env.h>
 #include <kern/cpu.h>
 #include <kern/pmap.h>
+#include <kern/kpti.h>
 
 struct CpuInfo cpus[NCPU];
 struct CpuInfo *bootcpu;

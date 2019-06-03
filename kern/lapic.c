@@ -9,6 +9,7 @@
 #include <inc/x86.h>
 #include <kern/pmap.h>
 #include <kern/cpu.h>
+#include <kern/kpti.h>
 
 // Local APIC registers, divided by 4 for use as uint32_t[] indices.
 #define ID      (0x0020/4)   // ID

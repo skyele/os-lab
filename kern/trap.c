@@ -14,6 +14,7 @@
 #include <kern/cpu.h>
 #include <kern/spinlock.h>
 #include <kern/time.h>
+#include <kern/kpti.h>
 
 static struct Taskstate ts;
 
@@ -323,3 +324,15 @@ page_fault_handler(struct Trapframe *tf)
 	env_destroy(curenv);
 }
 
+__user_mapped_text void
+switch_and_trap(struct Trapframe *frame)
+{
+	// LAB7: Your code here
+	if ((frame->tf_cs & 3) == 3) {
+		// Calculate the current CPU core number
+		int cpunum = -1;
+		// Load the physical address of kernel page table
+		// Switch to the kernel page table
+	}
+	trap(frame);
+}

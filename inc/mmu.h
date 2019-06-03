@@ -178,6 +178,11 @@ struct Segdesc {
     type, 1, dpl, 1, (unsigned) (lim) >> 16, 0, 0, 1, 0,		\
     (unsigned) (base) >> 24 }
 
+#define SEG_BASE(seg) \
+( seg.sd_base_15_0 | (seg.sd_base_23_16 << 16) | (seg.sd_base_31_24 << 24))
+#define SEG_LIM(seg) \
+( seg.sd_lim_15_0 | (seg.sd_lim_19_16 << 16))
+
 #endif /* !__ASSEMBLER__ */
 
 // Application segment type bits

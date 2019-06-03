@@ -14,6 +14,7 @@
 #include <kern/sched.h>
 #include <kern/cpu.h>
 #include <kern/spinlock.h>
+#include <kern/kpti.h>
 
 struct Env *envs = NULL;		// All environments
 static struct Env *env_free_list;	// Free environment list
@@ -186,6 +187,9 @@ env_setup_vm(struct Env *e)
 	// UVPT maps the env's own page table read-only.
 	// Permissions: kernel R, user R
 	e->env_pgdir[PDX(UVPT)] = PADDR(e->env_pgdir) | PTE_P | PTE_U;
+
+	// LAB 7: Your code here.
+	// Allocate another page to hold kernel page table
 
 	return 0;
 }
@@ -435,6 +439,59 @@ env_destroy(struct Env *e)
 	}
 }
 
+static void
+check_user_map(pde_t *pgdir, void *va, uint32_t len, const char *name)
+{
+	for (uintptr_t _va = ROUNDDOWN((uintptr_t) va, PGSIZE); _va < ROUNDUP((uintptr_t) va + len, PGSIZE); _va += PGSIZE) {
+		pte_t *pte;
+		if (page_lookup(pgdir, (void *) _va, &pte) == NULL) {
+			cprintf("%s not mapped in env_pgdir\n", name);
+			return;
+		}
+		if (*pte & PTE_U) {
+			cprintf("%s wrong permission in env_pgdir\n", name);
+			return;
+		}
+	}
+}
+
+extern struct Pseudodesc idt_pd;
+static void
+check_isolate(struct Env *e)
+{
+	pde_t *pgdir = e->env_pgdir;
+	uint32_t cnt = 0;
+	for (uintptr_t va = ULIM; va; va += PGSIZE) {
+		if ((uintptr_t) __USER_MAP_BEGIN__ <= va && va < (uintptr_t) __USER_MAP_END__)
+			continue;
+		if (KSTACKTOP - (KSTKSIZE + KSTKGAP) * NCPU <= va && va < KSTACKTOP)
+			continue;
+		if ((uintptr_t) envs <= va && va < (uintptr_t) (envs + NENV))
+			continue;
+		if (pgdir[PDX(va)] & PTE_P) {
+			if (pgdir[PDX(va)] & PTE_PS)
+				panic("User page table has kernel address %08x mapped", va);
+			else {
+				pte_t *pte = KADDR(PTE_ADDR(pgdir[PDX(va)]));
+				if (pte[PTX(va)] & PTE_P)
+					panic("User page table has kernel address %08x mapped", va);
+			}
+		}
+	}
+	check_user_map(pgdir, gdt, sizeof(gdt), "GDT");
+	check_user_map(pgdir, (void *) idt_pd.pd_base, idt_pd.pd_lim, "IDT");
+	for (int i = 0; i < NCPU; i++) {
+		char name[] = "TSS0";
+		name[3] = '0' + i;
+		check_user_map(pgdir, (void *) SEG_BASE(gdt[(GD_TSS0 >> 3) + i]), SEG_LIM(gdt[(GD_TSS0 >> 3) + i]), name);
+	}
+	for (int i = 0; i < NCPU; i++) {
+		char name[] = "kstack0";
+		name[6] = '0' + i;
+		check_user_map(pgdir, (void *) KSTACKTOP - (KSTKSIZE + KSTKGAP) * i - KSTKSIZE, KSTKSIZE, name);
+	}
+	check_user_map(pgdir, env_pop_tf, sizeof(env_pop_tf), "env_pop_tf");
+}
 
 //
 // Restores the register values in the Trapframe with the 'iret' instruction.
@@ -445,9 +502,6 @@ env_destroy(struct Env *e)
 void
 env_pop_tf(struct Trapframe *tf)
 {
-	// Record the CPU we are running on for user-space debugging
-	curenv->env_cpunum = cpunum();
-
 	asm volatile(
 		"\tmovl %0,%%esp\n"
 		"\tpopal\n"
@@ -459,6 +513,17 @@ env_pop_tf(struct Trapframe *tf)
 	panic("iret failed");  /* mostly to placate the compiler */
 }
 
+__user_mapped_text
+__attribute__((noreturn))
+__attribute__((noinline))
+static void
+kpti_run(struct Env *e)
+{
+	curenv->env_cpunum = cpunum();
+	lcr3(PADDR(e->env_pgdir));
+	env_pop_tf(&e->env_tf);
+}
+
 //
 // Context switch from curenv to env e.
 // Note: if this is the first call to env_run, curenv is NULL.
@@ -468,6 +533,9 @@ env_pop_tf(struct Trapframe *tf)
 void
 env_run(struct Env *e)
 {
+	// Verify no sensitive kernel page has PTE_P
+	check_isolate(e);
+
 	// Step 1: If this is a context switch (a new environment is running):
 	//	   1. Set the current environment (if any) back to
 	//	      ENV_RUNNABLE if it is ENV_RUNNING (think about

@@ -4,6 +4,16 @@ USERLIBS += lwip
 
 USERLIBS += jos
 
+$(OBJDIR)/user/nosyscall: user/nosyscall.c user/user.ld
+	@echo + cc[USER] $<
+	@mkdir -p $(@D)
+	$(V)$(CC) -fno-pie -nostdinc $(USER_CFLAGS) -c -o $@.o $<
+	@echo + ld $@
+	$(V)$(LD) -o $@.debug $(ULDFLAGS) $(LDFLAGS) -nostdlib $@.o $(GCC_LIB)
+	$(V)$(OBJDUMP) -S $@.debug > $@.asm
+	$(V)$(NM) -n $@.debug > $@.sym
+	$(V)$(OBJCOPY) -R .stab -R .stabstr --add-gnu-debuglink=$(basename $@.debug) $@.debug $@
+
 $(OBJDIR)/user/%.o: user/%.c $(OBJDIR)/.vars.USER_CFLAGS
 	@echo + cc[USER] $<
 	@mkdir -p $(@D)

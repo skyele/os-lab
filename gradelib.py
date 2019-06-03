@@ -483,7 +483,7 @@ Failed to shutdown QEMU.  You might need to 'killall qemu' or
 # Monitors
 #
 
-__all__ += ["save", "stop_breakpoint", "call_on_line", "stop_on_line"]
+__all__ += ["save", "stop_breakpoint", "call_on_line", "stop_on_line", "stop_on_reboot"]
 
 def save(path):
     """Return a monitor that writes QEMU's output to path.  If the
@@ -545,3 +545,13 @@ def stop_on_line(regexp):
     def stop(line):
         raise TerminateTest
     return call_on_line(regexp, stop)
+
+def stop_on_reboot():
+    def setup_stop_on_reboot(runner):
+        times = [3]
+        def stop(line):
+            if times[0] == 0:
+                raise TerminateTest
+            times[0] = times[0] - 1
+        call_on_line("Physical memory: [0-9]+K available, base = [0-9]+K, extended = [0-9]+K", stop)(runner)
+    return setup_stop_on_reboot

@@ -53,8 +53,10 @@ i386_init(void)
 	// Starting non-boot CPUs
 	boot_aps();
 
+#if !defined(TEST_NO_FS)
 	// Start fs.
 	ENV_CREATE(fs_fs, ENV_TYPE_FS);
+#endif
 
 #if !defined(TEST_NO_NS)
 	// Start ns.
@@ -63,7 +65,11 @@ i386_init(void)
 
 #if defined(TEST)
 	// Don't touch -- used by grading script!
+#if defined(TEST_ENV_TYPE)
+	ENV_CREATE(TEST, TEST_ENV_TYPE);
+#else
 	ENV_CREATE(TEST, ENV_TYPE_USER);
+#endif
 #else
 	// Touch all you want.
 	ENV_CREATE(user_icode, ENV_TYPE_USER);

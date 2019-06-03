@@ -39,6 +39,17 @@ SECTIONS
 				   for this section */
 	}
 
+	. = ALIGN(0x1000);
+	PROVIDE(__USER_MAP_BEGIN__ = .);
+
+	.user_mapped : {
+		*(.user_mapped.text);
+		*(.user_mapped.data);
+	}
+
+	. = ALIGN(0x1000);
+	PROVIDE(__USER_MAP_END__ = .);
+
 	/* Adjust the address for the data segment to the next page */
 	. = ALIGN(0x1000);
 

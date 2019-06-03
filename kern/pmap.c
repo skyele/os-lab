@@ -10,6 +10,7 @@
 #include <kern/env.h>
 #include <kern/cpu.h>
 #include <inc/queue.h>
+#include <kern/kpti.h>
 
 // These variables are set by i386_detect_memory()
 size_t npages;			// Amount of physical memory (in pages)
@@ -239,6 +240,9 @@ mem_init(void)
 
 	// Some more checks, only possible after kern_pgdir is installed.
 	check_page_installed_pgdir();
+
+	cprintf("__USER_MAP_BEGIN__ = %08x\n", __USER_MAP_BEGIN__);
+	cprintf("__USER_MAP_END__ = %08x\n", __USER_MAP_END__);
 }
 
 // Modify mappings in kern_pgdir to support SMP
