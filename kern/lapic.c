@@ -61,6 +61,9 @@ lapic_init(void)
 	// lapicaddr is the physical address of the LAPIC's 4K MMIO
 	// region.  Map it in to virtual memory so we can access it.
 	lapic = mmio_map_region(lapicaddr, 4096);
+	// cprintf("after lapic init\n");
+	//cprintf("lapic[[[[id]]]]]] %d\n", lapic[ID]);
+	// cprintf("after check lapic\n");
 
 	// Enable local APIC; set spurious interrupt vector.
 	lapicw(SVR, ENABLE | (IRQ_OFFSET + IRQ_SPURIOUS));
@@ -114,8 +117,9 @@ lapic_init(void)
 int
 cpunum(void)
 {
-	if (lapic)
+	if (lapic){
 		return lapic[ID] >> 24;
+	}
 	return 0;
 }
 

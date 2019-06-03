@@ -213,8 +213,18 @@ serve_read(envid_t envid, union Fsipc *ipc)
 	if (debug)
 		cprintf("serve_read %08x %08x %08x\n", envid, req->req_fileid, req->req_n);
 
+	struct OpenFile* open_file;
+	int r;
+	r =	openfile_lookup(envid, req->req_fileid, &open_file);
+	if(r < 0)
+		return r;
+	r = file_read(open_file->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), open_file->o_fd->fd_offset);
+	if(r < 0)
+		return r;
+
+	open_file->o_fd->fd_offset += r;
 	// Lab 5: Your code here:
-	return 0;
+	return r;
 }
 
 
@@ -228,8 +238,22 @@ serve_write(envid_t envid, struct Fsreq_write *req)
 	if (debug)
 		cprintf("serve_write %08x %08x %08x\n", envid, req->req_fileid, req->req_n);
 
+	struct OpenFile* open_file;
+	int r;
+	r =	openfile_lookup(envid, req->req_fileid, &open_file);
+	if(r < 0)
+		return r;
+	//lab5 bug?
+	r = file_write(open_file->o_file, req->req_buf, 
+			req->req_n, open_file->o_fd->fd_offset);
+	if(r < 0)
+		return r;
+
+	open_file->o_fd->fd_offset += r;
+	return r;
 	// LAB 5: Your code here.
-	panic("serve_write not implemented");
+
+	// panic("serve_write not implemented");
 }
 
 // Stat ipc->stat.req_fileid.  Return the file's struct Stat to the
@@ -294,6 +318,7 @@ fshandler handlers[] = {
 void
 serve(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	uint32_t req, whom;
 	int perm, r;
 	void *pg;
@@ -329,6 +354,7 @@ serve(void)
 void
 umain(int argc, char **argv)
 {
+	cprintf("in serv.c %s\n", __FUNCTION__);
 	static_assert(sizeof(struct File) == 256);
 	binaryname = "fs";
 	cprintf("FS is running\n");

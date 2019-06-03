@@ -10,7 +10,7 @@ static void
 putch(int ch, int *cnt)
 {
 	cputchar(ch);
-	*cnt++;
+	(*cnt)++;
 }
 
 int
@@ -31,7 +31,6 @@ cprintf(const char *fmt, ...)
 	va_start(ap, fmt);
 	cnt = vcprintf(fmt, ap);
 	va_end(ap);
-
 	return cnt;
 }
 

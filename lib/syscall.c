@@ -7,7 +7,6 @@ static inline int32_t
 syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
 {
 	int32_t ret;
-
 	// Generic system call: pass system call number in AX,
 	// up to five parameters in DX, CX, BX, DI, SI.
 	// Interrupt kernel with T_SYSCALL.
@@ -19,7 +18,10 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 	// The last clause tells the assembler that this can
 	// potentially change the condition codes and arbitrary
 	// memory locations.
-
+	// cprintf("????????\n");
+	// cprintf("in lib%s\n", __FUNCTION__);
+	// asm volatile("cli\n"); //lab4 bug? corresponding in /kern/syscall.c
+	// cprintf("the check %d\n", check);
 	asm volatile("int %1\n"
 		     : "=a" (ret)
 		     : "i" (T_SYSCALL),
@@ -30,7 +32,37 @@ syscall(int num, int check, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 		       "D" (a4),
 		       "S" (a5)
 		     : "cc", "memory");
+	// asm volatile("sti\n");//lab4 bug?
+	// asm volatile(
+	// 	"pushl %%ecx\n\t"
+	// 	"pushl %%edx\n\t"
+	// 	"pushl %%ebx\n\t"
+	// 	"pushl %%esp\n\t"
+	// 	"pushl %%ebp\n\t"
+	// 	"pushl %%esi\n\t"
+	// 	"pushl %%edi\n\t"
+	
+	// 	"pushl %%esp\n\t"
+	// 	"popl %%ebp\n\t"
+	// 	"leal after_sysenter_label%=, %%esi\n\t"
+	// 	"sysenter\n\t"
+	// 	"after_sysenter_label%=:\n\t"
 
+	// 	"popl %%edi\n\t"
+	// 	"popl %%esi\n\t"
+	// 	"popl %%ebp\n\t"
+	// 	"popl %%esp\n\t"
+	// 	"popl %%ebx\n\t"
+	// 	"popl %%edx\n\t"
+	// 	"popl %%ecx\n\t"
+	// 	:   "=a"(ret)
+	// 	:   "a"(num),xit
+	// 		"d"(a1),
+	// 		"c"(a2),
+	// 		"b"(a3),
+	// 		"D"(a4)
+	// 	:   "cc", "memory");xit
+	// cprintf("the check %d\n",check);
 	if(check && ret > 0)
 		panic("syscall %d returned %d (> 0)", num, ret);
 
@@ -145,4 +177,9 @@ int
 sys_net_recv(void *buf, uint32_t len)
 {
 	return (unsigned int) syscall(SYS_net_recv, 0, (uint32_t) buf, len, 0, 0, 0);
+}
+int
+sys_clear_access_bit(envid_t envid, void *va)
+{
+	return syscall(SYS_clear_access_bit, 1, envid, (uint32_t) va, 0, 0, 0);
 }

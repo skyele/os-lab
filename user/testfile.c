@@ -63,8 +63,11 @@ umain(int argc, char **argv)
 	fdcopy = *FVA;
 	sys_page_unmap(0, FVA);
 
-	if ((r = devfile.dev_read(&fdcopy, buf, sizeof buf)) != -E_INVAL)
+	cprintf("%d: before dev_read!!\n", thisenv->env_id);
+	if ((r = devfile.dev_read(&fdcopy, buf, sizeof buf)) != -E_INVAL){
+		cprintf("%d: after dev_read!! the r: %d\n", thisenv->env_id, r);
 		panic("serve_read does not handle stale fileids correctly: %e", r);
+	}
 	cprintf("stale fileid is good\n");
 
 	// Try writing
