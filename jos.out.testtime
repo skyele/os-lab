@@ -1,0 +1,60 @@
++ ld obj/kern/kernel
++ mk obj/kern/kernel.img
+
+(process:23405): GLib-WARNING **: 22:16:18.334: ../../../../glib/gmem.c:493: custom memory allocation vtable not supported
+
+(process:23407): GLib-WARNING **: 22:16:18.345: ../../../../glib/gmem.c:493: custom memory allocation vtable not supported
+pading space in the right to number 22: 22       .
+
+error! writing through NULL pointer! (%n argument)
+show me the sign: +1024, -1024
+Physical memory: 131072K available, base = 640K, extended = 130432K
+check_page_free_list() succeeded!
+check_page_alloc() succeeded!
+check_page() succeeded!
+check_kern_pgdir() succeeded!
+check_page_free_list() succeeded!
+check_page_installed_pgdir() succeeded!
+SMP: CPU 0 found 1 CPU(s)
+enabled interrupts: 1 2 4
+PCI: 00:00.0: 8086:1237: class: 6.0 (Bridge device) irq: 0
+PCI: 00:01.0: 8086:7000: class: 6.1 (Bridge device) irq: 0
+PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0
+PCI: 00:01.3: 8086:7113: class: 6.80 (Bridge device) irq: 9
+PCI: 00:02.0: 1013:00b8: class: 3.0 (Display controller) irq: 0
+PCI: 00:03.0: 8086:100e: class: 2.0 (Network controller) irq: 11
+[00000000] new env 00001000
+[00000000] new env 00001001
+call umain!
+in serv.c umain
+FS is running
+FS can do I/O
+Device 1 presence: 1
+call umain!
+block cache is good
+superblock is good
+bitmap is good
+in serve
+starting count down: 5 4097: in _panic
+[00001001] user panic in <unknown> at user/testtime.c:11: sys_time_msec: invalid parameter
+Welcome to the JOS kernel monitor!
+Type 'help' for a list of commands.
+TRAP frame at 0xf05ff080 from CPU 0
+  edi  0x00000001
+  esi  0x00802615
+  ebp  0xeebfdf80
+  oesp 0xefffffdc
+  ebx  0xeebfdf94
+  edx  0xeebfde38
+  ecx  0x00000001
+  eax  0x00000001
+  es   0x----0023
+  ds   0x----0023
+  trap 0x00000003 Breakpoint
+  err  0x00000000
+  eip  0x00800211
+  cs   0x----001b
+  flag 0x00000286
+  esp  0xeebfdf78
+  ss   0x----0023
+qemu: terminating on signal 15 from pid 23309

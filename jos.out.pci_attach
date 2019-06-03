@@ -1,0 +1,45 @@
++ ld obj/kern/kernel
++ mk obj/kern/kernel.img
+
+(process:23504): GLib-WARNING **: 22:16:20.172: ../../../../glib/gmem.c:493: custom memory allocation vtable not supported
+
+(process:23506): GLib-WARNING **: 22:16:20.178: ../../../../glib/gmem.c:493: custom memory allocation vtable not supported
+pading space in the right to number 22: 22       .
+
+error! writing through NULL pointer! (%n argument)
+show me the sign: +1024, -1024
+Physical memory: 131072K available, base = 640K, extended = 130432K
+check_page_free_list() succeeded!
+check_page_alloc() succeeded!
+check_page() succeeded!
+check_kern_pgdir() succeeded!
+check_page_free_list() succeeded!
+check_page_installed_pgdir() succeeded!
+SMP: CPU 0 found 1 CPU(s)
+enabled interrupts: 1 2 4
+PCI: 00:00.0: 8086:1237: class: 6.0 (Bridge device) irq: 0
+PCI: 00:01.0: 8086:7000: class: 6.1 (Bridge device) irq: 0
+PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0
+PCI: 00:01.3: 8086:7113: class: 6.80 (Bridge device) irq: 9
+PCI: 00:02.0: 1013:00b8: class: 3.0 (Display controller) irq: 0
+PCI: 00:03.0: 8086:100e: class: 2.0 (Network controller) irq: 11
+[00000000] new env 00001000
+[00000000] new env 00001001
+call umain!
+in serv.c umain
+FS is running
+FS can do I/O
+Device 1 presence: 1
+call umain!
+hello, world
+i am environment 00001001
+[00001001] exiting gracefully
+[00001001] free env 00001001
+block cache is good
+superblock is good
+bitmap is good
+in serve
+No runnable environments in the system!
+Welcome to the JOS kernel monitor!
+Type 'help' for a list of commands.
+qemu: terminating on signal 15 from pid 23410
