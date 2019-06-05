@@ -354,7 +354,7 @@ serve(void)
 void
 umain(int argc, char **argv)
 {
-	cprintf("in serv.c %s\n", __FUNCTION__);
+	cprintf("%d: in serv.c %s\n", thisenv->env_id, __FUNCTION__);
 	static_assert(sizeof(struct File) == 256);
 	binaryname = "fs";
 	cprintf("FS is running\n");

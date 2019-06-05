@@ -8,11 +8,6 @@ static struct E1000 *base;
 struct tx_desc *tx_descs;
 #define N_TXDESC (PGSIZE / sizeof(struct tx_desc))
 char tx_buffer[N_TXDESC][PKT_SIZE];
-char transmit_packet_buffer[N_TXDESC][PKT_SIZE];
-
-static void set_dd_bit(struct tx_desc* ptr){
-    ptr->status |= E1000_TX_STATUS_DD;
-}
 
 int
 e1000_tx_init()
@@ -29,7 +24,7 @@ e1000_tx_init()
 	tx_descs = (struct tx_desc *)page2kva(page);
 	// Initialize all descriptors
 	for(int i = 0; i < N_TXDESC; i++){
-		tx_descs[i].addr = PADDR(&tx_buffer[i]);
+		tx_descs[i].addr = PADDR(tx_buffer[i]);
 		tx_descs[i].cmd |= E1000_TX_CMD_EOP|E1000_TX_CMD_RS;
 		tx_descs[i].status |= E1000_TX_STATUS_DD;
 		tx_descs[i].length = 0;
@@ -53,42 +48,41 @@ e1000_tx_init()
 
 struct rx_desc *rx_descs;
 #define N_RXDESC (PGSIZE / sizeof(struct rx_desc))
+char rx_buffer[N_RXDESC][PKT_SIZE];
 
 int
 e1000_rx_init()
 {
-	cprintf("in %s\n", __FUNCTION__);
-	// int r;
-	// // Allocate one page for descriptors
-	// struct PageInfo* page = page_alloc(0);
-	// if(page == NULL)
-	// 		panic("page_alloc panic\n");
-	// r = page_insert(kern_pgdir, page, page2kva(page), PTE_P|PTE_U|PTE_W);
-	// if(r < 0)
-	// 	panic("page insert panic\n");
-	// rx_descs = (struct rx_desc *)page2kva(page);
-	// // Initialize all descriptors
-	// // You should allocate some pages as receive buffer
-	// for(int i = 0; i < N_RXDESC; i++){
-	// 	struct PageInfo* page = page_alloc(ALLOC_ZERO);
-	// 	if(page == NULL)
-	// 		panic("page_alloc panic\n");
-	// 	r = page_insert(kern_pgdir, page, page2kva(page), PTE_P|PTE_U|PTE_W);
-	// 	if(r < 0)
-	// 		panic("page insert panic\n");
-	// 	rx_descs[i].addr = (uint32_t)page2pa(page);
-	// 	rx_descs[i].status |= E1000_RX_STATUS_DD;
-	// }
-	// // Set hardward registers
-	// // Look kern/e1000.h to find useful definations
-	// //lab6 bug?
-	// base->RCTL |= E1000_RCTL_EN|E1000_RCTL_BSIZE_2048|E1000_RCTL_SECRC;
-	// base->RDBAL = PADDR(rx_descs);
-	// base->RDBAH = (uint32_t)0;
-	// base->RDLEN = N_RXDESC * sizeof(struct rx_desc); 
+	cprintf("in %s\n",__FUNCTION__);
+	int r;
+	// Allocate one page for descriptors
+	struct PageInfo* page = page_alloc(ALLOC_ZERO);
+	if(page == NULL)
+			panic("page_alloc panic\n");
+	rx_descs = (struct rx_desc *)page2kva(page);
+	// Initialize all descriptors
+	// You should allocate some pages as receive buffer
+	for(int i = 0; i < N_RXDESC; i++){
+		rx_descs[i].addr = PADDR(&rx_buffer[i]);
+		rx_descs[i].status |= E1000_RX_STATUS_DD;
+	}
+	// Set hardward registers
+	// Look kern/e1000.h to find useful definations
+	//lab6 bug?
+	base->RAL = QEMU_MAC_LOW;
+	base->RAH = QEMU_MAC_HIGH;
+	// memset(base->MTA, 0, 128);
+	base->IMS = 0;
+	base->RDBAL = PADDR(rx_descs);
+	base->RDBAH = (uint32_t)0;
+	base->RDLEN = N_RXDESC * sizeof(struct rx_desc); 
 
-	// base->RDH = 0;
-	// base->RDT = 0;
+	base->RCTL |= E1000_RCTL_EN|E1000_RCTL_BSIZE_2048|E1000_RCTL_SECRC;
+
+	base->RDH = 0;
+	base->RDT = N_RXDESC;
+
+	base->RCTL |= E1000_RCTL_BSIZE_2048 | E1000_RCTL_EN | E1000_RCTL_SECRC;
 	return 0;
 }
 
@@ -103,6 +97,9 @@ pci_e1000_attach(struct pci_func *pcif)
 	base = (struct E1000 *)mmio_map_region(pcif->reg_base[0], pcif->reg_size[0]);
 	e1000_tx_init();
 	e1000_rx_init();
+
+	// char test[100]="123456";
+	// e1000_tx(test,3);
 	return 0;
 }
 
@@ -111,7 +108,19 @@ e1000_tx(const void *buf, uint32_t len)
 {
 	// Send 'len' bytes in 'buf' to ethernet
 	// Hint: buf is a kernel virtual address
+	cprintf("in %s\n", __FUNCTION__);
+	if(tx_descs[base->TDT].status & E1000_TX_STATUS_DD){
+		tx_descs[base->TDT].status ^= E1000_TX_STATUS_DD;
+		memset(KADDR(tx_descs[base->TDT].addr), 0 , PKT_SIZE);
+		memcpy(KADDR(tx_descs[base->TDT].addr), buf, len);
+		tx_descs[base->TDT].length = len;
+		tx_descs[base->TDT].cmd |= E1000_TX_CMD_EOP|E1000_TX_CMD_RS;
 
+		base->TDT = (base->TDT + 1)%N_TXDESC;
+	}
+	else{
+		return -E_TX_FULL;
+	}
 	return 0;
 }
 

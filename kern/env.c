@@ -90,6 +90,9 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	e = &envs[ENVX(envid)];
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
 		*env_store = 0;
+		if(e->env_status == ENV_FREE)
+			cprintf("ssssssssssssssssss %d\n", envid);
+		cprintf("222222222222222222222\n");
 		return -E_BAD_ENV;
 	}
 
@@ -100,6 +103,7 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	// or an immediate child of the current environment.
 	if (checkperm && e != curenv && e->env_parent_id != curenv->env_id) {
 		*env_store = 0;
+		cprintf("33333333333333333333333\n");
 		return -E_BAD_ENV;
 	}
 
@@ -400,7 +404,7 @@ void
 env_create(uint8_t *binary, enum EnvType type)
 {
 	// LAB 3: Your code here.
-
+	cprintf("in %s\n", __FUNCTION__);
 	// If this is the file server (type == ENV_TYPE_FS) give it I/O privileges.
 	// LAB 5: Your code here.
 	struct Env *e;
@@ -461,7 +465,7 @@ env_free(struct Env *e)
 	pa = PADDR(e->env_pgdir);
 	e->env_pgdir = 0;
 	page_decref(pa2page(pa));
-
+	cprintf("in env_free we set the ENV_FREE\n");
 	// return the environment to the free list
 	e->env_status = ENV_FREE;
 	e->env_link = env_free_list;

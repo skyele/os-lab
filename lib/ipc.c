@@ -30,6 +30,7 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 {
 	// LAB 4: Your code here.
 	// panic("ipc_recv not implemented");
+	// cprintf("in %s\n", __FUNCTION__);
 	int ret;
 	if(!pg)
 		pg = (void *)UTOP;
@@ -64,6 +65,7 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 void
 ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 {	
+	// cprintf("%d: in %s to_env is %d\n", thisenv->env_id, __FUNCTION__, to_env);
 	int ret;
 	if(!pg)
 		pg = (void *)UTOP;

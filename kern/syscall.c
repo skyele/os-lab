@@ -351,12 +351,13 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 {
 	// // LAB 4: Your code here.
 	// // panic("sys_ipc_try_send not implemented");
-	
+	// cprintf("in %s\n", __FUNCTION__);
 	int ret;
 	struct Env* dst_env;
 	ret = envid2env(envid, &dst_env, 0);
-	if(ret < 0)
+	if(ret < 0){
 		return ret;
+	}
 	if(!dst_env->env_ipc_recving)
 		return -E_IPC_NOT_RECV;
 	
@@ -375,8 +376,10 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 			return -E_INVAL;
 		if(dst_env->env_ipc_dstva < (void *)UTOP){
 			ret = page_insert(dst_env->env_pgdir, page, dst_env->env_ipc_dstva, perm);
-			if(ret < 0)
+			if(ret < 0){
+				cprintf("2the ret in rece %d\n", ret);
 				return ret;
+			}
 		}
 	}
 
@@ -388,7 +391,6 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 	dst_env->env_tf.tf_regs.reg_eax = 0;
 
 	//how to detect is there are enough memory in srcva?
-
 	return 0;
 }
 
@@ -472,7 +474,31 @@ sys_net_send(const void *buf, uint32_t len)
 	// Check the user permission to [buf, buf + len]
 	// Call e1000_tx to send the packet
 	// Hint: e1000_tx only accept kernel virtual address
-	return -1;
+	cprintf("in %s\n", __FUNCTION__);
+	int r = 0;
+	// int cur_len = len;
+	// char *cur_buf = (char *)buf;
+	user_mem_assert(curenv, buf, len, PTE_U);
+
+	// struct PageInfo *page = page_alloc(ALLOC_ZERO);
+	// if(page == NULL)
+	// 	panic("the page_alloc panic\n");
+	// cprintf("the len is %d\n", len);
+
+	// while(cur_len > 0){
+	// 	int copy_len = cur_len>=PKT_SIZE?PKT_SIZE:cur_len;
+	// 	memcpy(page2kva(page), cur_buf, copy_len);
+	// 	r = e1000_tx(page2kva(page), copy_len);	
+	// 	if(r < 0)
+	// 		return r;
+	// 	cur_len -= copy_len;
+	// 	cur_buf += copy_len;
+	// 	memset(page2kva(page), 0, copy_len);
+	// }
+	r = e1000_tx(buf, len);	
+	if(r < 0)
+		return r;
+	return 0;
 }
 
 int
@@ -568,6 +594,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_time_msec:
 			ret = sys_time_msec();
+			break;
+		case SYS_net_send:
+			ret = sys_net_send((void *)a1, (uint32_t)a2);
 			break;
 		default:
 			ret = -E_INVAL;

@@ -30,10 +30,12 @@ libmain(int argc, char **argv)
 	if (argc > 0)
 		binaryname = argv[0];
 
-	cprintf("in libmain.c call umain!\n");
+	cprintf("%d: in libmain.c call umain!\n", thisenv->env_id);
+	cprintf("before umain\n");
 	// call user main routine
 	umain(argc, argv);
-
+	cprintf("after umain\n");
+	cprintf("%d: limain.c exit()\n", thisenv->env_id);
 	// exit gracefully
 	exit();
 }

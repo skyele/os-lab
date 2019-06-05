@@ -27,7 +27,9 @@ enum {
 	E_NOT_SUPP	,	// Operation not supported
 
 	E_AGAIN		,	// Resource not available, try again
-
+	
+	E_TX_FULL   ,
+	
 	MAXERROR
 };
 
