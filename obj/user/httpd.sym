@@ -130,9 +130,9 @@
 00802a57 T pageref
 00802aa0 T __udivdi3
 00802bb0 T __umoddi3
-00802ee8 r __FUNCTION__.1854
-00803220 r error_string
-0080330c r devtab
+00802ef8 r __FUNCTION__.1854
+00803240 r error_string
+0080332c r devtab
 00804000 D errors
 00804010 D headers
 00804020 D binaryname

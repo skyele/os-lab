@@ -121,7 +121,7 @@
 008028c1 T pageref
 00802900 T __udivdi3
 00802a10 T __umoddi3
-00802bf4 r __FUNCTION__.1854
+00802c04 r __FUNCTION__.1854
 00802f40 r error_string
 0080302c r devtab
 00803124 r __FUNCTION__.1924

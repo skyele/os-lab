@@ -30,7 +30,7 @@ libmain(int argc, char **argv)
 	if (argc > 0)
 		binaryname = argv[0];
 
-	cprintf("call umain!\n");
+	cprintf("in libmain.c call umain!\n");
 	// call user main routine
 	umain(argc, argv);
 

@@ -2653,7 +2653,7 @@ serve(void)
   8016cc:	83 ec 18             	sub    $0x18,%esp
 	cprintf("in %s\n", __FUNCTION__);
   8016cf:	68 10 45 80 00       	push   $0x804510
-  8016d4:	68 6b 47 80 00       	push   $0x80476b
+  8016d4:	68 78 47 80 00       	push   $0x804778
   8016d9:	e8 fb 06 00 00       	call   801dd9 <cprintf>
   8016de:	83 c4 10             	add    $0x10,%esp
 	int perm, r;
@@ -2794,7 +2794,7 @@ fs_test(void)
   8017fd:	83 ec 1c             	sub    $0x1c,%esp
 	cprintf("in %s\n", __FUNCTION__);
   801800:	68 48 47 80 00       	push   $0x804748
-  801805:	68 6b 47 80 00       	push   $0x80476b
+  801805:	68 78 47 80 00       	push   $0x804778
   80180a:	e8 ca 05 00 00       	call   801dd9 <cprintf>
 	int r;
 	char *blk;
@@ -3204,7 +3204,7 @@ libmain(int argc, char **argv)
   801c97:	8b 00                	mov    (%eax),%eax
   801c99:	a3 60 90 80 00       	mov    %eax,0x809060
 
-	cprintf("call umain!\n");
+	cprintf("in libmain.c call umain!\n");
   801c9e:	83 ec 0c             	sub    $0xc,%esp
   801ca1:	68 50 47 80 00       	push   $0x804750
   801ca6:	e8 2e 01 00 00       	call   801dd9 <cprintf>
@@ -3263,9 +3263,9 @@ _panic(const char *file, int line, const char *fmt, ...)
   801ce8:	a1 50 a0 80 00       	mov    0x80a050,%eax
   801ced:	8b 40 48             	mov    0x48(%eax),%eax
   801cf0:	83 ec 04             	sub    $0x4,%esp
-  801cf3:	68 98 47 80 00       	push   $0x804798
+  801cf3:	68 a4 47 80 00       	push   $0x8047a4
   801cf8:	50                   	push   %eax
-  801cf9:	68 67 47 80 00       	push   $0x804767
+  801cf9:	68 74 47 80 00       	push   $0x804774
   801cfe:	e8 d6 00 00 00       	call   801dd9 <cprintf>
 	va_list ap;
 
@@ -3283,7 +3283,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   801d17:	ff 75 08             	pushl  0x8(%ebp)
   801d1a:	56                   	push   %esi
   801d1b:	50                   	push   %eax
-  801d1c:	68 74 47 80 00       	push   $0x804774
+  801d1c:	68 80 47 80 00       	push   $0x804780
   801d21:	e8 b3 00 00 00       	call   801dd9 <cprintf>
 		sys_getenvid(), binaryname, file, line);
 	vcprintf(fmt, ap);
@@ -3512,7 +3512,7 @@ printnum(void (*putch)(int, void*), void *putdat,
   801eac:	ff 75 e0             	pushl  -0x20(%ebp)
   801eaf:	e8 8c 21 00 00       	call   804040 <__umoddi3>
   801eb4:	83 c4 14             	add    $0x14,%esp
-  801eb7:	0f be 80 9f 47 80 00 	movsbl 0x80479f(%eax),%eax
+  801eb7:	0f be 80 ab 47 80 00 	movsbl 0x8047ab(%eax),%eax
   801ebe:	50                   	push   %eax
   801ebf:	ff d6                	call   *%esi
   801ec1:	83 c4 10             	add    $0x10,%esp
@@ -3704,7 +3704,7 @@ sprintputch(int ch, struct sprintbuf *b)
   802049:	e9 fe 02 00 00       	jmp    80234c <vprintfmt+0x446>
 				printfmt(putch, putdat, "error %d", err);
   80204e:	50                   	push   %eax
-  80204f:	68 b7 47 80 00       	push   $0x8047b7
+  80204f:	68 c3 47 80 00       	push   $0x8047c3
   802054:	53                   	push   %ebx
   802055:	56                   	push   %esi
   802056:	e8 8e fe ff ff       	call   801ee9 <printfmt>
@@ -3721,7 +3721,7 @@ sprintputch(int ch, struct sprintbuf *b)
   802072:	8b 08                	mov    (%eax),%ecx
 				p = "(null)";
   802074:	85 c9                	test   %ecx,%ecx
-  802076:	b8 b0 47 80 00       	mov    $0x8047b0,%eax
+  802076:	b8 bc 47 80 00       	mov    $0x8047bc,%eax
   80207b:	0f 45 c1             	cmovne %ecx,%eax
   80207e:	89 45 c8             	mov    %eax,-0x38(%ebp)
 			if (width > 0 && padc != '-')
@@ -4104,7 +4104,7 @@ sprintputch(int ch, struct sprintbuf *b)
   802404:	e9 43 ff ff ff       	jmp    80234c <vprintfmt+0x446>
 						for (; (ch = *tmp++) != '\0';){
   802409:	b8 0a 00 00 00       	mov    $0xa,%eax
-  80240e:	bf d5 48 80 00       	mov    $0x8048d5,%edi
+  80240e:	bf e1 48 80 00       	mov    $0x8048e1,%edi
 							putch(ch, putdat);
   802413:	83 ec 08             	sub    $0x8,%esp
   802416:	53                   	push   %ebx
@@ -4124,7 +4124,7 @@ sprintputch(int ch, struct sprintbuf *b)
   802433:	88 10                	mov    %dl,(%eax)
 						for (; (ch = *tmp++) != '\0';){
   802435:	b8 0a 00 00 00       	mov    $0xa,%eax
-  80243a:	bf 0d 49 80 00       	mov    $0x80490d,%edi
+  80243a:	bf 19 49 80 00       	mov    $0x804919,%edi
 							putch(ch, putdat);
   80243f:	83 ec 08             	sub    $0x8,%esp
   802442:	53                   	push   %ebx

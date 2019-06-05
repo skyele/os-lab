@@ -68,7 +68,7 @@ ls1(const char *prefix, bool isdir, off_t size, const char *name)
 			sep = "/";
 		else
 			sep = "";
-  80006b:	b8 77 2a 80 00       	mov    $0x802a77,%eax
+  80006b:	b8 84 2a 80 00       	mov    $0x802a84,%eax
 		if (prefix[0] && prefix[strlen(prefix)-1] != '/')
   800070:	80 3b 00             	cmpb   $0x0,(%ebx)
   800073:	75 4b                	jne    8000c0 <ls1+0x8d>
@@ -95,7 +95,7 @@ ls1(const char *prefix, bool isdir, off_t size, const char *name)
 		printf("/");
 	printf("\n");
   8000a9:	83 ec 0c             	sub    $0xc,%esp
-  8000ac:	68 76 2a 80 00       	push   $0x802a76
+  8000ac:	68 83 2a 80 00       	push   $0x802a83
   8000b1:	e8 5f 1c 00 00       	call   801d15 <printf>
 }
   8000b6:	83 c4 10             	add    $0x10,%esp
@@ -112,7 +112,7 @@ ls1(const char *prefix, bool isdir, off_t size, const char *name)
 			sep = "";
   8000cc:	80 7c 03 ff 2f       	cmpb   $0x2f,-0x1(%ebx,%eax,1)
   8000d1:	b8 e0 29 80 00       	mov    $0x8029e0,%eax
-  8000d6:	ba 77 2a 80 00       	mov    $0x802a77,%edx
+  8000d6:	ba 84 2a 80 00       	mov    $0x802a84,%edx
   8000db:	0f 44 c2             	cmove  %edx,%eax
   8000de:	eb 95                	jmp    800075 <ls1+0x42>
 		printf("/");
@@ -330,7 +330,7 @@ umain(int argc, char **argv)
   80028e:	75 2a                	jne    8002ba <umain+0x84>
 		ls("/", "");
   800290:	83 ec 08             	sub    $0x8,%esp
-  800293:	68 77 2a 80 00       	push   $0x802a77
+  800293:	68 84 2a 80 00       	push   $0x802a84
   800298:	68 e0 29 80 00       	push   $0x8029e0
   80029d:	e8 06 ff ff ff       	call   8001a8 <ls>
   8002a2:	83 c4 10             	add    $0x10,%esp
@@ -414,7 +414,7 @@ libmain(int argc, char **argv)
   800336:	8b 00                	mov    (%eax),%eax
   800338:	a3 00 30 80 00       	mov    %eax,0x803000
 
-	cprintf("call umain!\n");
+	cprintf("in libmain.c call umain!\n");
   80033d:	83 ec 0c             	sub    $0xc,%esp
   800340:	68 6b 2a 80 00       	push   $0x802a6b
   800345:	e8 2e 01 00 00       	call   800478 <cprintf>
@@ -473,9 +473,9 @@ _panic(const char *file, int line, const char *fmt, ...)
   800387:	a1 20 44 80 00       	mov    0x804420,%eax
   80038c:	8b 40 48             	mov    0x48(%eax),%eax
   80038f:	83 ec 04             	sub    $0x4,%esp
-  800392:	68 b4 2a 80 00       	push   $0x802ab4
+  800392:	68 c0 2a 80 00       	push   $0x802ac0
   800397:	50                   	push   %eax
-  800398:	68 82 2a 80 00       	push   $0x802a82
+  800398:	68 8f 2a 80 00       	push   $0x802a8f
   80039d:	e8 d6 00 00 00       	call   800478 <cprintf>
 	va_list ap;
 
@@ -493,7 +493,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   8003b6:	ff 75 08             	pushl  0x8(%ebp)
   8003b9:	56                   	push   %esi
   8003ba:	50                   	push   %eax
-  8003bb:	68 90 2a 80 00       	push   $0x802a90
+  8003bb:	68 9c 2a 80 00       	push   $0x802a9c
   8003c0:	e8 b3 00 00 00       	call   800478 <cprintf>
 		sys_getenvid(), binaryname, file, line);
 	vcprintf(fmt, ap);
@@ -502,7 +502,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   8003c9:	ff 75 10             	pushl  0x10(%ebp)
   8003cc:	e8 56 00 00 00       	call   800427 <vcprintf>
 	cprintf("\n");
-  8003d1:	c7 04 24 76 2a 80 00 	movl   $0x802a76,(%esp)
+  8003d1:	c7 04 24 83 2a 80 00 	movl   $0x802a83,(%esp)
   8003d8:	e8 9b 00 00 00       	call   800478 <cprintf>
   8003dd:	83 c4 10             	add    $0x10,%esp
 
@@ -722,7 +722,7 @@ printnum(void (*putch)(int, void*), void *putdat,
   80054b:	ff 75 e0             	pushl  -0x20(%ebp)
   80054e:	e8 4d 23 00 00       	call   8028a0 <__umoddi3>
   800553:	83 c4 14             	add    $0x14,%esp
-  800556:	0f be 80 bb 2a 80 00 	movsbl 0x802abb(%eax),%eax
+  800556:	0f be 80 c7 2a 80 00 	movsbl 0x802ac7(%eax),%eax
   80055d:	50                   	push   %eax
   80055e:	ff d6                	call   *%esi
   800560:	83 c4 10             	add    $0x10,%esp
@@ -914,7 +914,7 @@ sprintputch(int ch, struct sprintbuf *b)
   8006e8:	e9 fe 02 00 00       	jmp    8009eb <vprintfmt+0x446>
 				printfmt(putch, putdat, "error %d", err);
   8006ed:	50                   	push   %eax
-  8006ee:	68 d3 2a 80 00       	push   $0x802ad3
+  8006ee:	68 df 2a 80 00       	push   $0x802adf
   8006f3:	53                   	push   %ebx
   8006f4:	56                   	push   %esi
   8006f5:	e8 8e fe ff ff       	call   800588 <printfmt>
@@ -931,7 +931,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800711:	8b 08                	mov    (%eax),%ecx
 				p = "(null)";
   800713:	85 c9                	test   %ecx,%ecx
-  800715:	b8 cc 2a 80 00       	mov    $0x802acc,%eax
+  800715:	b8 d8 2a 80 00       	mov    $0x802ad8,%eax
   80071a:	0f 45 c1             	cmovne %ecx,%eax
   80071d:	89 45 c8             	mov    %eax,-0x38(%ebp)
 			if (width > 0 && padc != '-')
@@ -1314,7 +1314,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800aa3:	e9 43 ff ff ff       	jmp    8009eb <vprintfmt+0x446>
 						for (; (ch = *tmp++) != '\0';){
   800aa8:	b8 0a 00 00 00       	mov    $0xa,%eax
-  800aad:	bf f1 2b 80 00       	mov    $0x802bf1,%edi
+  800aad:	bf fd 2b 80 00       	mov    $0x802bfd,%edi
 							putch(ch, putdat);
   800ab2:	83 ec 08             	sub    $0x8,%esp
   800ab5:	53                   	push   %ebx
@@ -1334,7 +1334,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800ad2:	88 10                	mov    %dl,(%eax)
 						for (; (ch = *tmp++) != '\0';){
   800ad4:	b8 0a 00 00 00       	mov    $0xa,%eax
-  800ad9:	bf 29 2c 80 00       	mov    $0x802c29,%edi
+  800ad9:	bf 35 2c 80 00       	mov    $0x802c35,%edi
 							putch(ch, putdat);
   800ade:	83 ec 08             	sub    $0x8,%esp
   800ae1:	53                   	push   %ebx
@@ -2770,7 +2770,7 @@ argstart(int *argc, char **argv, struct Argstate *args)
 	args->curarg = (*argc > 1 && argv ? "" : 0);
   8012af:	83 3a 01             	cmpl   $0x1,(%edx)
   8012b2:	7e 09                	jle    8012bd <argstart+0x1f>
-  8012b4:	ba 77 2a 80 00       	mov    $0x802a77,%edx
+  8012b4:	ba 84 2a 80 00       	mov    $0x802a84,%edx
   8012b9:	85 c9                	test   %ecx,%ecx
   8012bb:	75 05                	jne    8012c2 <argstart+0x24>
   8012bd:	ba 00 00 00 00       	mov    $0x0,%edx
@@ -2897,7 +2897,7 @@ argnextvalue(struct Argstate *args)
 		args->argvalue = args->curarg;
   801375:	89 43 0c             	mov    %eax,0xc(%ebx)
 		args->curarg = "";
-  801378:	c7 43 08 77 2a 80 00 	movl   $0x802a77,0x8(%ebx)
+  801378:	c7 43 08 84 2a 80 00 	movl   $0x802a84,0x8(%ebx)
 		(*args->argc)--;
 	} else {
 		args->argvalue = 0;

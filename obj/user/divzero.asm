@@ -117,7 +117,7 @@ libmain(int argc, char **argv)
   8000d0:	8b 00                	mov    (%eax),%eax
   8000d2:	a3 00 30 80 00       	mov    %eax,0x803000
 
-	cprintf("call umain!\n");
+	cprintf("in libmain.c call umain!\n");
   8000d7:	83 ec 0c             	sub    $0xc,%esp
   8000da:	68 2e 25 80 00       	push   $0x80252e
   8000df:	e8 cd 00 00 00       	call   8001b1 <cprintf>
@@ -371,7 +371,7 @@ printnum(void (*putch)(int, void*), void *putdat,
   800284:	ff 75 e0             	pushl  -0x20(%ebp)
   800287:	e8 54 21 00 00       	call   8023e0 <__umoddi3>
   80028c:	83 c4 14             	add    $0x14,%esp
-  80028f:	0f be 80 45 25 80 00 	movsbl 0x802545(%eax),%eax
+  80028f:	0f be 80 52 25 80 00 	movsbl 0x802552(%eax),%eax
   800296:	50                   	push   %eax
   800297:	ff d6                	call   *%esi
   800299:	83 c4 10             	add    $0x10,%esp
@@ -460,7 +460,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80032d:	3c 55                	cmp    $0x55,%al
   80032f:	0f 87 12 05 00 00    	ja     800847 <vprintfmt+0x569>
   800335:	0f b6 c0             	movzbl %al,%eax
-  800338:	ff 24 85 20 27 80 00 	jmp    *0x802720(,%eax,4)
+  800338:	ff 24 85 40 27 80 00 	jmp    *0x802740(,%eax,4)
   80033f:	8b 7d e4             	mov    -0x1c(%ebp),%edi
 			padc = '-';
   800342:	c6 45 cf 2d          	movb   $0x2d,-0x31(%ebp)
@@ -548,12 +548,12 @@ sprintputch(int ch, struct sprintbuf *b)
 			if (err >= MAXERROR || (p = error_string[err]) == NULL)
   8003fe:	83 f8 10             	cmp    $0x10,%eax
   800401:	7f 23                	jg     800426 <vprintfmt+0x148>
-  800403:	8b 14 85 80 28 80 00 	mov    0x802880(,%eax,4),%edx
+  800403:	8b 14 85 a0 28 80 00 	mov    0x8028a0(,%eax,4),%edx
   80040a:	85 d2                	test   %edx,%edx
   80040c:	74 18                	je     800426 <vprintfmt+0x148>
 				printfmt(putch, putdat, "%s", p);
   80040e:	52                   	push   %edx
-  80040f:	68 99 29 80 00       	push   $0x802999
+  80040f:	68 b9 29 80 00       	push   $0x8029b9
   800414:	53                   	push   %ebx
   800415:	56                   	push   %esi
   800416:	e8 a6 fe ff ff       	call   8002c1 <printfmt>
@@ -563,7 +563,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800421:	e9 fe 02 00 00       	jmp    800724 <vprintfmt+0x446>
 				printfmt(putch, putdat, "error %d", err);
   800426:	50                   	push   %eax
-  800427:	68 5d 25 80 00       	push   $0x80255d
+  800427:	68 6a 25 80 00       	push   $0x80256a
   80042c:	53                   	push   %ebx
   80042d:	56                   	push   %esi
   80042e:	e8 8e fe ff ff       	call   8002c1 <printfmt>
@@ -580,7 +580,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80044a:	8b 08                	mov    (%eax),%ecx
 				p = "(null)";
   80044c:	85 c9                	test   %ecx,%ecx
-  80044e:	b8 56 25 80 00       	mov    $0x802556,%eax
+  80044e:	b8 63 25 80 00       	mov    $0x802563,%eax
   800453:	0f 45 c1             	cmovne %ecx,%eax
   800456:	89 45 c8             	mov    %eax,-0x38(%ebp)
 			if (width > 0 && padc != '-')
@@ -963,7 +963,7 @@ sprintputch(int ch, struct sprintbuf *b)
   8007dc:	e9 43 ff ff ff       	jmp    800724 <vprintfmt+0x446>
 						for (; (ch = *tmp++) != '\0';){
   8007e1:	b8 0a 00 00 00       	mov    $0xa,%eax
-  8007e6:	bf 79 26 80 00       	mov    $0x802679,%edi
+  8007e6:	bf 89 26 80 00       	mov    $0x802689,%edi
 							putch(ch, putdat);
   8007eb:	83 ec 08             	sub    $0x8,%esp
   8007ee:	53                   	push   %ebx
@@ -983,7 +983,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80080b:	88 10                	mov    %dl,(%eax)
 						for (; (ch = *tmp++) != '\0';){
   80080d:	b8 0a 00 00 00       	mov    $0xa,%eax
-  800812:	bf b1 26 80 00       	mov    $0x8026b1,%edi
+  800812:	bf c1 26 80 00       	mov    $0x8026c1,%edi
 							putch(ch, putdat);
   800817:	83 ec 08             	sub    $0x8,%esp
   80081a:	53                   	push   %ebx
@@ -1874,9 +1874,9 @@ sys_env_destroy(envid_t envid)
   800cad:	83 ec 0c             	sub    $0xc,%esp
   800cb0:	50                   	push   %eax
   800cb1:	6a 03                	push   $0x3
-  800cb3:	68 c4 28 80 00       	push   $0x8028c4
+  800cb3:	68 e4 28 80 00       	push   $0x8028e4
   800cb8:	6a 43                	push   $0x43
-  800cba:	68 e1 28 80 00       	push   $0x8028e1
+  800cba:	68 01 29 80 00       	push   $0x802901
   800cbf:	e8 69 14 00 00       	call   80212d <_panic>
 
 00800cc4 <sys_getenvid>:
@@ -1965,9 +1965,9 @@ sys_page_alloc(envid_t envid, void *va, int perm)
   800d2e:	83 ec 0c             	sub    $0xc,%esp
   800d31:	50                   	push   %eax
   800d32:	6a 04                	push   $0x4
-  800d34:	68 c4 28 80 00       	push   $0x8028c4
+  800d34:	68 e4 28 80 00       	push   $0x8028e4
   800d39:	6a 43                	push   $0x43
-  800d3b:	68 e1 28 80 00       	push   $0x8028e1
+  800d3b:	68 01 29 80 00       	push   $0x802901
   800d40:	e8 e8 13 00 00       	call   80212d <_panic>
 
 00800d45 <sys_page_map>:
@@ -2004,9 +2004,9 @@ sys_page_map(envid_t srcenv, void *srcva, envid_t dstenv, void *dstva, int perm)
   800d70:	83 ec 0c             	sub    $0xc,%esp
   800d73:	50                   	push   %eax
   800d74:	6a 05                	push   $0x5
-  800d76:	68 c4 28 80 00       	push   $0x8028c4
+  800d76:	68 e4 28 80 00       	push   $0x8028e4
   800d7b:	6a 43                	push   $0x43
-  800d7d:	68 e1 28 80 00       	push   $0x8028e1
+  800d7d:	68 01 29 80 00       	push   $0x802901
   800d82:	e8 a6 13 00 00       	call   80212d <_panic>
 
 00800d87 <sys_page_unmap>:
@@ -2043,9 +2043,9 @@ sys_page_unmap(envid_t envid, void *va)
   800db2:	83 ec 0c             	sub    $0xc,%esp
   800db5:	50                   	push   %eax
   800db6:	6a 06                	push   $0x6
-  800db8:	68 c4 28 80 00       	push   $0x8028c4
+  800db8:	68 e4 28 80 00       	push   $0x8028e4
   800dbd:	6a 43                	push   $0x43
-  800dbf:	68 e1 28 80 00       	push   $0x8028e1
+  800dbf:	68 01 29 80 00       	push   $0x802901
   800dc4:	e8 64 13 00 00       	call   80212d <_panic>
 
 00800dc9 <sys_env_set_status>:
@@ -2084,9 +2084,9 @@ sys_env_set_status(envid_t envid, int status)
   800df4:	83 ec 0c             	sub    $0xc,%esp
   800df7:	50                   	push   %eax
   800df8:	6a 08                	push   $0x8
-  800dfa:	68 c4 28 80 00       	push   $0x8028c4
+  800dfa:	68 e4 28 80 00       	push   $0x8028e4
   800dff:	6a 43                	push   $0x43
-  800e01:	68 e1 28 80 00       	push   $0x8028e1
+  800e01:	68 01 29 80 00       	push   $0x802901
   800e06:	e8 22 13 00 00       	call   80212d <_panic>
 
 00800e0b <sys_env_set_trapframe>:
@@ -2123,9 +2123,9 @@ sys_env_set_trapframe(envid_t envid, struct Trapframe *tf)
   800e36:	83 ec 0c             	sub    $0xc,%esp
   800e39:	50                   	push   %eax
   800e3a:	6a 09                	push   $0x9
-  800e3c:	68 c4 28 80 00       	push   $0x8028c4
+  800e3c:	68 e4 28 80 00       	push   $0x8028e4
   800e41:	6a 43                	push   $0x43
-  800e43:	68 e1 28 80 00       	push   $0x8028e1
+  800e43:	68 01 29 80 00       	push   $0x802901
   800e48:	e8 e0 12 00 00       	call   80212d <_panic>
 
 00800e4d <sys_env_set_pgfault_upcall>:
@@ -2162,9 +2162,9 @@ sys_env_set_pgfault_upcall(envid_t envid, void *upcall)
   800e78:	83 ec 0c             	sub    $0xc,%esp
   800e7b:	50                   	push   %eax
   800e7c:	6a 0a                	push   $0xa
-  800e7e:	68 c4 28 80 00       	push   $0x8028c4
+  800e7e:	68 e4 28 80 00       	push   $0x8028e4
   800e83:	6a 43                	push   $0x43
-  800e85:	68 e1 28 80 00       	push   $0x8028e1
+  800e85:	68 01 29 80 00       	push   $0x802901
   800e8a:	e8 9e 12 00 00       	call   80212d <_panic>
 
 00800e8f <sys_ipc_try_send>:
@@ -2227,9 +2227,9 @@ sys_ipc_recv(void *dstva)
   800edc:	83 ec 0c             	sub    $0xc,%esp
   800edf:	50                   	push   %eax
   800ee0:	6a 0d                	push   $0xd
-  800ee2:	68 c4 28 80 00       	push   $0x8028c4
+  800ee2:	68 e4 28 80 00       	push   $0x8028e4
   800ee7:	6a 43                	push   $0x43
-  800ee9:	68 e1 28 80 00       	push   $0x8028e1
+  800ee9:	68 01 29 80 00       	push   $0x802901
   800eee:	e8 3a 12 00 00       	call   80212d <_panic>
 
 00800ef3 <sys_map_kernel_page>:
@@ -2395,9 +2395,9 @@ sys_clear_access_bit(envid_t envid, void *va)
   800fc0:	83 ec 0c             	sub    $0xc,%esp
   800fc3:	50                   	push   %eax
   800fc4:	6a 13                	push   $0x13
-  800fc6:	68 c4 28 80 00       	push   $0x8028c4
+  800fc6:	68 e4 28 80 00       	push   $0x8028e4
   800fcb:	6a 43                	push   $0x43
-  800fcd:	68 e1 28 80 00       	push   $0x8028e1
+  800fcd:	68 01 29 80 00       	push   $0x802901
   800fd2:	e8 56 11 00 00       	call   80212d <_panic>
 
 00800fd7 <fd2num>:
@@ -2555,7 +2555,7 @@ dev_lookup(int dev_id, struct Dev **dev)
   8010b5:	74 38                	je     8010ef <dev_lookup+0x4f>
 	for (i = 0; devtab[i]; i++)
   8010b7:	83 c2 01             	add    $0x1,%edx
-  8010ba:	8b 04 95 6c 29 80 00 	mov    0x80296c(,%edx,4),%eax
+  8010ba:	8b 04 95 8c 29 80 00 	mov    0x80298c(,%edx,4),%eax
   8010c1:	85 c0                	test   %eax,%eax
   8010c3:	75 ee                	jne    8010b3 <dev_lookup+0x13>
 			*dev = devtab[i];
@@ -2567,7 +2567,7 @@ dev_lookup(int dev_id, struct Dev **dev)
   8010cd:	83 ec 04             	sub    $0x4,%esp
   8010d0:	51                   	push   %ecx
   8010d1:	50                   	push   %eax
-  8010d2:	68 f0 28 80 00       	push   $0x8028f0
+  8010d2:	68 10 29 80 00       	push   $0x802910
   8010d7:	e8 d5 f0 ff ff       	call   8001b1 <cprintf>
 	*dev = 0;
   8010dc:	8b 45 0c             	mov    0xc(%ebp),%eax
@@ -2904,7 +2904,7 @@ read(int fdnum, void *buf, size_t n)
   801327:	83 ec 04             	sub    $0x4,%esp
   80132a:	53                   	push   %ebx
   80132b:	50                   	push   %eax
-  80132c:	68 31 29 80 00       	push   $0x802931
+  80132c:	68 51 29 80 00       	push   $0x802951
   801331:	e8 7b ee ff ff       	call   8001b1 <cprintf>
 		return -E_INVAL;
   801336:	83 c4 10             	add    $0x10,%esp
@@ -3032,7 +3032,7 @@ write(int fdnum, const void *buf, size_t n)
   8013ee:	83 ec 04             	sub    $0x4,%esp
   8013f1:	53                   	push   %ebx
   8013f2:	50                   	push   %eax
-  8013f3:	68 4d 29 80 00       	push   $0x80294d
+  8013f3:	68 6d 29 80 00       	push   $0x80296d
   8013f8:	e8 b4 ed ff ff       	call   8001b1 <cprintf>
 		return -E_INVAL;
   8013fd:	83 c4 10             	add    $0x10,%esp
@@ -3135,7 +3135,7 @@ ftruncate(int fdnum, off_t newsize)
   801496:	83 ec 04             	sub    $0x4,%esp
   801499:	53                   	push   %ebx
   80149a:	50                   	push   %eax
-  80149b:	68 10 29 80 00       	push   $0x802910
+  80149b:	68 30 29 80 00       	push   $0x802930
   8014a0:	e8 0c ed ff ff       	call   8001b1 <cprintf>
 		return -E_INVAL;
   8014a5:	83 c4 10             	add    $0x10,%esp
@@ -3410,16 +3410,16 @@ devfile_trunc(struct Fd *fd, off_t newsize)
   8016a8:	c9                   	leave  
   8016a9:	c3                   	ret    
 	assert(r <= n);
-  8016aa:	68 80 29 80 00       	push   $0x802980
-  8016af:	68 87 29 80 00       	push   $0x802987
+  8016aa:	68 a0 29 80 00       	push   $0x8029a0
+  8016af:	68 a7 29 80 00       	push   $0x8029a7
   8016b4:	68 98 00 00 00       	push   $0x98
-  8016b9:	68 9c 29 80 00       	push   $0x80299c
+  8016b9:	68 bc 29 80 00       	push   $0x8029bc
   8016be:	e8 6a 0a 00 00       	call   80212d <_panic>
 	assert(r <= PGSIZE);
-  8016c3:	68 a7 29 80 00       	push   $0x8029a7
-  8016c8:	68 87 29 80 00       	push   $0x802987
+  8016c3:	68 c7 29 80 00       	push   $0x8029c7
+  8016c8:	68 a7 29 80 00       	push   $0x8029a7
   8016cd:	68 99 00 00 00       	push   $0x99
-  8016d2:	68 9c 29 80 00       	push   $0x80299c
+  8016d2:	68 bc 29 80 00       	push   $0x8029bc
   8016d7:	e8 51 0a 00 00       	call   80212d <_panic>
 
 008016dc <devfile_read>:
@@ -3464,16 +3464,16 @@ devfile_trunc(struct Fd *fd, off_t newsize)
   801730:	5d                   	pop    %ebp
   801731:	c3                   	ret    
 	assert(r <= n);
-  801732:	68 80 29 80 00       	push   $0x802980
-  801737:	68 87 29 80 00       	push   $0x802987
+  801732:	68 a0 29 80 00       	push   $0x8029a0
+  801737:	68 a7 29 80 00       	push   $0x8029a7
   80173c:	6a 7c                	push   $0x7c
-  80173e:	68 9c 29 80 00       	push   $0x80299c
+  80173e:	68 bc 29 80 00       	push   $0x8029bc
   801743:	e8 e5 09 00 00       	call   80212d <_panic>
 	assert(r <= PGSIZE);
-  801748:	68 a7 29 80 00       	push   $0x8029a7
-  80174d:	68 87 29 80 00       	push   $0x802987
+  801748:	68 c7 29 80 00       	push   $0x8029c7
+  80174d:	68 a7 29 80 00       	push   $0x8029a7
   801752:	6a 7d                	push   $0x7d
-  801754:	68 9c 29 80 00       	push   $0x80299c
+  801754:	68 bc 29 80 00       	push   $0x8029bc
   801759:	e8 cf 09 00 00       	call   80212d <_panic>
 
 0080175e <open>:
@@ -3572,7 +3572,7 @@ devsock_stat(struct Fd *fd, struct Stat *stat)
   801804:	89 e5                	mov    %esp,%ebp
   801806:	83 ec 10             	sub    $0x10,%esp
 	strcpy(stat->st_name, "<sock>");
-  801809:	68 b3 29 80 00       	push   $0x8029b3
+  801809:	68 d3 29 80 00       	push   $0x8029d3
   80180e:	ff 75 0c             	pushl  0xc(%ebp)
   801811:	e8 fa f0 ff ff       	call   800910 <strcpy>
 	return 0;
@@ -4116,10 +4116,10 @@ nsipc_recv(int s, void *mem, int len, unsigned int flags)
   801bca:	5d                   	pop    %ebp
   801bcb:	c3                   	ret    
 		assert(r < 1600 && r <= len);
-  801bcc:	68 bf 29 80 00       	push   $0x8029bf
-  801bd1:	68 87 29 80 00       	push   $0x802987
+  801bcc:	68 df 29 80 00       	push   $0x8029df
+  801bd1:	68 a7 29 80 00       	push   $0x8029a7
   801bd6:	6a 62                	push   $0x62
-  801bd8:	68 d4 29 80 00       	push   $0x8029d4
+  801bd8:	68 f4 29 80 00       	push   $0x8029f4
   801bdd:	e8 4b 05 00 00       	call   80212d <_panic>
 
 00801be2 <nsipc_send>:
@@ -4157,10 +4157,10 @@ nsipc_send(int s, const void *buf, int size, unsigned int flags)
   801c28:	c9                   	leave  
   801c29:	c3                   	ret    
 	assert(size < 1600);
-  801c2a:	68 e0 29 80 00       	push   $0x8029e0
-  801c2f:	68 87 29 80 00       	push   $0x802987
+  801c2a:	68 00 2a 80 00       	push   $0x802a00
+  801c2f:	68 a7 29 80 00       	push   $0x8029a7
   801c34:	6a 6d                	push   $0x6d
-  801c36:	68 d4 29 80 00       	push   $0x8029d4
+  801c36:	68 f4 29 80 00       	push   $0x8029f4
   801c3b:	e8 ed 04 00 00       	call   80212d <_panic>
 
 00801c40 <nsipc_socket>:
@@ -4206,7 +4206,7 @@ devpipe_stat(struct Fd *fd, struct Stat *stat)
   801c7d:	89 c6                	mov    %eax,%esi
 	strcpy(stat->st_name, "<pipe>");
   801c7f:	83 c4 08             	add    $0x8,%esp
-  801c82:	68 ec 29 80 00       	push   $0x8029ec
+  801c82:	68 0c 2a 80 00       	push   $0x802a0c
   801c87:	53                   	push   %ebx
   801c88:	e8 83 ec ff ff       	call   800910 <strcpy>
 	stat->st_size = p->p_wpos - p->p_rpos;
@@ -4289,7 +4289,7 @@ devpipe_close(struct Fd *fd)
   801d23:	6a 01                	push   $0x1
   801d25:	50                   	push   %eax
   801d26:	53                   	push   %ebx
-  801d27:	68 f3 29 80 00       	push   $0x8029f3
+  801d27:	68 13 2a 80 00       	push   $0x802a13
   801d2c:	e8 80 e4 ff ff       	call   8001b1 <cprintf>
   801d31:	83 c4 10             	add    $0x10,%esp
   801d34:	eb b9                	jmp    801cef <_pipeisclosed+0xd>
@@ -4606,7 +4606,7 @@ devcons_stat(struct Fd *fd, struct Stat *stat)
   801fbf:	89 e5                	mov    %esp,%ebp
   801fc1:	83 ec 10             	sub    $0x10,%esp
 	strcpy(stat->st_name, "<cons>");
-  801fc4:	68 0b 2a 80 00       	push   $0x802a0b
+  801fc4:	68 2b 2a 80 00       	push   $0x802a2b
   801fc9:	ff 75 0c             	pushl  0xc(%ebp)
   801fcc:	e8 3f e9 ff ff       	call   800910 <strcpy>
 	return 0;
@@ -4814,9 +4814,9 @@ _panic(const char *file, int line, const char *fmt, ...)
   802132:	a1 0c 40 80 00       	mov    0x80400c,%eax
   802137:	8b 40 48             	mov    0x48(%eax),%eax
   80213a:	83 ec 04             	sub    $0x4,%esp
-  80213d:	68 48 2a 80 00       	push   $0x802a48
+  80213d:	68 68 2a 80 00       	push   $0x802a68
   802142:	50                   	push   %eax
-  802143:	68 17 2a 80 00       	push   $0x802a17
+  802143:	68 37 2a 80 00       	push   $0x802a37
   802148:	e8 64 e0 ff ff       	call   8001b1 <cprintf>
 	va_list ap;
 
@@ -4834,7 +4834,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   802161:	ff 75 08             	pushl  0x8(%ebp)
   802164:	56                   	push   %esi
   802165:	50                   	push   %eax
-  802166:	68 24 2a 80 00       	push   $0x802a24
+  802166:	68 44 2a 80 00       	push   $0x802a44
   80216b:	e8 41 e0 ff ff       	call   8001b1 <cprintf>
 		sys_getenvid(), binaryname, file, line);
 	vcprintf(fmt, ap);
@@ -4843,7 +4843,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   802174:	ff 75 10             	pushl  0x10(%ebp)
   802177:	e8 e4 df ff ff       	call   800160 <vcprintf>
 	cprintf("\n");
-  80217c:	c7 04 24 39 25 80 00 	movl   $0x802539,(%esp)
+  80217c:	c7 04 24 46 25 80 00 	movl   $0x802546,(%esp)
   802183:	e8 29 e0 ff ff       	call   8001b1 <cprintf>
   802188:	83 c4 10             	add    $0x10,%esp
 
@@ -4972,9 +4972,9 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
   802231:	74 e2                	je     802215 <ipc_send+0x1e>
 			panic("panic at ipc_send()\n");
   802233:	83 ec 04             	sub    $0x4,%esp
-  802236:	68 4f 2a 80 00       	push   $0x802a4f
+  802236:	68 6f 2a 80 00       	push   $0x802a6f
   80223b:	6a 48                	push   $0x48
-  80223d:	68 64 2a 80 00       	push   $0x802a64
+  80223d:	68 84 2a 80 00       	push   $0x802a84
   802242:	e8 e6 fe ff ff       	call   80212d <_panic>
 	}
 	// LAB 4: Your code here.

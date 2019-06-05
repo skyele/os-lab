@@ -6,6 +6,7 @@
         "string.h": "c",
         "syscall.h": "c",
         "trap.h": "c",
-        "sched.h": "c"
+        "sched.h": "c",
+        "error.h": "c"
     }
 }

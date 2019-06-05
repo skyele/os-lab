@@ -3,6 +3,10 @@
 
 #include <kern/pci.h>
 
+#define E1000_BASE KSTACKTOP //lab6 bug?
+
+#define PKT_SIZE 1518
+
 #define E1000_VID 0x8086
 #define E1000_DID 0x100e
 

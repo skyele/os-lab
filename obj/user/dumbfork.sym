@@ -121,7 +121,7 @@
 008023fc T pageref
 00802440 T __udivdi3
 00802550 T __umoddi3
-00802774 r __FUNCTION__.1854
+00802780 r __FUNCTION__.1854
 00802ac0 r error_string
 00802bb0 r devtab
 00803000 D binaryname

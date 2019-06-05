@@ -73,8 +73,9 @@ i386_init(void)
 	ENV_CREATE(TEST, ENV_TYPE_USER);
 #else
 	// Touch all you want.
-	// ENV_CREATE(user_icode, ENV_TYPE_USER);//lab5 bug just test
-	ENV_CREATE(user_faultio, ENV_TYPE_USER);
+	ENV_CREATE(user_icode, ENV_TYPE_USER);//lab5 bug just test
+	// ENV_CREATE(user_faultio, ENV_TYPE_USER);
+	// ENV_CREATE(user_testoutput, ENV_TYPE_USER);
 #endif // TEST*
 
 	// Should not be necessary - drains keyboard because interrupt has given up.

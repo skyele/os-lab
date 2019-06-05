@@ -120,9 +120,9 @@
 008028de T pageref
 00802920 T __udivdi3
 00802a30 T __umoddi3
-00802fbc r __FUNCTION__.1854
-00803300 r error_string
-00803410 r devtab
+00802fcc r __FUNCTION__.1854
+00803320 r error_string
+00803430 r devtab
 00804000 D msg
 00804004 D binaryname
 00804008 D devfile

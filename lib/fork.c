@@ -75,7 +75,6 @@ pgfault(struct UTrapframe *utf)
 static int
 duppage(envid_t envid, unsigned pn)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	int r;
 	//lab5 bug?
 	if((uvpt[pn]) & PTE_SHARE){

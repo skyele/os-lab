@@ -119,9 +119,9 @@
 008022e5 T pageref
 00802320 T __udivdi3
 00802430 T __umoddi3
-00802900 r error_string
-008029ec r devtab
-00802ac8 r __FUNCTION__.1854
+00802920 r error_string
+00802a0c r devtab
+00802ae8 r __FUNCTION__.1854
 00803000 D binaryname
 00803004 D devfile
 00803020 D devsock

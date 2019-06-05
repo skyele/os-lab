@@ -6,7 +6,7 @@
 void
 umain(int argc, char **argv)
 {
-	cprintf("in %s\n", __FUNCTION__);//just test
+	cprintf("in faultio.c %s\n", __FUNCTION__);//just test
         int x, r;
 	int nsecs = 1;
 	int secno = 0;

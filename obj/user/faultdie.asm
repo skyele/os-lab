@@ -156,7 +156,7 @@ libmain(int argc, char **argv)
   800122:	8b 00                	mov    (%eax),%eax
   800124:	a3 00 30 80 00       	mov    %eax,0x803000
 
-	cprintf("call umain!\n");
+	cprintf("in libmain.c call umain!\n");
   800129:	83 ec 0c             	sub    $0xc,%esp
   80012c:	68 40 26 80 00       	push   $0x802640
   800131:	e8 cd 00 00 00       	call   800203 <cprintf>
@@ -410,7 +410,7 @@ printnum(void (*putch)(int, void*), void *putdat,
   8002d6:	ff 75 e0             	pushl  -0x20(%ebp)
   8002d9:	e8 e2 21 00 00       	call   8024c0 <__umoddi3>
   8002de:	83 c4 14             	add    $0x14,%esp
-  8002e1:	0f be 80 57 26 80 00 	movsbl 0x802657(%eax),%eax
+  8002e1:	0f be 80 64 26 80 00 	movsbl 0x802664(%eax),%eax
   8002e8:	50                   	push   %eax
   8002e9:	ff d6                	call   *%esi
   8002eb:	83 c4 10             	add    $0x10,%esp
@@ -602,7 +602,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800473:	e9 fe 02 00 00       	jmp    800776 <vprintfmt+0x446>
 				printfmt(putch, putdat, "error %d", err);
   800478:	50                   	push   %eax
-  800479:	68 6f 26 80 00       	push   $0x80266f
+  800479:	68 7c 26 80 00       	push   $0x80267c
   80047e:	53                   	push   %ebx
   80047f:	56                   	push   %esi
   800480:	e8 8e fe ff ff       	call   800313 <printfmt>
@@ -619,7 +619,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80049c:	8b 08                	mov    (%eax),%ecx
 				p = "(null)";
   80049e:	85 c9                	test   %ecx,%ecx
-  8004a0:	b8 68 26 80 00       	mov    $0x802668,%eax
+  8004a0:	b8 75 26 80 00       	mov    $0x802675,%eax
   8004a5:	0f 45 c1             	cmovne %ecx,%eax
   8004a8:	89 45 c8             	mov    %eax,-0x38(%ebp)
 			if (width > 0 && padc != '-')
@@ -1002,7 +1002,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80082e:	e9 43 ff ff ff       	jmp    800776 <vprintfmt+0x446>
 						for (; (ch = *tmp++) != '\0';){
   800833:	b8 0a 00 00 00       	mov    $0xa,%eax
-  800838:	bf 8d 27 80 00       	mov    $0x80278d,%edi
+  800838:	bf 99 27 80 00       	mov    $0x802799,%edi
 							putch(ch, putdat);
   80083d:	83 ec 08             	sub    $0x8,%esp
   800840:	53                   	push   %ebx
@@ -1022,7 +1022,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80085d:	88 10                	mov    %dl,(%eax)
 						for (; (ch = *tmp++) != '\0';){
   80085f:	b8 0a 00 00 00       	mov    $0xa,%eax
-  800864:	bf c5 27 80 00       	mov    $0x8027c5,%edi
+  800864:	bf d1 27 80 00       	mov    $0x8027d1,%edi
 							putch(ch, putdat);
   800869:	83 ec 08             	sub    $0x8,%esp
   80086c:	53                   	push   %ebx
@@ -4996,7 +4996,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   80225b:	ff 75 10             	pushl  0x10(%ebp)
   80225e:	e8 4f df ff ff       	call   8001b2 <vcprintf>
 	cprintf("\n");
-  802263:	c7 04 24 4b 26 80 00 	movl   $0x80264b,(%esp)
+  802263:	c7 04 24 58 26 80 00 	movl   $0x802658,(%esp)
   80226a:	e8 94 df ff ff       	call   800203 <cprintf>
   80226f:	83 c4 10             	add    $0x10,%esp
 

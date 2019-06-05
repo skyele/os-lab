@@ -123,7 +123,7 @@
 008028a0 T pageref
 008028e0 T __udivdi3
 008029f0 T __umoddi3
-00802c9c r __FUNCTION__.1854
+00802ca8 r __FUNCTION__.1854
 00802fe0 r error_string
 00803148 r devtab
 00804000 D binaryname

@@ -127,7 +127,7 @@ libmain(int argc, char **argv)
   8000eb:	8b 00                	mov    (%eax),%eax
   8000ed:	a3 00 40 80 00       	mov    %eax,0x804000
 
-	cprintf("call umain!\n");
+	cprintf("in libmain.c call umain!\n");
   8000f2:	83 ec 0c             	sub    $0xc,%esp
   8000f5:	68 b4 2b 80 00       	push   $0x802bb4
   8000fa:	e8 2e 01 00 00       	call   80022d <cprintf>
@@ -186,9 +186,9 @@ _panic(const char *file, int line, const char *fmt, ...)
   80013c:	a1 08 50 80 00       	mov    0x805008,%eax
   800141:	8b 40 48             	mov    0x48(%eax),%eax
   800144:	83 ec 04             	sub    $0x4,%esp
-  800147:	68 fc 2b 80 00       	push   $0x802bfc
+  800147:	68 08 2c 80 00       	push   $0x802c08
   80014c:	50                   	push   %eax
-  80014d:	68 cb 2b 80 00       	push   $0x802bcb
+  80014d:	68 d8 2b 80 00       	push   $0x802bd8
   800152:	e8 d6 00 00 00       	call   80022d <cprintf>
 	va_list ap;
 
@@ -206,7 +206,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   80016b:	ff 75 08             	pushl  0x8(%ebp)
   80016e:	56                   	push   %esi
   80016f:	50                   	push   %eax
-  800170:	68 d8 2b 80 00       	push   $0x802bd8
+  800170:	68 e4 2b 80 00       	push   $0x802be4
   800175:	e8 b3 00 00 00       	call   80022d <cprintf>
 		sys_getenvid(), binaryname, file, line);
 	vcprintf(fmt, ap);
@@ -215,7 +215,7 @@ _panic(const char *file, int line, const char *fmt, ...)
   80017e:	ff 75 10             	pushl  0x10(%ebp)
   800181:	e8 56 00 00 00       	call   8001dc <vcprintf>
 	cprintf("\n");
-  800186:	c7 04 24 bf 2b 80 00 	movl   $0x802bbf,(%esp)
+  800186:	c7 04 24 cc 2b 80 00 	movl   $0x802bcc,(%esp)
   80018d:	e8 9b 00 00 00       	call   80022d <cprintf>
   800192:	83 c4 10             	add    $0x10,%esp
 
@@ -435,7 +435,7 @@ printnum(void (*putch)(int, void*), void *putdat,
   800300:	ff 75 e0             	pushl  -0x20(%ebp)
   800303:	e8 08 27 00 00       	call   802a10 <__umoddi3>
   800308:	83 c4 14             	add    $0x14,%esp
-  80030b:	0f be 80 03 2c 80 00 	movsbl 0x802c03(%eax),%eax
+  80030b:	0f be 80 0f 2c 80 00 	movsbl 0x802c0f(%eax),%eax
   800312:	50                   	push   %eax
   800313:	ff d6                	call   *%esi
   800315:	83 c4 10             	add    $0x10,%esp
@@ -627,7 +627,7 @@ sprintputch(int ch, struct sprintbuf *b)
   80049d:	e9 fe 02 00 00       	jmp    8007a0 <vprintfmt+0x446>
 				printfmt(putch, putdat, "error %d", err);
   8004a2:	50                   	push   %eax
-  8004a3:	68 1b 2c 80 00       	push   $0x802c1b
+  8004a3:	68 27 2c 80 00       	push   $0x802c27
   8004a8:	53                   	push   %ebx
   8004a9:	56                   	push   %esi
   8004aa:	e8 8e fe ff ff       	call   80033d <printfmt>
@@ -644,7 +644,7 @@ sprintputch(int ch, struct sprintbuf *b)
   8004c6:	8b 08                	mov    (%eax),%ecx
 				p = "(null)";
   8004c8:	85 c9                	test   %ecx,%ecx
-  8004ca:	b8 14 2c 80 00       	mov    $0x802c14,%eax
+  8004ca:	b8 20 2c 80 00       	mov    $0x802c20,%eax
   8004cf:	0f 45 c1             	cmovne %ecx,%eax
   8004d2:	89 45 c8             	mov    %eax,-0x38(%ebp)
 			if (width > 0 && padc != '-')
@@ -1027,7 +1027,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800858:	e9 43 ff ff ff       	jmp    8007a0 <vprintfmt+0x446>
 						for (; (ch = *tmp++) != '\0';){
   80085d:	b8 0a 00 00 00       	mov    $0xa,%eax
-  800862:	bf 39 2d 80 00       	mov    $0x802d39,%edi
+  800862:	bf 45 2d 80 00       	mov    $0x802d45,%edi
 							putch(ch, putdat);
   800867:	83 ec 08             	sub    $0x8,%esp
   80086a:	53                   	push   %ebx
@@ -1047,7 +1047,7 @@ sprintputch(int ch, struct sprintbuf *b)
   800887:	88 10                	mov    %dl,(%eax)
 						for (; (ch = *tmp++) != '\0';){
   800889:	b8 0a 00 00 00       	mov    $0xa,%eax
-  80088e:	bf 71 2d 80 00       	mov    $0x802d71,%edi
+  80088e:	bf 7d 2d 80 00       	mov    $0x802d7d,%edi
 							putch(ch, putdat);
   800893:	83 ec 08             	sub    $0x8,%esp
   800896:	53                   	push   %ebx
@@ -3640,7 +3640,7 @@ spawn(const char *prog, const char **argv)
   801885:	81 ec 94 02 00 00    	sub    $0x294,%esp
 	cprintf("in %s\n", __FUNCTION__);
   80188b:	68 4c 31 80 00       	push   $0x80314c
-  801890:	68 cf 2b 80 00       	push   $0x802bcf
+  801890:	68 dc 2b 80 00       	push   $0x802bdc
   801895:	e8 93 e9 ff ff       	call   80022d <cprintf>
 	//   - Call sys_env_set_trapframe(child, &child_tf) to set up the
 	//     correct initial eip and esp values in the child.
@@ -3717,7 +3717,7 @@ init_stack(envid_t child, const char **argv, uintptr_t *init_esp)
 	cprintf("in %s\n", __FUNCTION__);
   801929:	83 ec 08             	sub    $0x8,%esp
   80192c:	68 40 31 80 00       	push   $0x803140
-  801931:	68 cf 2b 80 00       	push   $0x802bcf
+  801931:	68 dc 2b 80 00       	push   $0x802bdc
   801936:	e8 f2 e8 ff ff       	call   80022d <cprintf>
   80193b:	83 c4 10             	add    $0x10,%esp
 	uintptr_t *argv_store;
@@ -4037,7 +4037,7 @@ copy_shared_pages(envid_t child)
 	cprintf("in %s\n", __FUNCTION__);
   801cbd:	83 c4 08             	add    $0x8,%esp
   801cc0:	68 2c 31 80 00       	push   $0x80312c
-  801cc5:	68 cf 2b 80 00       	push   $0x802bcf
+  801cc5:	68 dc 2b 80 00       	push   $0x802bdc
   801cca:	e8 5e e5 ff ff       	call   80022d <cprintf>
   801ccf:	83 c4 10             	add    $0x10,%esp
 	int r;
@@ -4153,7 +4153,7 @@ copy_shared_pages(envid_t child)
   801e12:	83 ec 14             	sub    $0x14,%esp
 	cprintf("in %s\n", __FUNCTION__);
   801e15:	68 24 31 80 00       	push   $0x803124
-  801e1a:	68 cf 2b 80 00       	push   $0x802bcf
+  801e1a:	68 dc 2b 80 00       	push   $0x802bdc
   801e1f:	e8 09 e4 ff ff       	call   80022d <cprintf>
 	va_start(vl, arg0);
   801e24:	8d 55 10             	lea    0x10(%ebp),%edx

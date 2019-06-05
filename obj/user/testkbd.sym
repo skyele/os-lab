@@ -125,7 +125,7 @@
 00802513 T pageref
 00802550 T __udivdi3
 00802660 T __umoddi3
-00802858 r __FUNCTION__.1854
+00802864 r __FUNCTION__.1854
 00802ba0 r error_string
 00802ca0 r devtab
 00803000 D devcons
