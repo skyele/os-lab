@@ -63,7 +63,7 @@ e1000_rx_init()
 	// Initialize all descriptors
 	// You should allocate some pages as receive buffer
 	for(int i = 0; i < N_RXDESC; i++){
-		rx_descs[i].addr = PADDR(&rx_buffer[i]);
+		rx_descs[i].addr = PADDR(rx_buffer[i]);
 		rx_descs[i].status |= E1000_RX_STATUS_DD;
 	}
 	// Set hardward registers

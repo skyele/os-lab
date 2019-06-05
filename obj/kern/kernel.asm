@@ -11776,7 +11776,7 @@ f010716e:	0f 86 e8 00 00 00    	jbe    f010725c <e1000_rx_init+0x163>
 	// Initialize all descriptors
 	// You should allocate some pages as receive buffer
 	for(int i = 0; i < N_RXDESC; i++){
-		rx_descs[i].addr = PADDR(&rx_buffer[i]);
+		rx_descs[i].addr = PADDR(rx_buffer[i]);
 f0107174:	8b 35 24 10 5c f0    	mov    0xf05c1024,%esi
 f010717a:	89 0c 06             	mov    %ecx,(%esi,%eax,1)
 f010717d:	89 5c 06 04          	mov    %ebx,0x4(%esi,%eax,1)
