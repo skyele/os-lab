@@ -329,14 +329,12 @@ serve(void)
 		if (debug)
 			cprintf("fs req %d from %08x [page %08x: %s]\n",
 				req, whom, uvpt[PGNUM(fsreq)], fsreq);
-
 		// All requests must contain an argument page
 		if (!(perm & PTE_P)) {
 			cprintf("Invalid request from %08x: no argument page\n",
 				whom);
 			continue; // just leave it hanging...
 		}
-
 		pg = NULL;
 		if (req == FSREQ_OPEN) {
 			r = serve_open(whom, (struct Fsreq_open*)fsreq, &pg, &perm);

@@ -470,35 +470,43 @@ sys_time_msec(void)
 int
 sys_net_send(const void *buf, uint32_t len)
 {
-	// LAB 6: Your code here.
-	// Check the user permission to [buf, buf + len]
-	// Call e1000_tx to send the packet
-	// Hint: e1000_tx only accept kernel virtual address
-	cprintf("in %s\n", __FUNCTION__);
-	int r = 0;
-	// int cur_len = len;
-	// char *cur_buf = (char *)buf;
-	user_mem_assert(curenv, buf, len, PTE_U);
+	// // LAB 6: Your code here.
+	// // Check the user permission to [buf, buf + len]
+	// // Call e1000_tx to send the packet
+	// // Hint: e1000_tx only accept kernel virtual address
+	// cprintf("in %s\n", __FUNCTION__);
+	// int r = 0;
+	// // int cur_len = len;
+	// // char *cur_buf = (char *)buf;
+	// user_mem_assert(curenv, buf, len, PTE_U);
 
-	// struct PageInfo *page = page_alloc(ALLOC_ZERO);
-	// if(page == NULL)
-	// 	panic("the page_alloc panic\n");
-	// cprintf("the len is %d\n", len);
+	// // struct PageInfo *page = page_alloc(ALLOC_ZERO);
+	// // if(page == NULL)
+	// // 	panic("the page_alloc panic\n");
+	// // cprintf("the len is %d\n", len);
 
-	// while(cur_len > 0){
-	// 	int copy_len = cur_len>=PKT_SIZE?PKT_SIZE:cur_len;
-	// 	memcpy(page2kva(page), cur_buf, copy_len);
-	// 	r = e1000_tx(page2kva(page), copy_len);	
-	// 	if(r < 0)
-	// 		return r;
-	// 	cur_len -= copy_len;
-	// 	cur_buf += copy_len;
-	// 	memset(page2kva(page), 0, copy_len);
-	// }
-	r = e1000_tx(buf, len);	
-	if(r < 0)
+	// // while(cur_len > 0){
+	// // 	int copy_len = cur_len>=PKT_SIZE?PKT_SIZE:cur_len;
+	// // 	memcpy(page2kva(page), cur_buf, copy_len);
+	// // 	r = e1000_tx(page2kva(page), copy_len);	
+	// // 	if(r < 0)
+	// // 		return r;
+	// // 	cur_len -= copy_len;
+	// // 	cur_buf += copy_len;
+	// // 	memset(page2kva(page), 0, copy_len);
+	// // }
+	// r = e1000_tx(buf, len);	
+	// if(r < 0)
+	// 	return r;
+	// return 0;
+
+	int r;
+	if((r = user_mem_check(curenv, buf, len, PTE_W|PTE_U)) < 0){
+		cprintf("address:%x\n", (uint32_t)buf);
 		return r;
-	return 0;
+	}
+	return e1000_tx(buf, len);
+
 }
 
 int
@@ -508,7 +516,8 @@ sys_net_recv(void *buf, uint32_t len)
 	// Check the user permission to [buf, buf + len]
 	// Call e1000_rx to fill the buffer
 	// Hint: e1000_rx only accept kernel virtual address
-	return -1;
+	user_mem_assert(curenv, ROUNDDOWN(buf, PGSIZE), PGSIZE, PTE_U | PTE_W);   // check permission
+  	return e1000_rx(buf,len);
 }
 
 static int 
@@ -597,6 +606,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_net_send:
 			ret = sys_net_send((void *)a1, (uint32_t)a2);
+			break;
+		case SYS_net_recv:
+			ret = sys_net_recv((void *)a1, (uint32_t)a2);
 			break;
 		default:
 			ret = -E_INVAL;

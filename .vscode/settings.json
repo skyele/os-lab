@@ -7,6 +7,7 @@
         "syscall.h": "c",
         "trap.h": "c",
         "sched.h": "c",
-        "error.h": "c"
+        "error.h": "c",
+        "pmap.h": "c"
     }
 }

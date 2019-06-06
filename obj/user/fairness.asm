@@ -2472,7 +2472,6 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
   801074:	8b 5d 10             	mov    0x10(%ebp),%ebx
 	// LAB 4: Your code here.
 	// panic("ipc_recv not implemented");
-	// cprintf("in %s\n", __FUNCTION__);
 	int ret;
 	if(!pg)
   801077:	85 c0                	test   %eax,%eax
@@ -2495,7 +2494,6 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	if(from_env_store){
   801091:	85 f6                	test   %esi,%esi
   801093:	74 0a                	je     80109f <ipc_recv+0x36>
-		// *from_env_store = getthisenv()->env_ipc_from;
 		*from_env_store = thisenv->env_ipc_from;
   801095:	a1 08 40 80 00       	mov    0x804008,%eax
   80109a:	8b 40 74             	mov    0x74(%eax),%eax
@@ -2504,13 +2502,11 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	if(perm_store){
   80109f:	85 db                	test   %ebx,%ebx
   8010a1:	74 0a                	je     8010ad <ipc_recv+0x44>
-		// *perm_store = getthisenv()->env_ipc_perm;
 		*perm_store = thisenv->env_ipc_perm;
   8010a3:	a1 08 40 80 00       	mov    0x804008,%eax
   8010a8:	8b 40 78             	mov    0x78(%eax),%eax
   8010ab:	89 03                	mov    %eax,(%ebx)
 	}
-	// return getthisenv()->env_ipc_value;
 	return thisenv->env_ipc_value;
   8010ad:	a1 08 40 80 00       	mov    0x804008,%eax
   8010b2:	8b 40 70             	mov    0x70(%eax),%eax
@@ -2578,7 +2574,7 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 			panic("panic at ipc_send()\n");
   80110e:	83 ec 04             	sub    $0x4,%esp
   801111:	68 f3 29 80 00       	push   $0x8029f3
-  801116:	6a 4a                	push   $0x4a
+  801116:	6a 46                	push   $0x46
   801118:	68 08 2a 80 00       	push   $0x802a08
   80111d:	e8 99 11 00 00       	call   8022bb <_panic>
 	}

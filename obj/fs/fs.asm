@@ -2665,11 +2665,11 @@ serve(void)
   8016e1:	8d 5d f0             	lea    -0x10(%ebp),%ebx
   8016e4:	8d 75 f4             	lea    -0xc(%ebp),%esi
   8016e7:	e9 82 00 00 00       	jmp    80176e <serve+0xa7>
+		if (!(perm & PTE_P)) {
 			cprintf("Invalid request from %08x: no argument page\n",
 				whom);
 			continue; // just leave it hanging...
 		}
-
 		pg = NULL;
   8016ec:	c7 45 ec 00 00 00 00 	movl   $0x0,-0x14(%ebp)
 		if (req == FSREQ_OPEN) {
@@ -5695,7 +5695,6 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
   802cf9:	8b 5d 10             	mov    0x10(%ebp),%ebx
 	// LAB 4: Your code here.
 	// panic("ipc_recv not implemented");
-	// cprintf("in %s\n", __FUNCTION__);
 	int ret;
 	if(!pg)
   802cfc:	85 c0                	test   %eax,%eax
@@ -5718,7 +5717,6 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	if(from_env_store){
   802d16:	85 f6                	test   %esi,%esi
   802d18:	74 0a                	je     802d24 <ipc_recv+0x36>
-		// *from_env_store = getthisenv()->env_ipc_from;
 		*from_env_store = thisenv->env_ipc_from;
   802d1a:	a1 50 a0 80 00       	mov    0x80a050,%eax
   802d1f:	8b 40 74             	mov    0x74(%eax),%eax
@@ -5727,13 +5725,11 @@ ipc_recv(envid_t *from_env_store, void *pg, int *perm_store)
 	if(perm_store){
   802d24:	85 db                	test   %ebx,%ebx
   802d26:	74 0a                	je     802d32 <ipc_recv+0x44>
-		// *perm_store = getthisenv()->env_ipc_perm;
 		*perm_store = thisenv->env_ipc_perm;
   802d28:	a1 50 a0 80 00       	mov    0x80a050,%eax
   802d2d:	8b 40 78             	mov    0x78(%eax),%eax
   802d30:	89 03                	mov    %eax,(%ebx)
 	}
-	// return getthisenv()->env_ipc_value;
 	return thisenv->env_ipc_value;
   802d32:	a1 50 a0 80 00       	mov    0x80a050,%eax
   802d37:	8b 40 70             	mov    0x70(%eax),%eax
@@ -5801,7 +5797,7 @@ ipc_send(envid_t to_env, uint32_t val, void *pg, int perm)
 			panic("panic at ipc_send()\n");
   802d93:	83 ec 04             	sub    $0x4,%esp
   802d96:	68 6b 4c 80 00       	push   $0x804c6b
-  802d9b:	6a 4a                	push   $0x4a
+  802d9b:	6a 46                	push   $0x46
   802d9d:	68 80 4c 80 00       	push   $0x804c80
   802da2:	e8 96 ef ff ff       	call   801d3d <_panic>
 	}
