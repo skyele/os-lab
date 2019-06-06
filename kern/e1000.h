@@ -5,7 +5,7 @@
 
 #define E1000_BASE KSTACKTOP //lab6 bug?
 
-#define PKT_SIZE 1518
+#define TX_PKT_SIZE 1518
 #define RX_PKT_SIZE 2048
 
 #define MAX_PKT_SIZE 1518

@@ -349,8 +349,8 @@ sys_page_unmap(envid_t envid, void *va)
 static int
 sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 {
-	// // LAB 4: Your code here.
-	// // panic("sys_ipc_try_send not implemented");
+	// LAB 4: Your code here.
+	// panic("sys_ipc_try_send not implemented");
 	// cprintf("in %s\n", __FUNCTION__);
 	int ret;
 	struct Env* dst_env;
@@ -470,36 +470,10 @@ sys_time_msec(void)
 int
 sys_net_send(const void *buf, uint32_t len)
 {
-	// // LAB 6: Your code here.
-	// // Check the user permission to [buf, buf + len]
-	// // Call e1000_tx to send the packet
-	// // Hint: e1000_tx only accept kernel virtual address
-	// cprintf("in %s\n", __FUNCTION__);
-	// int r = 0;
-	// // int cur_len = len;
-	// // char *cur_buf = (char *)buf;
-	// user_mem_assert(curenv, buf, len, PTE_U);
-
-	// // struct PageInfo *page = page_alloc(ALLOC_ZERO);
-	// // if(page == NULL)
-	// // 	panic("the page_alloc panic\n");
-	// // cprintf("the len is %d\n", len);
-
-	// // while(cur_len > 0){
-	// // 	int copy_len = cur_len>=PKT_SIZE?PKT_SIZE:cur_len;
-	// // 	memcpy(page2kva(page), cur_buf, copy_len);
-	// // 	r = e1000_tx(page2kva(page), copy_len);	
-	// // 	if(r < 0)
-	// // 		return r;
-	// // 	cur_len -= copy_len;
-	// // 	cur_buf += copy_len;
-	// // 	memset(page2kva(page), 0, copy_len);
-	// // }
-	// r = e1000_tx(buf, len);	
-	// if(r < 0)
-	// 	return r;
-	// return 0;
-
+	// LAB 6: Your code here.
+	// Check the user permission to [buf, buf + len]
+	// Call e1000_tx to send the packet
+	// Hint: e1000_tx only accept kernel virtual address
 	int r;
 	if((r = user_mem_check(curenv, buf, len, PTE_W|PTE_U)) < 0){
 		cprintf("address:%x\n", (uint32_t)buf);
