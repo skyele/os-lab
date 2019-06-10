@@ -23,6 +23,7 @@ enum {
 	SYS_net_send,
 	SYS_net_recv,
 	SYS_clear_access_bit,
+	SYS_get_mac_addr,
 	NSYSCALLS
 };
 

@@ -509,6 +509,13 @@ sys_clear_access_bit(envid_t envid, void *va){
 	*pte_store ^= PTE_A;
 	return 0;
 }
+
+static void 
+sys_get_mac_addr(uint64_t *mac_addr_store){
+	*mac_addr_store = read_eeprom_mac_addr();
+	cprintf("in sys_get_mac_addr the mac_addr is 0x%016lx\n", *mac_addr_store);
+}
+
 // Dispatches to the correct kernel function, passing the arguments.
 int32_t
 syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
@@ -583,6 +590,9 @@ syscall(uint32_t syscallno, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, 
 			break;
 		case SYS_net_recv:
 			ret = sys_net_recv((void *)a1, (uint32_t)a2);
+			break;
+		case SYS_get_mac_addr:
+			sys_get_mac_addr((uint64_t *)a1);
 			break;
 		default:
 			ret = -E_INVAL;

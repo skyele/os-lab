@@ -8,6 +8,9 @@
         "trap.h": "c",
         "sched.h": "c",
         "error.h": "c",
-        "pmap.h": "c"
+        "pmap.h": "c",
+        "e1000.h": "c",
+        "pci.h": "c",
+        "types.h": "c"
     }
 }

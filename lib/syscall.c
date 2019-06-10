@@ -183,3 +183,9 @@ sys_clear_access_bit(envid_t envid, void *va)
 {
 	return syscall(SYS_clear_access_bit, 1, envid, (uint32_t) va, 0, 0, 0);
 }
+
+void
+sys_get_mac_addr(uint64_t *mac_addr_store)
+{
+    syscall(SYS_get_mac_addr, 0, (uint32_t) mac_addr_store, 0, 0, 0, 0);
+}

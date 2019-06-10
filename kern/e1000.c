@@ -8,6 +8,26 @@ static struct E1000 *base;
 struct tx_desc *tx_descs;
 #define N_TXDESC (PGSIZE / sizeof(struct tx_desc))
 char tx_buffer[N_TXDESC][TX_PKT_SIZE];
+uint64_t mac_address = 0;
+
+uint16_t read_eeprom(uint32_t addr)
+{
+    base->EERD = E1000_EEPROM_RD_START | addr;
+	while ((base->EERD & E1000_EEPROM_RD_START) == 1); // Continually poll until we have a response
+	return base->EERD >> 16;
+}
+
+uint64_t read_eeprom_mac_addr(){
+	if (mac_address > 0)
+        return mac_address;
+
+    uint64_t word0 = read_eeprom(E1000_EEPROM_RD_MAC_ADDR_WD0);
+    uint64_t word1 = read_eeprom(E1000_EEPROM_RD_MAC_ADDR_WD1);
+    uint64_t word2 = read_eeprom(E1000_EEPROM_RD_MAC_ADDR_WD2);
+    uint64_t word3 = (uint64_t)0x8000;
+    mac_address = word3<<48 | word2<<32 | word1<<16 | word0;
+    return mac_address;
+}
 
 int
 e1000_tx_init()
@@ -45,10 +65,10 @@ e1000_tx_init()
 struct rx_desc *rx_descs;
 #define N_RXDESC (PGSIZE / sizeof(struct rx_desc))
 char rx_buffer[N_RXDESC][RX_PKT_SIZE];
+
 int
 e1000_rx_init()
 {
-	cprintf("in %s\n",__FUNCTION__);
 	int r;
 	// Allocate one page for descriptors
 	struct PageInfo* page = page_alloc(ALLOC_ZERO);
@@ -60,6 +80,9 @@ e1000_rx_init()
 	for(int i = 0; i < N_RXDESC; i++){
 		rx_descs[i].addr = PADDR(rx_buffer[i]);
 	}
+
+	uint64_t macaddr_local = read_eeprom_mac_addr();
+
 	// Set hardward registers
 	// Look kern/e1000.h to find useful definations
 	//lab6 bug?
@@ -71,6 +94,9 @@ e1000_rx_init()
 	base->RDT = N_RXDESC-1;
 	base->RAL = QEMU_MAC_LOW;
 	base->RAH = QEMU_MAC_HIGH;
+
+	// base->RAL = (uint32_t)(macaddr_local & 0xffffffff);
+	// base->RAH = (uint32_t)(macaddr_local>>32);
 
 	return 0;
 }
