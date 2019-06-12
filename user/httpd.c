@@ -87,6 +87,7 @@ send_data(struct http_request *req, int fd)
     	die("fd's file size > 1518");
   	if ((r = readn(fd, buf, stat.st_size)) != stat.st_size)
     	die("just read partitial data");
+	cprintf("the data is %s\n", buf);
   	if ((r = write(req->sock, buf, stat.st_size)) != stat.st_size)
     	die("not write all data");
 	return 0;

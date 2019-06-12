@@ -92,11 +92,11 @@ e1000_rx_init()
 	base->RDLEN = N_RXDESC* sizeof(struct rx_desc);
 	base->RDH = 0;
 	base->RDT = N_RXDESC-1;
-	base->RAL = QEMU_MAC_LOW;
-	base->RAH = QEMU_MAC_HIGH;
+	// base->RAL = QEMU_MAC_LOW;
+	// base->RAH = QEMU_MAC_HIGH;
 
-	// base->RAL = (uint32_t)(macaddr_local & 0xffffffff);
-	// base->RAH = (uint32_t)(macaddr_local>>32);
+	base->RAL = (uint32_t)(macaddr_local & 0xffffffff);
+	base->RAH = (uint32_t)(macaddr_local>>32);
 
 	return 0;
 }

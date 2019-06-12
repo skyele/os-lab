@@ -1,0 +1,137 @@
+Lab6
+徐天强 516030910391
+Exercise 1. Add a call to time_tick for every clock interrupt in kern/trap.c. Implement sys_time_msec and add it to syscall in kern/syscall.c so that user space has access to the time.
+	需要为user提供访问时间的syscall。首先我们在每次接收到时钟中断的时候，调用timetick来更新本地时间。接下来是实现用户访问时间的syscall，即sys_time_msec()，我发现time_msec()函数已经很好的完成了ticks到时钟的转换，直接调用即可。
+
+Exercise 3. Fill the attach function in e1000.c to initialize the E1000. Add an entry to thepci_attach_vendor array in kern/pci.c to trigger your function if a matching PCI device is found (be sure to put it before the {0, 0, 0} entry that mark the end of the table). The vendor ID and device ID of the 82540EM is given in kern/e1000.h. You should also see these listed when JOS scans the PCI bus while booting.
+	在e1000.c中的pci_e1000_attach函数里，调用pci_func_enable函数。
+	根据文档，我们还需要填pci_attach_vendor这个数组，注意一定要在{0,0,0}这一项之前。
+	具体填法如下：
+	struct pci_driver pci_attach_class[] = {
+		{ PCI_CLASS_BRIDGE, PCI_SUBCLASS_BRIDGE_PCI, &pci_bridge_attach },
+		{ 0, 0, 0 },
+	};
+
+Exercise 4. In your attach function, create a virtual memory mapping for the E1000's BAR 0 by calling mmio_map_region (which you wrote in lab 4 to support memory-mapping the LAPIC). Then convert the returned address to struct E1000 *
+	为base分配mmio的内存映射。其pa与size通过读取pcif的reg_base和reg_size的第0项即可。
+	具体代码如下：
+	base = (struct E1000 *)mmio_map_region(pcif->reg_base[0], pcif->reg_size[0]);
+
+Exercise 5. Perform the initialization steps described in section 14.5 (but not its subsections). Use section 13 as a reference for the registers the initialization process refers to and sections 3.3.3 and 3.4 for reference to the transmit descriptors and transmit descriptor array.
+	Exercise 5要实现的是transmit descriptor的初始化。
+	由注释的提示，需要为descriptors分配一个页：
+		// Allocate one page for descriptors
+    	struct PageInfo* page = page_alloc(ALLOC_ZERO);
+    	tx_descs = (struct tx_desc *)page2kva(page);
+	接着，为descriptors里的每一个descriptor进行初始化。其中它的addr字段，我们分配给它全局变量tx_buffer的对应偏移元素的物理地址。其中cmd字段，它的具体设置直接参考e1000.h中定义的CMD宏。Status字段同上：
+	// Initialize all descriptors
+    for(int i = 0; i < N_TXDESC; i++){
+        tx_descs[i].addr = PADDR(tx_buffer[i]);
+        tx_descs[i].cmd |= E1000_TX_CMD_EOP|E1000_TX_CMD_RS;
+        tx_descs[i].status |= E1000_TX_STATUS_DD;
+        tx_descs[i].length = 0;
+        tx_descs[i].cso = 0;
+        tx_descs[i].css = 0;
+        tx_descs[i].special = 0;
+    }
+	根据手册，接下来分别初始化TDBAL、TDBAH、TDLEN、TDH、TDT、TCTL、
+TIPG。其中一定要注意TCTL和TIPG的初始化位置，一定得在最后，他们的字段根据e1000.h的宏可以推断出来。代码如下：
+	base->TDBAL = (uint32_t)PADDR(tx_descs);
+    base->TDBAH = (uint32_t)0;
+    base->TDLEN = N_TXDESC * sizeof(struct tx_desc);
+	base->TDH = 0;
+    base->TDT = 0;
+	base->TCTL |= E1000_TCTL_EN|E1000_TCTL_PSP|E1000_TCTL_CT_ETHER|E1000_TCTL_COLD_FULL_DUPLEX;
+    base->TIPG = E1000_TIPG_DEFAULT;
+
+Exercise 6. Fill the function e1000_tx to transmit a packet by checking that the next descriptor is free, setting up next descriptor, and updating TDT. Make sure you handle the transmit queue being full.
+	Exercise6要实现的是用e1000来发送数据。我们通过读取base->TDT来访问当前可用的descriptor，但是它可能还在传输之前的数据。由手册可知，当descriptor传输完数据之后，会将E1000_TX_STATUS_DD位置上。所以我们需要检查E1000_TX_STATUS_DD是否已经被置上。
+	当这个位被置上，我们就能用这个descriptor来传输数据了。将数据buf拷贝到此descriptor的buffer处，修改length和cmd字段。并更新TDT字段来通知硬件，已经有新的数据需要传输，硬件就能开始传输数据了。
+	具体代码如下：
+	if(tx_descs[base->TDT].status & E1000_TX_STATUS_DD){
+        tx_descs[base->TDT].status ^= E1000_TX_STATUS_DD;
+        memset(KADDR(tx_descs[base->TDT].addr), 0 , TX_PKT_SIZE);
+        memcpy(KADDR(tx_descs[base->TDT].addr), buf, len);
+        tx_descs[base->TDT].length = len;
+        tx_descs[base->TDT].cmd |= E1000_TX_CMD_EOP|E1000_TX_CMD_RS;
+
+        base->TDT = (base->TDT + 1)%N_TXDESC;
+    }
+    else{
+        return -E_TX_FULL;
+    }
+return 0;
+
+Exercise 7. Finish the sys_net_send system call that lets you transmit packets from user space. Don't forget to check any pointers passed to the kernel from user space.
+	需要实现sys_net_send().其逻辑是，用户调用这个syscall来利用硬件发送数据。因此主要的逻辑是调用e1000_tx来传数据。由于参数是用户态的指针，因此我们需要对其进行权限检查，调用user_mem_check即可。
+	具体代码如下：
+	int r;
+    if((r = user_mem_check(curenv, buf, len, PTE_W|PTE_U)) < 0){
+        cprintf("address:%x\n", (uint32_t)buf);
+        return r;
+    }
+    return e1000_tx(buf, len);
+
+Exercise 8. Implement net/output.c.
+	Output相当于一个转发站。它利用ipc_recv来接收其他进程通过ipc通信发来的数据，然后通过sys_net_send利用硬件将数据发送出去。具体代码如下：
+	while(1){
+        r = ipc_recv(&from_env_store, &nsipcbuf, &perm_store);
+        if(r < 0)
+            panic("ipc_recv panic\n");
+        while((r = sys_net_send(nsipcbuf.pkt.jp_data, nsipcbuf.pkt.jp_len)) < 0){
+            if(r != -E_TX_FULL)
+                panic("sys_net_send panic\n");
+        }
+    }
+	由于它需要不断的转发，因此需要用while包裹住它的主要逻辑。
+
+Question 1. How did you structure your transmit implementation? In particular, what do you do if the transmit ring is full?
+	当我们的transmit ring满了之后，e1000.c会检测到，然后返回E_TX_FULL的error num，当output检测到这一点之后，会重发，直到发出去为止。
+
+Exercise 10. Set up the receive queue and configure the E1000 by following the process in section 14.4. You don't have to support "long packets" or multicast. For now, don't configure the card to use interrupts; you can change that later if you decide to use receive interrupts. Also, configure the E1000 to strip the Ethernet CRC, since the grade script expects it to be stripped.
+	现在，我们需要初始化receive的descriptors了，与transmit一样，参考手册即可。唯一要注意的是它RDH和RDT字段的设置。其中RDT要设置为descriptor数组的最后一位。
+
+Exercise 11. Finish e1000_rx and sys_net_recv. Make sure you handle the receive queue being empty.
+	首先是e1000_rx，其E1000_RX_STATUS_DD标志位和e1000_tx的作用相同，只有当它没有被标记的时候才表示空闲。当E1000_RX_STATUS_DD位为1时，表示buffer中已经有数据了，可以读取。我们将它对应的buffer中的数据拷贝到用户指针buf中来，然后更新RDT即可。
+	具体代码如下：
+	len = rx_descs[rdt].length;
+    memcpy(buf, rx_buffer[rdt], rx_descs[rdt].length);
+    rx_descs[rdt].status ^= E1000_RX_STATUS_DD;//lab6 bug?
+
+    base->RDT = rdt;
+    return len;
+	接着是sys_net_recv，与send的syscall相同，同样也是user_mem_check传入的指针，然后调用e1000_rx来获得e1000中缓存的数据。
+
+Exercise 12. Implement net/input.c.
+	我们通过调用sys_net_recv从e1000硬件来获得数据，接着，将数据拷贝到nsipcbuf的数据结构中，然后利用ipc通信将数据发送给ns的env。具体代码如下：
+	while(1){
+        if((r = sys_net_recv(buf, 2048)) < 0) {
+            sys_yield();
+            continue;
+        }
+        while (sys_page_alloc(0, &nsipcbuf, PTE_P|PTE_W|PTE_U) < 0) ;
+        nsipcbuf.pkt.jp_len = r; 
+        memcpy(nsipcbuf.pkt.jp_data, buf, r);
+        while(sys_ipc_try_send(ns_envid, NSREQ_INPUT, &nsipcbuf, PTE_P|PTE_W|PTE_U) < 0) ;
+    }
+
+2.	How did you structure your receive implementation? In particular, what do you do if the receive queue is empty and a user environment requests the next incoming packet?
+当满了之后，调用sys_yield来释放对cpu的占用。
+
+Exercise 13. The web server is missing the code that deals with sending the contents of a file back to the client. Finish the web server by implementing send_file and send_data.
+	首先是send_file,根据从ics课上学到的知识，通过open函数打开特定路径下的文件，获得对应的fd。然后通过fstat来读取关于这个fd的相关信息，比如size信息。
+	然后是send_data,同样我们利用fstate函数来读取相关信息。利用readn库函数来从fd里读取数据，然后将读取到的数据通过write来写到socket里，实现传输逻辑。
+
+3.	What does the web page served by JOS's web server say?
+This file came from JOS. Cheesy web page
+4.	How long approximately did it take you to do this lab?
+3 days
+
+Challenge! Read about the EEPROM in the developer's manual and write the code to load the E1000's MAC address out of the EEPROM. Currently, QEMU's default MAC address is hard-coded into both your receive initialization and lwIP. Fix your initialization to use the MAC address you read from the EEPROM, add a system call to pass the MAC address to lwIP, and modify lwIP to the MAC address read from the card. Test your change by configuring QEMU to use a different MAC address.
+	要实现从EEPROM里读取mac地址。首先阅读文档，发现读取的端口register偏移是0x14，因此先要修改E1000数据结构，将对应的reserved位修改成已被使用的字段。
+	首先我们要实现读eeprom的逻辑，它通过0x14处的偏移，来获得要读取EEPROM的数据的地址。通过查询手册，我们知道EEPROM中关于mac地址的位置分别在第0，1，2个word处，因此我们通过读取这些地址处的数据，就可以获得EEPROM的ethernet地址。接着，将这个地址替换之前硬编码在e1000_rx_init中的mac地址即可。
+	接着，还要改的是在lwip中的地址初始化。在用户态的代码如何获得这个地址呢？我们需要新实现一个syscall -- sys_get_mac_addr，但是由于我们的mac地址是64位的，因此不能直接通过系统调用的返回值来存储。我们传递一个指针给这个系统调用，然后将mac地址存入这个指针即可。具体代码如下：
+	static void 
+	sys_get_mac_addr(uint64_t *mac_addr_store){
+    	*mac_addr_store = read_eeprom_mac_addr();
+	}

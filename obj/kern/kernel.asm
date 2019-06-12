@@ -165,9 +165,9 @@ f01000fa:	e8 29 6b 00 00       	call   f0106c28 <lapic_init>
 	pic_init();
 f01000ff:	e8 d1 3c 00 00       	call   f0103dd5 <pic_init>
 	time_init();
-f0100104:	e8 61 79 00 00       	call   f0107a6a <time_init>
+f0100104:	e8 5a 79 00 00       	call   f0107a63 <time_init>
 	pci_init();
-f0100109:	e8 3c 79 00 00       	call   f0107a4a <pci_init>
+f0100109:	e8 35 79 00 00       	call   f0107a43 <pci_init>
 extern struct spinlock kernel_lock;
 
 static inline void
@@ -6973,7 +6973,7 @@ f0104acd:	89 46 1c             	mov    %eax,0x1c(%esi)
 f0104ad0:	83 c4 20             	add    $0x20,%esp
 f0104ad3:	eb a3                	jmp    f0104a78 <trap+0x13b>
 			time_tick();
-f0104ad5:	e8 9b 2f 00 00       	call   f0107a75 <time_tick>
+f0104ad5:	e8 94 2f 00 00       	call   f0107a6e <time_tick>
 			lapic_eoi();
 f0104ada:	e8 7a 22 00 00       	call   f0106d59 <lapic_eoi>
 			sched_yield();
@@ -7602,7 +7602,7 @@ f0104f61:	78 19                	js     f0104f7c <sys_net_send+0x46>
 f0104f63:	83 ec 08             	sub    $0x8,%esp
 f0104f66:	56                   	push   %esi
 f0104f67:	53                   	push   %ebx
-f0104f68:	e8 1c 24 00 00       	call   f0107389 <e1000_tx>
+f0104f68:	e8 15 24 00 00       	call   f0107382 <e1000_tx>
 f0104f6d:	89 c7                	mov    %eax,%edi
 f0104f6f:	83 c4 10             	add    $0x10,%esp
 
@@ -7652,7 +7652,7 @@ f0104fb9:	e8 ad e4 ff ff       	call   f010346b <user_mem_assert>
 f0104fbe:	83 c4 08             	add    $0x8,%esp
 f0104fc1:	ff 75 0c             	pushl  0xc(%ebp)
 f0104fc4:	53                   	push   %ebx
-f0104fc5:	e8 e7 24 00 00       	call   f01074b1 <e1000_rx>
+f0104fc5:	e8 e0 24 00 00       	call   f01074aa <e1000_rx>
 }
 f0104fca:	8b 5d fc             	mov    -0x4(%ebp),%ebx
 f0104fcd:	c9                   	leave  
@@ -8422,7 +8422,7 @@ f0105832:	bb fd ff ff ff       	mov    $0xfffffffd,%ebx
 			break;
 f0105837:	e9 e5 f7 ff ff       	jmp    f0105021 <syscall+0x52>
 	return time_msec();
-f010583c:	e8 62 22 00 00       	call   f0107aa3 <time_msec>
+f010583c:	e8 5b 22 00 00       	call   f0107a9c <time_msec>
 f0105841:	89 c3                	mov    %eax,%ebx
 			break;
 f0105843:	e9 d9 f7 ff ff       	jmp    f0105021 <syscall+0x52>
@@ -11868,7 +11868,7 @@ f01071f7:	e8 d7 a0 ff ff       	call   f01012d3 <page_alloc>
 	if(page == NULL)
 f01071fc:	83 c4 10             	add    $0x10,%esp
 f01071ff:	85 c0                	test   %eax,%eax
-f0107201:	0f 84 f0 00 00 00    	je     f01072f7 <e1000_rx_init+0x10b>
+f0107201:	0f 84 e9 00 00 00    	je     f01072f0 <e1000_rx_init+0x104>
 	return (pp - pages) << PGSHIFT;
 f0107207:	2b 05 b0 1e 58 f0    	sub    0xf0581eb0,%eax
 f010720d:	c1 f8 03             	sar    $0x3,%eax
@@ -11877,7 +11877,7 @@ f0107210:	c1 e0 0c             	shl    $0xc,%eax
 f0107213:	89 c2                	mov    %eax,%edx
 f0107215:	c1 ea 0c             	shr    $0xc,%edx
 f0107218:	3b 15 a8 1e 58 f0    	cmp    0xf0581ea8,%edx
-f010721e:	0f 83 e7 00 00 00    	jae    f010730b <e1000_rx_init+0x11f>
+f010721e:	0f 83 e0 00 00 00    	jae    f0107304 <e1000_rx_init+0x118>
 	return (void *)(pa + KERNBASE);
 f0107224:	2d 00 00 00 10       	sub    $0x10000000,%eax
 f0107229:	a3 24 30 5c f0       	mov    %eax,0xf05c3024
@@ -11890,7 +11890,7 @@ f010723d:	be 40 30 64 f0       	mov    $0xf0643040,%esi
 f0107242:	ba 00 00 00 00       	mov    $0x0,%edx
 	if ((uint32_t)kva < KERNBASE)
 f0107247:	3d ff ff ff ef       	cmp    $0xefffffff,%eax
-f010724c:	0f 86 cb 00 00 00    	jbe    f010731d <e1000_rx_init+0x131>
+f010724c:	0f 86 c4 00 00 00    	jbe    f0107316 <e1000_rx_init+0x12a>
 	// Initialize all descriptors
 	// You should allocate some pages as receive buffer
 	for(int i = 0; i < N_RXDESC; i++){
@@ -11914,999 +11914,1001 @@ f0107274:	e8 ae fd ff ff       	call   f0107027 <read_eeprom_mac_addr>
 	// Look kern/e1000.h to find useful definations
 	//lab6 bug?
 	base->RCTL |= E1000_RCTL_EN|E1000_RCTL_BSIZE_2048|E1000_RCTL_SECRC;
-f0107279:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
-f010727e:	8b 90 00 01 00 00    	mov    0x100(%eax),%edx
-f0107284:	81 ca 02 00 00 04    	or     $0x4000002,%edx
-f010728a:	89 90 00 01 00 00    	mov    %edx,0x100(%eax)
+f0107279:	8b 0d 88 0e 58 f0    	mov    0xf0580e88,%ecx
+f010727f:	8b 99 00 01 00 00    	mov    0x100(%ecx),%ebx
+f0107285:	81 cb 02 00 00 04    	or     $0x4000002,%ebx
+f010728b:	89 99 00 01 00 00    	mov    %ebx,0x100(%ecx)
 	base->RDBAL = PADDR(rx_descs);
-f0107290:	8b 15 24 30 5c f0    	mov    0xf05c3024,%edx
-f0107296:	81 fa ff ff ff ef    	cmp    $0xefffffff,%edx
-f010729c:	0f 86 8d 00 00 00    	jbe    f010732f <e1000_rx_init+0x143>
+f0107291:	8b 1d 24 30 5c f0    	mov    0xf05c3024,%ebx
+f0107297:	81 fb ff ff ff ef    	cmp    $0xefffffff,%ebx
+f010729d:	0f 86 85 00 00 00    	jbe    f0107328 <e1000_rx_init+0x13c>
 	return (physaddr_t)kva - KERNBASE;
-f01072a2:	81 c2 00 00 00 10    	add    $0x10000000,%edx
-f01072a8:	89 90 00 28 00 00    	mov    %edx,0x2800(%eax)
+f01072a3:	81 c3 00 00 00 10    	add    $0x10000000,%ebx
+f01072a9:	89 99 00 28 00 00    	mov    %ebx,0x2800(%ecx)
 	base->RDBAH = (uint32_t)0;
-f01072ae:	c7 80 04 28 00 00 00 	movl   $0x0,0x2804(%eax)
-f01072b5:	00 00 00 
+f01072af:	c7 81 04 28 00 00 00 	movl   $0x0,0x2804(%ecx)
+f01072b6:	00 00 00 
 	base->RDLEN = N_RXDESC* sizeof(struct rx_desc);
-f01072b8:	c7 80 08 28 00 00 00 	movl   $0x1000,0x2808(%eax)
-f01072bf:	10 00 00 
+f01072b9:	c7 81 08 28 00 00 00 	movl   $0x1000,0x2808(%ecx)
+f01072c0:	10 00 00 
 	base->RDH = 0;
-f01072c2:	c7 80 10 28 00 00 00 	movl   $0x0,0x2810(%eax)
-f01072c9:	00 00 00 
+f01072c3:	c7 81 10 28 00 00 00 	movl   $0x0,0x2810(%ecx)
+f01072ca:	00 00 00 
 	base->RDT = N_RXDESC-1;
-f01072cc:	c7 80 18 28 00 00 ff 	movl   $0xff,0x2818(%eax)
-f01072d3:	00 00 00 
-	base->RAL = QEMU_MAC_LOW;
-f01072d6:	c7 80 1c 3a 00 00 52 	movl   $0x12005452,0x3a1c(%eax)
-f01072dd:	54 00 12 
-	base->RAH = QEMU_MAC_HIGH;
-f01072e0:	c7 80 20 3a 00 00 34 	movl   $0x5634,0x3a20(%eax)
-f01072e7:	56 00 00 
+f01072cd:	c7 81 18 28 00 00 ff 	movl   $0xff,0x2818(%ecx)
+f01072d4:	00 00 00 
+	// base->RAL = QEMU_MAC_LOW;
+	// base->RAH = QEMU_MAC_HIGH;
 
-	// base->RAL = (uint32_t)(macaddr_local & 0xffffffff);
-	// base->RAH = (uint32_t)(macaddr_local>>32);
+	base->RAL = (uint32_t)(macaddr_local & 0xffffffff);
+f01072d7:	89 81 1c 3a 00 00    	mov    %eax,0x3a1c(%ecx)
+	base->RAH = (uint32_t)(macaddr_local>>32);
+f01072dd:	89 91 20 3a 00 00    	mov    %edx,0x3a20(%ecx)
 
 	return 0;
 }
-f01072ea:	b8 00 00 00 00       	mov    $0x0,%eax
-f01072ef:	8d 65 f4             	lea    -0xc(%ebp),%esp
-f01072f2:	5b                   	pop    %ebx
-f01072f3:	5e                   	pop    %esi
-f01072f4:	5f                   	pop    %edi
-f01072f5:	5d                   	pop    %ebp
-f01072f6:	c3                   	ret    
+f01072e3:	b8 00 00 00 00       	mov    $0x0,%eax
+f01072e8:	8d 65 f4             	lea    -0xc(%ebp),%esp
+f01072eb:	5b                   	pop    %ebx
+f01072ec:	5e                   	pop    %esi
+f01072ed:	5f                   	pop    %edi
+f01072ee:	5d                   	pop    %ebp
+f01072ef:	c3                   	ret    
 			panic("page_alloc panic\n");
-f01072f7:	83 ec 04             	sub    $0x4,%esp
-f01072fa:	68 e2 a0 10 f0       	push   $0xf010a0e2
-f01072ff:	6a 4c                	push   $0x4c
-f0107301:	68 d5 a0 10 f0       	push   $0xf010a0d5
-f0107306:	e8 3e 8d ff ff       	call   f0100049 <_panic>
+f01072f0:	83 ec 04             	sub    $0x4,%esp
+f01072f3:	68 e2 a0 10 f0       	push   $0xf010a0e2
+f01072f8:	6a 4c                	push   $0x4c
+f01072fa:	68 d5 a0 10 f0       	push   $0xf010a0d5
+f01072ff:	e8 45 8d ff ff       	call   f0100049 <_panic>
 		_panic(file, line, "KADDR called with invalid pa %08lx", pa);
-f010730b:	50                   	push   %eax
-f010730c:	68 54 7d 10 f0       	push   $0xf0107d54
-f0107311:	6a 58                	push   $0x58
-f0107313:	68 f1 8e 10 f0       	push   $0xf0108ef1
-f0107318:	e8 2c 8d ff ff       	call   f0100049 <_panic>
+f0107304:	50                   	push   %eax
+f0107305:	68 54 7d 10 f0       	push   $0xf0107d54
+f010730a:	6a 58                	push   $0x58
+f010730c:	68 f1 8e 10 f0       	push   $0xf0108ef1
+f0107311:	e8 33 8d ff ff       	call   f0100049 <_panic>
 		_panic(file, line, "PADDR called with invalid kva %08lx", kva);
-f010731d:	50                   	push   %eax
-f010731e:	68 78 7d 10 f0       	push   $0xf0107d78
-f0107323:	6a 51                	push   $0x51
-f0107325:	68 d5 a0 10 f0       	push   $0xf010a0d5
-f010732a:	e8 1a 8d ff ff       	call   f0100049 <_panic>
-f010732f:	52                   	push   %edx
-f0107330:	68 78 7d 10 f0       	push   $0xf0107d78
-f0107335:	6a 5a                	push   $0x5a
-f0107337:	68 d5 a0 10 f0       	push   $0xf010a0d5
-f010733c:	e8 08 8d ff ff       	call   f0100049 <_panic>
+f0107316:	50                   	push   %eax
+f0107317:	68 78 7d 10 f0       	push   $0xf0107d78
+f010731c:	6a 51                	push   $0x51
+f010731e:	68 d5 a0 10 f0       	push   $0xf010a0d5
+f0107323:	e8 21 8d ff ff       	call   f0100049 <_panic>
+f0107328:	53                   	push   %ebx
+f0107329:	68 78 7d 10 f0       	push   $0xf0107d78
+f010732e:	6a 5a                	push   $0x5a
+f0107330:	68 d5 a0 10 f0       	push   $0xf010a0d5
+f0107335:	e8 0f 8d ff ff       	call   f0100049 <_panic>
 
-f0107341 <pci_e1000_attach>:
+f010733a <pci_e1000_attach>:
 
 int
 pci_e1000_attach(struct pci_func *pcif)
 {
-f0107341:	55                   	push   %ebp
-f0107342:	89 e5                	mov    %esp,%ebp
-f0107344:	53                   	push   %ebx
-f0107345:	83 ec 0c             	sub    $0xc,%esp
-f0107348:	8b 5d 08             	mov    0x8(%ebp),%ebx
+f010733a:	55                   	push   %ebp
+f010733b:	89 e5                	mov    %esp,%ebp
+f010733d:	53                   	push   %ebx
+f010733e:	83 ec 0c             	sub    $0xc,%esp
+f0107341:	8b 5d 08             	mov    0x8(%ebp),%ebx
 	cprintf("in %s\n", __FUNCTION__);
-f010734b:	68 14 a1 10 f0       	push   $0xf010a114
-f0107350:	68 e6 92 10 f0       	push   $0xf01092e6
-f0107355:	e8 76 cb ff ff       	call   f0103ed0 <cprintf>
+f0107344:	68 14 a1 10 f0       	push   $0xf010a114
+f0107349:	68 e6 92 10 f0       	push   $0xf01092e6
+f010734e:	e8 7d cb ff ff       	call   f0103ed0 <cprintf>
 	// Enable PCI function
 	// Map MMIO region and save the address in 'base;
 	pci_func_enable(pcif);
-f010735a:	89 1c 24             	mov    %ebx,(%esp)
-f010735d:	e8 a8 05 00 00       	call   f010790a <pci_func_enable>
+f0107353:	89 1c 24             	mov    %ebx,(%esp)
+f0107356:	e8 a8 05 00 00       	call   f0107903 <pci_func_enable>
 	
 	base = (struct E1000 *)mmio_map_region(pcif->reg_base[0], pcif->reg_size[0]);
-f0107362:	83 c4 08             	add    $0x8,%esp
-f0107365:	ff 73 2c             	pushl  0x2c(%ebx)
-f0107368:	ff 73 14             	pushl  0x14(%ebx)
-f010736b:	e8 81 a3 ff ff       	call   f01016f1 <mmio_map_region>
-f0107370:	a3 88 0e 58 f0       	mov    %eax,0xf0580e88
+f010735b:	83 c4 08             	add    $0x8,%esp
+f010735e:	ff 73 2c             	pushl  0x2c(%ebx)
+f0107361:	ff 73 14             	pushl  0x14(%ebx)
+f0107364:	e8 88 a3 ff ff       	call   f01016f1 <mmio_map_region>
+f0107369:	a3 88 0e 58 f0       	mov    %eax,0xf0580e88
 	e1000_tx_init();
-f0107375:	e8 27 fd ff ff       	call   f01070a1 <e1000_tx_init>
+f010736e:	e8 2e fd ff ff       	call   f01070a1 <e1000_tx_init>
 	e1000_rx_init();
-f010737a:	e8 6d fe ff ff       	call   f01071ec <e1000_rx_init>
+f0107373:	e8 74 fe ff ff       	call   f01071ec <e1000_rx_init>
 
 	return 0;
 }
-f010737f:	b8 00 00 00 00       	mov    $0x0,%eax
-f0107384:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-f0107387:	c9                   	leave  
-f0107388:	c3                   	ret    
+f0107378:	b8 00 00 00 00       	mov    $0x0,%eax
+f010737d:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+f0107380:	c9                   	leave  
+f0107381:	c3                   	ret    
 
-f0107389 <e1000_tx>:
+f0107382 <e1000_tx>:
 
 int
 e1000_tx(const void *buf, uint32_t len)
 {
-f0107389:	55                   	push   %ebp
-f010738a:	89 e5                	mov    %esp,%ebp
-f010738c:	53                   	push   %ebx
-f010738d:	83 ec 0c             	sub    $0xc,%esp
-f0107390:	8b 5d 0c             	mov    0xc(%ebp),%ebx
+f0107382:	55                   	push   %ebp
+f0107383:	89 e5                	mov    %esp,%ebp
+f0107385:	53                   	push   %ebx
+f0107386:	83 ec 0c             	sub    $0xc,%esp
+f0107389:	8b 5d 0c             	mov    0xc(%ebp),%ebx
 	// Send 'len' bytes in 'buf' to ethernet
 	// Hint: buf is a kernel virtual address
 	cprintf("in %s\n", __FUNCTION__);
-f0107393:	68 08 a1 10 f0       	push   $0xf010a108
-f0107398:	68 e6 92 10 f0       	push   $0xf01092e6
-f010739d:	e8 2e cb ff ff       	call   f0103ed0 <cprintf>
+f010738c:	68 08 a1 10 f0       	push   $0xf010a108
+f0107391:	68 e6 92 10 f0       	push   $0xf01092e6
+f0107396:	e8 35 cb ff ff       	call   f0103ed0 <cprintf>
 	if(tx_descs[base->TDT].status & E1000_TX_STATUS_DD){
-f01073a2:	a1 20 30 5c f0       	mov    0xf05c3020,%eax
-f01073a7:	8b 0d 88 0e 58 f0    	mov    0xf0580e88,%ecx
-f01073ad:	8b 91 18 38 00 00    	mov    0x3818(%ecx),%edx
-f01073b3:	c1 e2 04             	shl    $0x4,%edx
-f01073b6:	83 c4 10             	add    $0x10,%esp
-f01073b9:	f6 44 10 0c 01       	testb  $0x1,0xc(%eax,%edx,1)
-f01073be:	0f 84 e6 00 00 00    	je     f01074aa <e1000_tx+0x121>
+f010739b:	a1 20 30 5c f0       	mov    0xf05c3020,%eax
+f01073a0:	8b 0d 88 0e 58 f0    	mov    0xf0580e88,%ecx
+f01073a6:	8b 91 18 38 00 00    	mov    0x3818(%ecx),%edx
+f01073ac:	c1 e2 04             	shl    $0x4,%edx
+f01073af:	83 c4 10             	add    $0x10,%esp
+f01073b2:	f6 44 10 0c 01       	testb  $0x1,0xc(%eax,%edx,1)
+f01073b7:	0f 84 e6 00 00 00    	je     f01074a3 <e1000_tx+0x121>
 		tx_descs[base->TDT].status ^= E1000_TX_STATUS_DD;
-f01073c4:	8b 91 18 38 00 00    	mov    0x3818(%ecx),%edx
-f01073ca:	c1 e2 04             	shl    $0x4,%edx
-f01073cd:	80 74 10 0c 01       	xorb   $0x1,0xc(%eax,%edx,1)
+f01073bd:	8b 91 18 38 00 00    	mov    0x3818(%ecx),%edx
+f01073c3:	c1 e2 04             	shl    $0x4,%edx
+f01073c6:	80 74 10 0c 01       	xorb   $0x1,0xc(%eax,%edx,1)
 		memset(KADDR(tx_descs[base->TDT].addr), 0 , TX_PKT_SIZE);
-f01073d2:	8b 91 18 38 00 00    	mov    0x3818(%ecx),%edx
-f01073d8:	c1 e2 04             	shl    $0x4,%edx
-f01073db:	8b 04 10             	mov    (%eax,%edx,1),%eax
+f01073cb:	8b 91 18 38 00 00    	mov    0x3818(%ecx),%edx
+f01073d1:	c1 e2 04             	shl    $0x4,%edx
+f01073d4:	8b 04 10             	mov    (%eax,%edx,1),%eax
 	if (PGNUM(pa) >= npages)
-f01073de:	89 c2                	mov    %eax,%edx
-f01073e0:	c1 ea 0c             	shr    $0xc,%edx
-f01073e3:	3b 15 a8 1e 58 f0    	cmp    0xf0581ea8,%edx
-f01073e9:	0f 83 94 00 00 00    	jae    f0107483 <e1000_tx+0xfa>
-f01073ef:	83 ec 04             	sub    $0x4,%esp
-f01073f2:	68 ee 05 00 00       	push   $0x5ee
-f01073f7:	6a 00                	push   $0x0
+f01073d7:	89 c2                	mov    %eax,%edx
+f01073d9:	c1 ea 0c             	shr    $0xc,%edx
+f01073dc:	3b 15 a8 1e 58 f0    	cmp    0xf0581ea8,%edx
+f01073e2:	0f 83 94 00 00 00    	jae    f010747c <e1000_tx+0xfa>
+f01073e8:	83 ec 04             	sub    $0x4,%esp
+f01073eb:	68 ee 05 00 00       	push   $0x5ee
+f01073f0:	6a 00                	push   $0x0
 	return (void *)(pa + KERNBASE);
-f01073f9:	2d 00 00 00 10       	sub    $0x10000000,%eax
-f01073fe:	50                   	push   %eax
-f01073ff:	e8 08 f2 ff ff       	call   f010660c <memset>
+f01073f2:	2d 00 00 00 10       	sub    $0x10000000,%eax
+f01073f7:	50                   	push   %eax
+f01073f8:	e8 0f f2 ff ff       	call   f010660c <memset>
 		memcpy(KADDR(tx_descs[base->TDT].addr), buf, len);
-f0107404:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
-f0107409:	8b 80 18 38 00 00    	mov    0x3818(%eax),%eax
-f010740f:	c1 e0 04             	shl    $0x4,%eax
-f0107412:	03 05 20 30 5c f0    	add    0xf05c3020,%eax
-f0107418:	8b 00                	mov    (%eax),%eax
+f01073fd:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
+f0107402:	8b 80 18 38 00 00    	mov    0x3818(%eax),%eax
+f0107408:	c1 e0 04             	shl    $0x4,%eax
+f010740b:	03 05 20 30 5c f0    	add    0xf05c3020,%eax
+f0107411:	8b 00                	mov    (%eax),%eax
 	if (PGNUM(pa) >= npages)
-f010741a:	89 c2                	mov    %eax,%edx
-f010741c:	c1 ea 0c             	shr    $0xc,%edx
-f010741f:	83 c4 10             	add    $0x10,%esp
-f0107422:	39 15 a8 1e 58 f0    	cmp    %edx,0xf0581ea8
-f0107428:	76 6b                	jbe    f0107495 <e1000_tx+0x10c>
-f010742a:	83 ec 04             	sub    $0x4,%esp
-f010742d:	53                   	push   %ebx
-f010742e:	ff 75 08             	pushl  0x8(%ebp)
+f0107413:	89 c2                	mov    %eax,%edx
+f0107415:	c1 ea 0c             	shr    $0xc,%edx
+f0107418:	83 c4 10             	add    $0x10,%esp
+f010741b:	39 15 a8 1e 58 f0    	cmp    %edx,0xf0581ea8
+f0107421:	76 6b                	jbe    f010748e <e1000_tx+0x10c>
+f0107423:	83 ec 04             	sub    $0x4,%esp
+f0107426:	53                   	push   %ebx
+f0107427:	ff 75 08             	pushl  0x8(%ebp)
 	return (void *)(pa + KERNBASE);
-f0107431:	2d 00 00 00 10       	sub    $0x10000000,%eax
-f0107436:	50                   	push   %eax
-f0107437:	e8 7a f2 ff ff       	call   f01066b6 <memcpy>
+f010742a:	2d 00 00 00 10       	sub    $0x10000000,%eax
+f010742f:	50                   	push   %eax
+f0107430:	e8 81 f2 ff ff       	call   f01066b6 <memcpy>
 		tx_descs[base->TDT].length = len;
-f010743c:	8b 0d 20 30 5c f0    	mov    0xf05c3020,%ecx
-f0107442:	8b 15 88 0e 58 f0    	mov    0xf0580e88,%edx
-f0107448:	8b 82 18 38 00 00    	mov    0x3818(%edx),%eax
-f010744e:	c1 e0 04             	shl    $0x4,%eax
-f0107451:	66 89 5c 01 08       	mov    %bx,0x8(%ecx,%eax,1)
+f0107435:	8b 0d 20 30 5c f0    	mov    0xf05c3020,%ecx
+f010743b:	8b 15 88 0e 58 f0    	mov    0xf0580e88,%edx
+f0107441:	8b 82 18 38 00 00    	mov    0x3818(%edx),%eax
+f0107447:	c1 e0 04             	shl    $0x4,%eax
+f010744a:	66 89 5c 01 08       	mov    %bx,0x8(%ecx,%eax,1)
 		tx_descs[base->TDT].cmd |= E1000_TX_CMD_EOP|E1000_TX_CMD_RS;
-f0107456:	8b 82 18 38 00 00    	mov    0x3818(%edx),%eax
-f010745c:	c1 e0 04             	shl    $0x4,%eax
-f010745f:	80 4c 01 0b 05       	orb    $0x5,0xb(%ecx,%eax,1)
+f010744f:	8b 82 18 38 00 00    	mov    0x3818(%edx),%eax
+f0107455:	c1 e0 04             	shl    $0x4,%eax
+f0107458:	80 4c 01 0b 05       	orb    $0x5,0xb(%ecx,%eax,1)
 
 		base->TDT = (base->TDT + 1)%N_TXDESC;
-f0107464:	8b 82 18 38 00 00    	mov    0x3818(%edx),%eax
-f010746a:	83 c0 01             	add    $0x1,%eax
-f010746d:	0f b6 c0             	movzbl %al,%eax
-f0107470:	89 82 18 38 00 00    	mov    %eax,0x3818(%edx)
+f010745d:	8b 82 18 38 00 00    	mov    0x3818(%edx),%eax
+f0107463:	83 c0 01             	add    $0x1,%eax
+f0107466:	0f b6 c0             	movzbl %al,%eax
+f0107469:	89 82 18 38 00 00    	mov    %eax,0x3818(%edx)
 	}
 	else{
 		return -E_TX_FULL;
 	}
 	return 0;
-f0107476:	83 c4 10             	add    $0x10,%esp
-f0107479:	b8 00 00 00 00       	mov    $0x0,%eax
+f010746f:	83 c4 10             	add    $0x10,%esp
+f0107472:	b8 00 00 00 00       	mov    $0x0,%eax
 }
-f010747e:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-f0107481:	c9                   	leave  
-f0107482:	c3                   	ret    
+f0107477:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+f010747a:	c9                   	leave  
+f010747b:	c3                   	ret    
 		_panic(file, line, "KADDR called with invalid pa %08lx", pa);
-f0107483:	50                   	push   %eax
-f0107484:	68 54 7d 10 f0       	push   $0xf0107d54
-f0107489:	6a 7f                	push   $0x7f
-f010748b:	68 d5 a0 10 f0       	push   $0xf010a0d5
-f0107490:	e8 b4 8b ff ff       	call   f0100049 <_panic>
-f0107495:	50                   	push   %eax
-f0107496:	68 54 7d 10 f0       	push   $0xf0107d54
-f010749b:	68 80 00 00 00       	push   $0x80
-f01074a0:	68 d5 a0 10 f0       	push   $0xf010a0d5
-f01074a5:	e8 9f 8b ff ff       	call   f0100049 <_panic>
+f010747c:	50                   	push   %eax
+f010747d:	68 54 7d 10 f0       	push   $0xf0107d54
+f0107482:	6a 7f                	push   $0x7f
+f0107484:	68 d5 a0 10 f0       	push   $0xf010a0d5
+f0107489:	e8 bb 8b ff ff       	call   f0100049 <_panic>
+f010748e:	50                   	push   %eax
+f010748f:	68 54 7d 10 f0       	push   $0xf0107d54
+f0107494:	68 80 00 00 00       	push   $0x80
+f0107499:	68 d5 a0 10 f0       	push   $0xf010a0d5
+f010749e:	e8 a6 8b ff ff       	call   f0100049 <_panic>
 		return -E_TX_FULL;
-f01074aa:	b8 ef ff ff ff       	mov    $0xffffffef,%eax
-f01074af:	eb cd                	jmp    f010747e <e1000_tx+0xf5>
+f01074a3:	b8 ef ff ff ff       	mov    $0xffffffef,%eax
+f01074a8:	eb cd                	jmp    f0107477 <e1000_tx+0xf5>
 
-f01074b1 <e1000_rx>:
+f01074aa <e1000_rx>:
 
 // char rx_bufs[N_RXDESC][RX_PKT_SIZE];
 
 int
 e1000_rx(void *buf, uint32_t len)
 {
-f01074b1:	55                   	push   %ebp
-f01074b2:	89 e5                	mov    %esp,%ebp
-f01074b4:	57                   	push   %edi
-f01074b5:	56                   	push   %esi
-f01074b6:	53                   	push   %ebx
-f01074b7:	83 ec 0c             	sub    $0xc,%esp
+f01074aa:	55                   	push   %ebp
+f01074ab:	89 e5                	mov    %esp,%ebp
+f01074ad:	57                   	push   %edi
+f01074ae:	56                   	push   %esi
+f01074af:	53                   	push   %ebx
+f01074b0:	83 ec 0c             	sub    $0xc,%esp
 	// 	assert(len > rx_descs[base->RDH].length);
 	// 	memcpy(buf, KADDR(rx_descs[base->RDH].addr), len);
 	// 	memset(KADDR(rx_descs[base->RDH].addr), 0, PKT_SIZE);
 	// 	base->RDT = base->RDH;
 	// }
 	uint32_t rdt = (base->RDT + 1) % N_RXDESC;
-f01074ba:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
-f01074bf:	8b 98 18 28 00 00    	mov    0x2818(%eax),%ebx
-f01074c5:	83 c3 01             	add    $0x1,%ebx
-f01074c8:	0f b6 db             	movzbl %bl,%ebx
+f01074b3:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
+f01074b8:	8b 98 18 28 00 00    	mov    0x2818(%eax),%ebx
+f01074be:	83 c3 01             	add    $0x1,%ebx
+f01074c1:	0f b6 db             	movzbl %bl,%ebx
   	if(!(rx_descs[rdt].status & E1000_RX_STATUS_DD)){
-f01074cb:	89 de                	mov    %ebx,%esi
-f01074cd:	c1 e6 04             	shl    $0x4,%esi
-f01074d0:	89 f0                	mov    %esi,%eax
-f01074d2:	03 05 24 30 5c f0    	add    0xf05c3024,%eax
-f01074d8:	f6 40 0c 01          	testb  $0x1,0xc(%eax)
-f01074dc:	74 5a                	je     f0107538 <e1000_rx+0x87>
+f01074c4:	89 de                	mov    %ebx,%esi
+f01074c6:	c1 e6 04             	shl    $0x4,%esi
+f01074c9:	89 f0                	mov    %esi,%eax
+f01074cb:	03 05 24 30 5c f0    	add    0xf05c3024,%eax
+f01074d1:	f6 40 0c 01          	testb  $0x1,0xc(%eax)
+f01074d5:	74 5a                	je     f0107531 <e1000_rx+0x87>
 		return -E_AGAIN;
 	}
 
 	if(rx_descs[rdt].error) {
-f01074de:	80 78 0d 00          	cmpb   $0x0,0xd(%eax)
-f01074e2:	75 3d                	jne    f0107521 <e1000_rx+0x70>
+f01074d7:	80 78 0d 00          	cmpb   $0x0,0xd(%eax)
+f01074db:	75 3d                	jne    f010751a <e1000_rx+0x70>
 		cprintf("[rx]error occours\n");
 		return -E_UNSPECIFIED;
 	}
 	len = rx_descs[rdt].length;
   	memcpy(buf, rx_buffer[rdt], rx_descs[rdt].length);
-f01074e4:	83 ec 04             	sub    $0x4,%esp
+f01074dd:	83 ec 04             	sub    $0x4,%esp
 	len = rx_descs[rdt].length;
-f01074e7:	0f b7 78 08          	movzwl 0x8(%eax),%edi
+f01074e0:	0f b7 78 08          	movzwl 0x8(%eax),%edi
   	memcpy(buf, rx_buffer[rdt], rx_descs[rdt].length);
-f01074eb:	57                   	push   %edi
-f01074ec:	89 d8                	mov    %ebx,%eax
-f01074ee:	c1 e0 0b             	shl    $0xb,%eax
-f01074f1:	05 40 30 5c f0       	add    $0xf05c3040,%eax
-f01074f6:	50                   	push   %eax
-f01074f7:	ff 75 08             	pushl  0x8(%ebp)
-f01074fa:	e8 b7 f1 ff ff       	call   f01066b6 <memcpy>
+f01074e4:	57                   	push   %edi
+f01074e5:	89 d8                	mov    %ebx,%eax
+f01074e7:	c1 e0 0b             	shl    $0xb,%eax
+f01074ea:	05 40 30 5c f0       	add    $0xf05c3040,%eax
+f01074ef:	50                   	push   %eax
+f01074f0:	ff 75 08             	pushl  0x8(%ebp)
+f01074f3:	e8 be f1 ff ff       	call   f01066b6 <memcpy>
   	rx_descs[rdt].status ^= E1000_RX_STATUS_DD;//lab6 bug?
-f01074ff:	03 35 24 30 5c f0    	add    0xf05c3024,%esi
-f0107505:	80 76 0c 01          	xorb   $0x1,0xc(%esi)
+f01074f8:	03 35 24 30 5c f0    	add    0xf05c3024,%esi
+f01074fe:	80 76 0c 01          	xorb   $0x1,0xc(%esi)
 
   	base->RDT = rdt;
-f0107509:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
-f010750e:	89 98 18 28 00 00    	mov    %ebx,0x2818(%eax)
+f0107502:	a1 88 0e 58 f0       	mov    0xf0580e88,%eax
+f0107507:	89 98 18 28 00 00    	mov    %ebx,0x2818(%eax)
 	return len;
-f0107514:	89 f8                	mov    %edi,%eax
-f0107516:	83 c4 10             	add    $0x10,%esp
+f010750d:	89 f8                	mov    %edi,%eax
+f010750f:	83 c4 10             	add    $0x10,%esp
 }
-f0107519:	8d 65 f4             	lea    -0xc(%ebp),%esp
-f010751c:	5b                   	pop    %ebx
-f010751d:	5e                   	pop    %esi
-f010751e:	5f                   	pop    %edi
-f010751f:	5d                   	pop    %ebp
-f0107520:	c3                   	ret    
+f0107512:	8d 65 f4             	lea    -0xc(%ebp),%esp
+f0107515:	5b                   	pop    %ebx
+f0107516:	5e                   	pop    %esi
+f0107517:	5f                   	pop    %edi
+f0107518:	5d                   	pop    %ebp
+f0107519:	c3                   	ret    
 		cprintf("[rx]error occours\n");
-f0107521:	83 ec 0c             	sub    $0xc,%esp
-f0107524:	68 f4 a0 10 f0       	push   $0xf010a0f4
-f0107529:	e8 a2 c9 ff ff       	call   f0103ed0 <cprintf>
+f010751a:	83 ec 0c             	sub    $0xc,%esp
+f010751d:	68 f4 a0 10 f0       	push   $0xf010a0f4
+f0107522:	e8 a9 c9 ff ff       	call   f0103ed0 <cprintf>
 		return -E_UNSPECIFIED;
-f010752e:	83 c4 10             	add    $0x10,%esp
-f0107531:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
-f0107536:	eb e1                	jmp    f0107519 <e1000_rx+0x68>
+f0107527:	83 c4 10             	add    $0x10,%esp
+f010752a:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
+f010752f:	eb e1                	jmp    f0107512 <e1000_rx+0x68>
 		return -E_AGAIN;
-f0107538:	b8 f0 ff ff ff       	mov    $0xfffffff0,%eax
-f010753d:	eb da                	jmp    f0107519 <e1000_rx+0x68>
+f0107531:	b8 f0 ff ff ff       	mov    $0xfffffff0,%eax
+f0107536:	eb da                	jmp    f0107512 <e1000_rx+0x68>
 
-f010753f <pci_attach_match>:
+f0107538 <pci_attach_match>:
 }
 
 static int __attribute__((warn_unused_result))
 pci_attach_match(uint32_t key1, uint32_t key2,
 		 struct pci_driver *list, struct pci_func *pcif)
 {
-f010753f:	55                   	push   %ebp
-f0107540:	89 e5                	mov    %esp,%ebp
-f0107542:	57                   	push   %edi
-f0107543:	56                   	push   %esi
-f0107544:	53                   	push   %ebx
-f0107545:	83 ec 0c             	sub    $0xc,%esp
-f0107548:	8b 7d 08             	mov    0x8(%ebp),%edi
-f010754b:	8b 5d 10             	mov    0x10(%ebp),%ebx
+f0107538:	55                   	push   %ebp
+f0107539:	89 e5                	mov    %esp,%ebp
+f010753b:	57                   	push   %edi
+f010753c:	56                   	push   %esi
+f010753d:	53                   	push   %ebx
+f010753e:	83 ec 0c             	sub    $0xc,%esp
+f0107541:	8b 7d 08             	mov    0x8(%ebp),%edi
+f0107544:	8b 5d 10             	mov    0x10(%ebp),%ebx
 	uint32_t i;
 
 	for (i = 0; list[i].attachfn; i++) {
-f010754e:	eb 03                	jmp    f0107553 <pci_attach_match+0x14>
-f0107550:	83 c3 0c             	add    $0xc,%ebx
-f0107553:	89 de                	mov    %ebx,%esi
-f0107555:	8b 43 08             	mov    0x8(%ebx),%eax
-f0107558:	85 c0                	test   %eax,%eax
-f010755a:	74 37                	je     f0107593 <pci_attach_match+0x54>
+f0107547:	eb 03                	jmp    f010754c <pci_attach_match+0x14>
+f0107549:	83 c3 0c             	add    $0xc,%ebx
+f010754c:	89 de                	mov    %ebx,%esi
+f010754e:	8b 43 08             	mov    0x8(%ebx),%eax
+f0107551:	85 c0                	test   %eax,%eax
+f0107553:	74 37                	je     f010758c <pci_attach_match+0x54>
 		if (list[i].key1 == key1 && list[i].key2 == key2) {
-f010755c:	39 3b                	cmp    %edi,(%ebx)
-f010755e:	75 f0                	jne    f0107550 <pci_attach_match+0x11>
-f0107560:	8b 55 0c             	mov    0xc(%ebp),%edx
-f0107563:	39 56 04             	cmp    %edx,0x4(%esi)
-f0107566:	75 e8                	jne    f0107550 <pci_attach_match+0x11>
+f0107555:	39 3b                	cmp    %edi,(%ebx)
+f0107557:	75 f0                	jne    f0107549 <pci_attach_match+0x11>
+f0107559:	8b 55 0c             	mov    0xc(%ebp),%edx
+f010755c:	39 56 04             	cmp    %edx,0x4(%esi)
+f010755f:	75 e8                	jne    f0107549 <pci_attach_match+0x11>
 			int r = list[i].attachfn(pcif);
-f0107568:	83 ec 0c             	sub    $0xc,%esp
-f010756b:	ff 75 14             	pushl  0x14(%ebp)
-f010756e:	ff d0                	call   *%eax
+f0107561:	83 ec 0c             	sub    $0xc,%esp
+f0107564:	ff 75 14             	pushl  0x14(%ebp)
+f0107567:	ff d0                	call   *%eax
 			if (r > 0)
-f0107570:	83 c4 10             	add    $0x10,%esp
-f0107573:	85 c0                	test   %eax,%eax
-f0107575:	7f 1c                	jg     f0107593 <pci_attach_match+0x54>
+f0107569:	83 c4 10             	add    $0x10,%esp
+f010756c:	85 c0                	test   %eax,%eax
+f010756e:	7f 1c                	jg     f010758c <pci_attach_match+0x54>
 				return r;
 			if (r < 0)
-f0107577:	79 d7                	jns    f0107550 <pci_attach_match+0x11>
+f0107570:	79 d7                	jns    f0107549 <pci_attach_match+0x11>
 				cprintf("pci_attach_match: attaching "
-f0107579:	83 ec 0c             	sub    $0xc,%esp
-f010757c:	50                   	push   %eax
-f010757d:	ff 76 08             	pushl  0x8(%esi)
-f0107580:	ff 75 0c             	pushl  0xc(%ebp)
-f0107583:	57                   	push   %edi
-f0107584:	68 28 a1 10 f0       	push   $0xf010a128
-f0107589:	e8 42 c9 ff ff       	call   f0103ed0 <cprintf>
-f010758e:	83 c4 20             	add    $0x20,%esp
-f0107591:	eb bd                	jmp    f0107550 <pci_attach_match+0x11>
+f0107572:	83 ec 0c             	sub    $0xc,%esp
+f0107575:	50                   	push   %eax
+f0107576:	ff 76 08             	pushl  0x8(%esi)
+f0107579:	ff 75 0c             	pushl  0xc(%ebp)
+f010757c:	57                   	push   %edi
+f010757d:	68 28 a1 10 f0       	push   $0xf010a128
+f0107582:	e8 49 c9 ff ff       	call   f0103ed0 <cprintf>
+f0107587:	83 c4 20             	add    $0x20,%esp
+f010758a:	eb bd                	jmp    f0107549 <pci_attach_match+0x11>
 					"%x.%x (%p): e\n",
 					key1, key2, list[i].attachfn, r);
 		}
 	}
 	return 0;
 }
-f0107593:	8d 65 f4             	lea    -0xc(%ebp),%esp
-f0107596:	5b                   	pop    %ebx
-f0107597:	5e                   	pop    %esi
-f0107598:	5f                   	pop    %edi
-f0107599:	5d                   	pop    %ebp
-f010759a:	c3                   	ret    
+f010758c:	8d 65 f4             	lea    -0xc(%ebp),%esp
+f010758f:	5b                   	pop    %ebx
+f0107590:	5e                   	pop    %esi
+f0107591:	5f                   	pop    %edi
+f0107592:	5d                   	pop    %ebp
+f0107593:	c3                   	ret    
 
-f010759b <pci_conf1_set_addr>:
+f0107594 <pci_conf1_set_addr>:
 {
-f010759b:	55                   	push   %ebp
-f010759c:	89 e5                	mov    %esp,%ebp
-f010759e:	53                   	push   %ebx
-f010759f:	83 ec 04             	sub    $0x4,%esp
-f01075a2:	8b 5d 08             	mov    0x8(%ebp),%ebx
+f0107594:	55                   	push   %ebp
+f0107595:	89 e5                	mov    %esp,%ebp
+f0107597:	53                   	push   %ebx
+f0107598:	83 ec 04             	sub    $0x4,%esp
+f010759b:	8b 5d 08             	mov    0x8(%ebp),%ebx
 	assert(bus < 256);
-f01075a5:	3d ff 00 00 00       	cmp    $0xff,%eax
-f01075aa:	77 36                	ja     f01075e2 <pci_conf1_set_addr+0x47>
+f010759e:	3d ff 00 00 00       	cmp    $0xff,%eax
+f01075a3:	77 36                	ja     f01075db <pci_conf1_set_addr+0x47>
 	assert(dev < 32);
-f01075ac:	83 fa 1f             	cmp    $0x1f,%edx
-f01075af:	77 47                	ja     f01075f8 <pci_conf1_set_addr+0x5d>
+f01075a5:	83 fa 1f             	cmp    $0x1f,%edx
+f01075a8:	77 47                	ja     f01075f1 <pci_conf1_set_addr+0x5d>
 	assert(func < 8);
-f01075b1:	83 f9 07             	cmp    $0x7,%ecx
-f01075b4:	77 58                	ja     f010760e <pci_conf1_set_addr+0x73>
+f01075aa:	83 f9 07             	cmp    $0x7,%ecx
+f01075ad:	77 58                	ja     f0107607 <pci_conf1_set_addr+0x73>
 	assert(offset < 256);
-f01075b6:	81 fb ff 00 00 00    	cmp    $0xff,%ebx
-f01075bc:	77 66                	ja     f0107624 <pci_conf1_set_addr+0x89>
+f01075af:	81 fb ff 00 00 00    	cmp    $0xff,%ebx
+f01075b5:	77 66                	ja     f010761d <pci_conf1_set_addr+0x89>
 	assert((offset & 0x3) == 0);
-f01075be:	f6 c3 03             	test   $0x3,%bl
-f01075c1:	75 77                	jne    f010763a <pci_conf1_set_addr+0x9f>
+f01075b7:	f6 c3 03             	test   $0x3,%bl
+f01075ba:	75 77                	jne    f0107633 <pci_conf1_set_addr+0x9f>
 		(bus << 16) | (dev << 11) | (func << 8) | (offset);
-f01075c3:	c1 e0 10             	shl    $0x10,%eax
-f01075c6:	09 d8                	or     %ebx,%eax
-f01075c8:	c1 e1 08             	shl    $0x8,%ecx
-f01075cb:	09 c8                	or     %ecx,%eax
-f01075cd:	c1 e2 0b             	shl    $0xb,%edx
-f01075d0:	09 d0                	or     %edx,%eax
+f01075bc:	c1 e0 10             	shl    $0x10,%eax
+f01075bf:	09 d8                	or     %ebx,%eax
+f01075c1:	c1 e1 08             	shl    $0x8,%ecx
+f01075c4:	09 c8                	or     %ecx,%eax
+f01075c6:	c1 e2 0b             	shl    $0xb,%edx
+f01075c9:	09 d0                	or     %edx,%eax
 	uint32_t v = (1 << 31) |		// config-space
-f01075d2:	0d 00 00 00 80       	or     $0x80000000,%eax
+f01075cb:	0d 00 00 00 80       	or     $0x80000000,%eax
 	asm volatile("outl %0,%w1" : : "a" (data), "d" (port));
-f01075d7:	ba f8 0c 00 00       	mov    $0xcf8,%edx
-f01075dc:	ef                   	out    %eax,(%dx)
+f01075d0:	ba f8 0c 00 00       	mov    $0xcf8,%edx
+f01075d5:	ef                   	out    %eax,(%dx)
 }
-f01075dd:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-f01075e0:	c9                   	leave  
-f01075e1:	c3                   	ret    
+f01075d6:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+f01075d9:	c9                   	leave  
+f01075da:	c3                   	ret    
 	assert(bus < 256);
-f01075e2:	68 80 a2 10 f0       	push   $0xf010a280
-f01075e7:	68 0b 8f 10 f0       	push   $0xf0108f0b
-f01075ec:	6a 2c                	push   $0x2c
-f01075ee:	68 8a a2 10 f0       	push   $0xf010a28a
-f01075f3:	e8 51 8a ff ff       	call   f0100049 <_panic>
+f01075db:	68 80 a2 10 f0       	push   $0xf010a280
+f01075e0:	68 0b 8f 10 f0       	push   $0xf0108f0b
+f01075e5:	6a 2c                	push   $0x2c
+f01075e7:	68 8a a2 10 f0       	push   $0xf010a28a
+f01075ec:	e8 58 8a ff ff       	call   f0100049 <_panic>
 	assert(dev < 32);
-f01075f8:	68 95 a2 10 f0       	push   $0xf010a295
-f01075fd:	68 0b 8f 10 f0       	push   $0xf0108f0b
-f0107602:	6a 2d                	push   $0x2d
-f0107604:	68 8a a2 10 f0       	push   $0xf010a28a
-f0107609:	e8 3b 8a ff ff       	call   f0100049 <_panic>
+f01075f1:	68 95 a2 10 f0       	push   $0xf010a295
+f01075f6:	68 0b 8f 10 f0       	push   $0xf0108f0b
+f01075fb:	6a 2d                	push   $0x2d
+f01075fd:	68 8a a2 10 f0       	push   $0xf010a28a
+f0107602:	e8 42 8a ff ff       	call   f0100049 <_panic>
 	assert(func < 8);
-f010760e:	68 9e a2 10 f0       	push   $0xf010a29e
-f0107613:	68 0b 8f 10 f0       	push   $0xf0108f0b
-f0107618:	6a 2e                	push   $0x2e
-f010761a:	68 8a a2 10 f0       	push   $0xf010a28a
-f010761f:	e8 25 8a ff ff       	call   f0100049 <_panic>
+f0107607:	68 9e a2 10 f0       	push   $0xf010a29e
+f010760c:	68 0b 8f 10 f0       	push   $0xf0108f0b
+f0107611:	6a 2e                	push   $0x2e
+f0107613:	68 8a a2 10 f0       	push   $0xf010a28a
+f0107618:	e8 2c 8a ff ff       	call   f0100049 <_panic>
 	assert(offset < 256);
-f0107624:	68 a7 a2 10 f0       	push   $0xf010a2a7
-f0107629:	68 0b 8f 10 f0       	push   $0xf0108f0b
-f010762e:	6a 2f                	push   $0x2f
-f0107630:	68 8a a2 10 f0       	push   $0xf010a28a
-f0107635:	e8 0f 8a ff ff       	call   f0100049 <_panic>
+f010761d:	68 a7 a2 10 f0       	push   $0xf010a2a7
+f0107622:	68 0b 8f 10 f0       	push   $0xf0108f0b
+f0107627:	6a 2f                	push   $0x2f
+f0107629:	68 8a a2 10 f0       	push   $0xf010a28a
+f010762e:	e8 16 8a ff ff       	call   f0100049 <_panic>
 	assert((offset & 0x3) == 0);
-f010763a:	68 b4 a2 10 f0       	push   $0xf010a2b4
-f010763f:	68 0b 8f 10 f0       	push   $0xf0108f0b
-f0107644:	6a 30                	push   $0x30
-f0107646:	68 8a a2 10 f0       	push   $0xf010a28a
-f010764b:	e8 f9 89 ff ff       	call   f0100049 <_panic>
+f0107633:	68 b4 a2 10 f0       	push   $0xf010a2b4
+f0107638:	68 0b 8f 10 f0       	push   $0xf0108f0b
+f010763d:	6a 30                	push   $0x30
+f010763f:	68 8a a2 10 f0       	push   $0xf010a28a
+f0107644:	e8 00 8a ff ff       	call   f0100049 <_panic>
 
-f0107650 <pci_conf_read>:
+f0107649 <pci_conf_read>:
 {
-f0107650:	55                   	push   %ebp
-f0107651:	89 e5                	mov    %esp,%ebp
-f0107653:	53                   	push   %ebx
-f0107654:	83 ec 10             	sub    $0x10,%esp
+f0107649:	55                   	push   %ebp
+f010764a:	89 e5                	mov    %esp,%ebp
+f010764c:	53                   	push   %ebx
+f010764d:	83 ec 10             	sub    $0x10,%esp
 	pci_conf1_set_addr(f->bus->busno, f->dev, f->func, off);
-f0107657:	8b 48 08             	mov    0x8(%eax),%ecx
-f010765a:	8b 58 04             	mov    0x4(%eax),%ebx
-f010765d:	8b 00                	mov    (%eax),%eax
-f010765f:	8b 40 04             	mov    0x4(%eax),%eax
-f0107662:	52                   	push   %edx
-f0107663:	89 da                	mov    %ebx,%edx
-f0107665:	e8 31 ff ff ff       	call   f010759b <pci_conf1_set_addr>
+f0107650:	8b 48 08             	mov    0x8(%eax),%ecx
+f0107653:	8b 58 04             	mov    0x4(%eax),%ebx
+f0107656:	8b 00                	mov    (%eax),%eax
+f0107658:	8b 40 04             	mov    0x4(%eax),%eax
+f010765b:	52                   	push   %edx
+f010765c:	89 da                	mov    %ebx,%edx
+f010765e:	e8 31 ff ff ff       	call   f0107594 <pci_conf1_set_addr>
 	asm volatile("inl %w1,%0" : "=a" (data) : "d" (port));
-f010766a:	ba fc 0c 00 00       	mov    $0xcfc,%edx
-f010766f:	ed                   	in     (%dx),%eax
+f0107663:	ba fc 0c 00 00       	mov    $0xcfc,%edx
+f0107668:	ed                   	in     (%dx),%eax
 }
-f0107670:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-f0107673:	c9                   	leave  
-f0107674:	c3                   	ret    
+f0107669:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+f010766c:	c9                   	leave  
+f010766d:	c3                   	ret    
 
-f0107675 <pci_scan_bus>:
+f010766e <pci_scan_bus>:
 		f->irq_line);
 }
 
 static int
 pci_scan_bus(struct pci_bus *bus)
 {
-f0107675:	55                   	push   %ebp
-f0107676:	89 e5                	mov    %esp,%ebp
-f0107678:	57                   	push   %edi
-f0107679:	56                   	push   %esi
-f010767a:	53                   	push   %ebx
-f010767b:	81 ec 00 01 00 00    	sub    $0x100,%esp
-f0107681:	89 c3                	mov    %eax,%ebx
+f010766e:	55                   	push   %ebp
+f010766f:	89 e5                	mov    %esp,%ebp
+f0107671:	57                   	push   %edi
+f0107672:	56                   	push   %esi
+f0107673:	53                   	push   %ebx
+f0107674:	81 ec 00 01 00 00    	sub    $0x100,%esp
+f010767a:	89 c3                	mov    %eax,%ebx
 	int totaldev = 0;
 	struct pci_func df;
 	memset(&df, 0, sizeof(df));
-f0107683:	6a 48                	push   $0x48
-f0107685:	6a 00                	push   $0x0
-f0107687:	8d 45 a0             	lea    -0x60(%ebp),%eax
-f010768a:	50                   	push   %eax
-f010768b:	e8 7c ef ff ff       	call   f010660c <memset>
+f010767c:	6a 48                	push   $0x48
+f010767e:	6a 00                	push   $0x0
+f0107680:	8d 45 a0             	lea    -0x60(%ebp),%eax
+f0107683:	50                   	push   %eax
+f0107684:	e8 83 ef ff ff       	call   f010660c <memset>
 	df.bus = bus;
-f0107690:	89 5d a0             	mov    %ebx,-0x60(%ebp)
+f0107689:	89 5d a0             	mov    %ebx,-0x60(%ebp)
 
 	for (df.dev = 0; df.dev < 32; df.dev++) {
-f0107693:	c7 45 a4 00 00 00 00 	movl   $0x0,-0x5c(%ebp)
-f010769a:	83 c4 10             	add    $0x10,%esp
+f010768c:	c7 45 a4 00 00 00 00 	movl   $0x0,-0x5c(%ebp)
+f0107693:	83 c4 10             	add    $0x10,%esp
 	int totaldev = 0;
-f010769d:	c7 85 00 ff ff ff 00 	movl   $0x0,-0x100(%ebp)
-f01076a4:	00 00 00 
-f01076a7:	e9 25 01 00 00       	jmp    f01077d1 <pci_scan_bus+0x15c>
+f0107696:	c7 85 00 ff ff ff 00 	movl   $0x0,-0x100(%ebp)
+f010769d:	00 00 00 
+f01076a0:	e9 25 01 00 00       	jmp    f01077ca <pci_scan_bus+0x15c>
 		PCI_VENDOR(f->dev_id), PCI_PRODUCT(f->dev_id),
-f01076ac:	8b 95 64 ff ff ff    	mov    -0x9c(%ebp),%edx
+f01076a5:	8b 95 64 ff ff ff    	mov    -0x9c(%ebp),%edx
 	cprintf("PCI: %02x:%02x.%d: %04x:%04x: class: %x.%x (%s) irq: %d\n",
-f01076b2:	83 ec 08             	sub    $0x8,%esp
-f01076b5:	0f b6 7d 9c          	movzbl -0x64(%ebp),%edi
-f01076b9:	57                   	push   %edi
-f01076ba:	56                   	push   %esi
+f01076ab:	83 ec 08             	sub    $0x8,%esp
+f01076ae:	0f b6 7d 9c          	movzbl -0x64(%ebp),%edi
+f01076b2:	57                   	push   %edi
+f01076b3:	56                   	push   %esi
 		PCI_CLASS(f->dev_class), PCI_SUBCLASS(f->dev_class), class,
-f01076bb:	c1 e8 10             	shr    $0x10,%eax
+f01076b4:	c1 e8 10             	shr    $0x10,%eax
 	cprintf("PCI: %02x:%02x.%d: %04x:%04x: class: %x.%x (%s) irq: %d\n",
-f01076be:	0f b6 c0             	movzbl %al,%eax
+f01076b7:	0f b6 c0             	movzbl %al,%eax
+f01076ba:	50                   	push   %eax
+f01076bb:	51                   	push   %ecx
+f01076bc:	89 d0                	mov    %edx,%eax
+f01076be:	c1 e8 10             	shr    $0x10,%eax
 f01076c1:	50                   	push   %eax
-f01076c2:	51                   	push   %ecx
-f01076c3:	89 d0                	mov    %edx,%eax
-f01076c5:	c1 e8 10             	shr    $0x10,%eax
-f01076c8:	50                   	push   %eax
-f01076c9:	0f b7 d2             	movzwl %dx,%edx
-f01076cc:	52                   	push   %edx
-f01076cd:	ff b5 60 ff ff ff    	pushl  -0xa0(%ebp)
-f01076d3:	ff b5 5c ff ff ff    	pushl  -0xa4(%ebp)
-f01076d9:	8b 85 58 ff ff ff    	mov    -0xa8(%ebp),%eax
-f01076df:	ff 70 04             	pushl  0x4(%eax)
-f01076e2:	68 54 a1 10 f0       	push   $0xf010a154
-f01076e7:	e8 e4 c7 ff ff       	call   f0103ed0 <cprintf>
+f01076c2:	0f b7 d2             	movzwl %dx,%edx
+f01076c5:	52                   	push   %edx
+f01076c6:	ff b5 60 ff ff ff    	pushl  -0xa0(%ebp)
+f01076cc:	ff b5 5c ff ff ff    	pushl  -0xa4(%ebp)
+f01076d2:	8b 85 58 ff ff ff    	mov    -0xa8(%ebp),%eax
+f01076d8:	ff 70 04             	pushl  0x4(%eax)
+f01076db:	68 54 a1 10 f0       	push   $0xf010a154
+f01076e0:	e8 eb c7 ff ff       	call   f0103ed0 <cprintf>
 				 PCI_SUBCLASS(f->dev_class),
-f01076ec:	8b 85 68 ff ff ff    	mov    -0x98(%ebp),%eax
+f01076e5:	8b 85 68 ff ff ff    	mov    -0x98(%ebp),%eax
 		pci_attach_match(PCI_CLASS(f->dev_class),
-f01076f2:	83 c4 30             	add    $0x30,%esp
-f01076f5:	53                   	push   %ebx
-f01076f6:	68 0c 84 12 f0       	push   $0xf012840c
+f01076eb:	83 c4 30             	add    $0x30,%esp
+f01076ee:	53                   	push   %ebx
+f01076ef:	68 0c 84 12 f0       	push   $0xf012840c
 				 PCI_SUBCLASS(f->dev_class),
-f01076fb:	89 c2                	mov    %eax,%edx
-f01076fd:	c1 ea 10             	shr    $0x10,%edx
+f01076f4:	89 c2                	mov    %eax,%edx
+f01076f6:	c1 ea 10             	shr    $0x10,%edx
 		pci_attach_match(PCI_CLASS(f->dev_class),
-f0107700:	0f b6 d2             	movzbl %dl,%edx
-f0107703:	52                   	push   %edx
-f0107704:	c1 e8 18             	shr    $0x18,%eax
-f0107707:	50                   	push   %eax
-f0107708:	e8 32 fe ff ff       	call   f010753f <pci_attach_match>
+f01076f9:	0f b6 d2             	movzbl %dl,%edx
+f01076fc:	52                   	push   %edx
+f01076fd:	c1 e8 18             	shr    $0x18,%eax
+f0107700:	50                   	push   %eax
+f0107701:	e8 32 fe ff ff       	call   f0107538 <pci_attach_match>
 				 &pci_attach_class[0], f) ||
-f010770d:	83 c4 10             	add    $0x10,%esp
-f0107710:	85 c0                	test   %eax,%eax
-f0107712:	0f 84 88 00 00 00    	je     f01077a0 <pci_scan_bus+0x12b>
+f0107706:	83 c4 10             	add    $0x10,%esp
+f0107709:	85 c0                	test   %eax,%eax
+f010770b:	0f 84 88 00 00 00    	je     f0107799 <pci_scan_bus+0x12b>
 
 		totaldev++;
 
 		struct pci_func f = df;
 		for (f.func = 0; f.func < (PCI_HDRTYPE_MULTIFN(bhlc) ? 8 : 1);
 		     f.func++) {
-f0107718:	83 85 18 ff ff ff 01 	addl   $0x1,-0xe8(%ebp)
+f0107711:	83 85 18 ff ff ff 01 	addl   $0x1,-0xe8(%ebp)
 		for (f.func = 0; f.func < (PCI_HDRTYPE_MULTIFN(bhlc) ? 8 : 1);
-f010771f:	8b 85 04 ff ff ff    	mov    -0xfc(%ebp),%eax
-f0107725:	39 85 18 ff ff ff    	cmp    %eax,-0xe8(%ebp)
-f010772b:	0f 83 92 00 00 00    	jae    f01077c3 <pci_scan_bus+0x14e>
+f0107718:	8b 85 04 ff ff ff    	mov    -0xfc(%ebp),%eax
+f010771e:	39 85 18 ff ff ff    	cmp    %eax,-0xe8(%ebp)
+f0107724:	0f 83 92 00 00 00    	jae    f01077bc <pci_scan_bus+0x14e>
 			struct pci_func af = f;
-f0107731:	8d bd 58 ff ff ff    	lea    -0xa8(%ebp),%edi
-f0107737:	8d b5 10 ff ff ff    	lea    -0xf0(%ebp),%esi
-f010773d:	b9 12 00 00 00       	mov    $0x12,%ecx
-f0107742:	f3 a5                	rep movsl %ds:(%esi),%es:(%edi)
+f010772a:	8d bd 58 ff ff ff    	lea    -0xa8(%ebp),%edi
+f0107730:	8d b5 10 ff ff ff    	lea    -0xf0(%ebp),%esi
+f0107736:	b9 12 00 00 00       	mov    $0x12,%ecx
+f010773b:	f3 a5                	rep movsl %ds:(%esi),%es:(%edi)
 
 			af.dev_id = pci_conf_read(&f, PCI_ID_REG);
-f0107744:	ba 00 00 00 00       	mov    $0x0,%edx
-f0107749:	8d 85 10 ff ff ff    	lea    -0xf0(%ebp),%eax
-f010774f:	e8 fc fe ff ff       	call   f0107650 <pci_conf_read>
-f0107754:	89 85 64 ff ff ff    	mov    %eax,-0x9c(%ebp)
+f010773d:	ba 00 00 00 00       	mov    $0x0,%edx
+f0107742:	8d 85 10 ff ff ff    	lea    -0xf0(%ebp),%eax
+f0107748:	e8 fc fe ff ff       	call   f0107649 <pci_conf_read>
+f010774d:	89 85 64 ff ff ff    	mov    %eax,-0x9c(%ebp)
 			if (PCI_VENDOR(af.dev_id) == 0xffff)
-f010775a:	66 83 f8 ff          	cmp    $0xffff,%ax
-f010775e:	74 b8                	je     f0107718 <pci_scan_bus+0xa3>
+f0107753:	66 83 f8 ff          	cmp    $0xffff,%ax
+f0107757:	74 b8                	je     f0107711 <pci_scan_bus+0xa3>
 				continue;
 
 			uint32_t intr = pci_conf_read(&af, PCI_INTERRUPT_REG);
-f0107760:	ba 3c 00 00 00       	mov    $0x3c,%edx
-f0107765:	89 d8                	mov    %ebx,%eax
-f0107767:	e8 e4 fe ff ff       	call   f0107650 <pci_conf_read>
+f0107759:	ba 3c 00 00 00       	mov    $0x3c,%edx
+f010775e:	89 d8                	mov    %ebx,%eax
+f0107760:	e8 e4 fe ff ff       	call   f0107649 <pci_conf_read>
 			af.irq_line = PCI_INTERRUPT_LINE(intr);
-f010776c:	88 45 9c             	mov    %al,-0x64(%ebp)
+f0107765:	88 45 9c             	mov    %al,-0x64(%ebp)
 
 			af.dev_class = pci_conf_read(&af, PCI_CLASS_REG);
-f010776f:	ba 08 00 00 00       	mov    $0x8,%edx
-f0107774:	89 d8                	mov    %ebx,%eax
-f0107776:	e8 d5 fe ff ff       	call   f0107650 <pci_conf_read>
-f010777b:	89 85 68 ff ff ff    	mov    %eax,-0x98(%ebp)
+f0107768:	ba 08 00 00 00       	mov    $0x8,%edx
+f010776d:	89 d8                	mov    %ebx,%eax
+f010776f:	e8 d5 fe ff ff       	call   f0107649 <pci_conf_read>
+f0107774:	89 85 68 ff ff ff    	mov    %eax,-0x98(%ebp)
 	if (PCI_CLASS(f->dev_class) < ARRAY_SIZE(pci_class))
-f0107781:	89 c1                	mov    %eax,%ecx
-f0107783:	c1 e9 18             	shr    $0x18,%ecx
+f010777a:	89 c1                	mov    %eax,%ecx
+f010777c:	c1 e9 18             	shr    $0x18,%ecx
 	const char *class = pci_class[0];
-f0107786:	be c8 a2 10 f0       	mov    $0xf010a2c8,%esi
+f010777f:	be c8 a2 10 f0       	mov    $0xf010a2c8,%esi
 	if (PCI_CLASS(f->dev_class) < ARRAY_SIZE(pci_class))
-f010778b:	83 f9 06             	cmp    $0x6,%ecx
-f010778e:	0f 87 18 ff ff ff    	ja     f01076ac <pci_scan_bus+0x37>
+f0107784:	83 f9 06             	cmp    $0x6,%ecx
+f0107787:	0f 87 18 ff ff ff    	ja     f01076a5 <pci_scan_bus+0x37>
 		class = pci_class[PCI_CLASS(f->dev_class)];
-f0107794:	8b 34 8d 3c a3 10 f0 	mov    -0xfef5cc4(,%ecx,4),%esi
-f010779b:	e9 0c ff ff ff       	jmp    f01076ac <pci_scan_bus+0x37>
+f010778d:	8b 34 8d 3c a3 10 f0 	mov    -0xfef5cc4(,%ecx,4),%esi
+f0107794:	e9 0c ff ff ff       	jmp    f01076a5 <pci_scan_bus+0x37>
 				 PCI_PRODUCT(f->dev_id),
-f01077a0:	8b 85 64 ff ff ff    	mov    -0x9c(%ebp),%eax
+f0107799:	8b 85 64 ff ff ff    	mov    -0x9c(%ebp),%eax
 		pci_attach_match(PCI_VENDOR(f->dev_id),
-f01077a6:	53                   	push   %ebx
-f01077a7:	68 f4 83 12 f0       	push   $0xf01283f4
-f01077ac:	89 c2                	mov    %eax,%edx
-f01077ae:	c1 ea 10             	shr    $0x10,%edx
-f01077b1:	52                   	push   %edx
-f01077b2:	0f b7 c0             	movzwl %ax,%eax
-f01077b5:	50                   	push   %eax
-f01077b6:	e8 84 fd ff ff       	call   f010753f <pci_attach_match>
-f01077bb:	83 c4 10             	add    $0x10,%esp
-f01077be:	e9 55 ff ff ff       	jmp    f0107718 <pci_scan_bus+0xa3>
+f010779f:	53                   	push   %ebx
+f01077a0:	68 f4 83 12 f0       	push   $0xf01283f4
+f01077a5:	89 c2                	mov    %eax,%edx
+f01077a7:	c1 ea 10             	shr    $0x10,%edx
+f01077aa:	52                   	push   %edx
+f01077ab:	0f b7 c0             	movzwl %ax,%eax
+f01077ae:	50                   	push   %eax
+f01077af:	e8 84 fd ff ff       	call   f0107538 <pci_attach_match>
+f01077b4:	83 c4 10             	add    $0x10,%esp
+f01077b7:	e9 55 ff ff ff       	jmp    f0107711 <pci_scan_bus+0xa3>
 	for (df.dev = 0; df.dev < 32; df.dev++) {
-f01077c3:	8b 45 a4             	mov    -0x5c(%ebp),%eax
-f01077c6:	83 c0 01             	add    $0x1,%eax
-f01077c9:	89 45 a4             	mov    %eax,-0x5c(%ebp)
-f01077cc:	83 f8 1f             	cmp    $0x1f,%eax
-f01077cf:	77 59                	ja     f010782a <pci_scan_bus+0x1b5>
+f01077bc:	8b 45 a4             	mov    -0x5c(%ebp),%eax
+f01077bf:	83 c0 01             	add    $0x1,%eax
+f01077c2:	89 45 a4             	mov    %eax,-0x5c(%ebp)
+f01077c5:	83 f8 1f             	cmp    $0x1f,%eax
+f01077c8:	77 59                	ja     f0107823 <pci_scan_bus+0x1b5>
 		uint32_t bhlc = pci_conf_read(&df, PCI_BHLC_REG);
-f01077d1:	ba 0c 00 00 00       	mov    $0xc,%edx
-f01077d6:	8d 45 a0             	lea    -0x60(%ebp),%eax
-f01077d9:	e8 72 fe ff ff       	call   f0107650 <pci_conf_read>
+f01077ca:	ba 0c 00 00 00       	mov    $0xc,%edx
+f01077cf:	8d 45 a0             	lea    -0x60(%ebp),%eax
+f01077d2:	e8 72 fe ff ff       	call   f0107649 <pci_conf_read>
 		if (PCI_HDRTYPE_TYPE(bhlc) > 1)	    // Unsupported or no device
-f01077de:	89 c2                	mov    %eax,%edx
-f01077e0:	c1 ea 10             	shr    $0x10,%edx
-f01077e3:	f6 c2 7e             	test   $0x7e,%dl
-f01077e6:	75 db                	jne    f01077c3 <pci_scan_bus+0x14e>
+f01077d7:	89 c2                	mov    %eax,%edx
+f01077d9:	c1 ea 10             	shr    $0x10,%edx
+f01077dc:	f6 c2 7e             	test   $0x7e,%dl
+f01077df:	75 db                	jne    f01077bc <pci_scan_bus+0x14e>
 		totaldev++;
-f01077e8:	83 85 00 ff ff ff 01 	addl   $0x1,-0x100(%ebp)
+f01077e1:	83 85 00 ff ff ff 01 	addl   $0x1,-0x100(%ebp)
 		struct pci_func f = df;
-f01077ef:	8d bd 10 ff ff ff    	lea    -0xf0(%ebp),%edi
-f01077f5:	8d 75 a0             	lea    -0x60(%ebp),%esi
-f01077f8:	b9 12 00 00 00       	mov    $0x12,%ecx
-f01077fd:	f3 a5                	rep movsl %ds:(%esi),%es:(%edi)
+f01077e8:	8d bd 10 ff ff ff    	lea    -0xf0(%ebp),%edi
+f01077ee:	8d 75 a0             	lea    -0x60(%ebp),%esi
+f01077f1:	b9 12 00 00 00       	mov    $0x12,%ecx
+f01077f6:	f3 a5                	rep movsl %ds:(%esi),%es:(%edi)
 		for (f.func = 0; f.func < (PCI_HDRTYPE_MULTIFN(bhlc) ? 8 : 1);
-f01077ff:	c7 85 18 ff ff ff 00 	movl   $0x0,-0xe8(%ebp)
-f0107806:	00 00 00 
-f0107809:	25 00 00 80 00       	and    $0x800000,%eax
-f010780e:	83 f8 01             	cmp    $0x1,%eax
-f0107811:	19 c0                	sbb    %eax,%eax
-f0107813:	83 e0 f9             	and    $0xfffffff9,%eax
-f0107816:	83 c0 08             	add    $0x8,%eax
-f0107819:	89 85 04 ff ff ff    	mov    %eax,-0xfc(%ebp)
+f01077f8:	c7 85 18 ff ff ff 00 	movl   $0x0,-0xe8(%ebp)
+f01077ff:	00 00 00 
+f0107802:	25 00 00 80 00       	and    $0x800000,%eax
+f0107807:	83 f8 01             	cmp    $0x1,%eax
+f010780a:	19 c0                	sbb    %eax,%eax
+f010780c:	83 e0 f9             	and    $0xfffffff9,%eax
+f010780f:	83 c0 08             	add    $0x8,%eax
+f0107812:	89 85 04 ff ff ff    	mov    %eax,-0xfc(%ebp)
 			uint32_t intr = pci_conf_read(&af, PCI_INTERRUPT_REG);
-f010781f:	8d 9d 58 ff ff ff    	lea    -0xa8(%ebp),%ebx
+f0107818:	8d 9d 58 ff ff ff    	lea    -0xa8(%ebp),%ebx
 		for (f.func = 0; f.func < (PCI_HDRTYPE_MULTIFN(bhlc) ? 8 : 1);
-f0107825:	e9 f5 fe ff ff       	jmp    f010771f <pci_scan_bus+0xaa>
+f010781e:	e9 f5 fe ff ff       	jmp    f0107718 <pci_scan_bus+0xaa>
 			pci_attach(&af);
 		}
 	}
 
 	return totaldev;
 }
-f010782a:	8b 85 00 ff ff ff    	mov    -0x100(%ebp),%eax
-f0107830:	8d 65 f4             	lea    -0xc(%ebp),%esp
-f0107833:	5b                   	pop    %ebx
-f0107834:	5e                   	pop    %esi
-f0107835:	5f                   	pop    %edi
-f0107836:	5d                   	pop    %ebp
-f0107837:	c3                   	ret    
+f0107823:	8b 85 00 ff ff ff    	mov    -0x100(%ebp),%eax
+f0107829:	8d 65 f4             	lea    -0xc(%ebp),%esp
+f010782c:	5b                   	pop    %ebx
+f010782d:	5e                   	pop    %esi
+f010782e:	5f                   	pop    %edi
+f010782f:	5d                   	pop    %ebp
+f0107830:	c3                   	ret    
 
-f0107838 <pci_bridge_attach>:
+f0107831 <pci_bridge_attach>:
 
 static int
 pci_bridge_attach(struct pci_func *pcif)
 {
-f0107838:	55                   	push   %ebp
-f0107839:	89 e5                	mov    %esp,%ebp
-f010783b:	57                   	push   %edi
-f010783c:	56                   	push   %esi
-f010783d:	53                   	push   %ebx
-f010783e:	83 ec 1c             	sub    $0x1c,%esp
-f0107841:	8b 5d 08             	mov    0x8(%ebp),%ebx
+f0107831:	55                   	push   %ebp
+f0107832:	89 e5                	mov    %esp,%ebp
+f0107834:	57                   	push   %edi
+f0107835:	56                   	push   %esi
+f0107836:	53                   	push   %ebx
+f0107837:	83 ec 1c             	sub    $0x1c,%esp
+f010783a:	8b 5d 08             	mov    0x8(%ebp),%ebx
 	uint32_t ioreg  = pci_conf_read(pcif, PCI_BRIDGE_STATIO_REG);
-f0107844:	ba 1c 00 00 00       	mov    $0x1c,%edx
-f0107849:	89 d8                	mov    %ebx,%eax
-f010784b:	e8 00 fe ff ff       	call   f0107650 <pci_conf_read>
-f0107850:	89 c7                	mov    %eax,%edi
+f010783d:	ba 1c 00 00 00       	mov    $0x1c,%edx
+f0107842:	89 d8                	mov    %ebx,%eax
+f0107844:	e8 00 fe ff ff       	call   f0107649 <pci_conf_read>
+f0107849:	89 c7                	mov    %eax,%edi
 	uint32_t busreg = pci_conf_read(pcif, PCI_BRIDGE_BUS_REG);
-f0107852:	ba 18 00 00 00       	mov    $0x18,%edx
-f0107857:	89 d8                	mov    %ebx,%eax
-f0107859:	e8 f2 fd ff ff       	call   f0107650 <pci_conf_read>
+f010784b:	ba 18 00 00 00       	mov    $0x18,%edx
+f0107850:	89 d8                	mov    %ebx,%eax
+f0107852:	e8 f2 fd ff ff       	call   f0107649 <pci_conf_read>
 
 	if (PCI_BRIDGE_IO_32BITS(ioreg)) {
-f010785e:	83 e7 0f             	and    $0xf,%edi
-f0107861:	83 ff 01             	cmp    $0x1,%edi
-f0107864:	74 56                	je     f01078bc <pci_bridge_attach+0x84>
-f0107866:	89 c6                	mov    %eax,%esi
+f0107857:	83 e7 0f             	and    $0xf,%edi
+f010785a:	83 ff 01             	cmp    $0x1,%edi
+f010785d:	74 56                	je     f01078b5 <pci_bridge_attach+0x84>
+f010785f:	89 c6                	mov    %eax,%esi
 			pcif->bus->busno, pcif->dev, pcif->func);
 		return 0;
 	}
 
 	struct pci_bus nbus;
 	memset(&nbus, 0, sizeof(nbus));
-f0107868:	83 ec 04             	sub    $0x4,%esp
-f010786b:	6a 08                	push   $0x8
-f010786d:	6a 00                	push   $0x0
-f010786f:	8d 7d e0             	lea    -0x20(%ebp),%edi
-f0107872:	57                   	push   %edi
-f0107873:	e8 94 ed ff ff       	call   f010660c <memset>
+f0107861:	83 ec 04             	sub    $0x4,%esp
+f0107864:	6a 08                	push   $0x8
+f0107866:	6a 00                	push   $0x0
+f0107868:	8d 7d e0             	lea    -0x20(%ebp),%edi
+f010786b:	57                   	push   %edi
+f010786c:	e8 9b ed ff ff       	call   f010660c <memset>
 	nbus.parent_bridge = pcif;
-f0107878:	89 5d e0             	mov    %ebx,-0x20(%ebp)
+f0107871:	89 5d e0             	mov    %ebx,-0x20(%ebp)
 	nbus.busno = (busreg >> PCI_BRIDGE_BUS_SECONDARY_SHIFT) & 0xff;
-f010787b:	89 f0                	mov    %esi,%eax
-f010787d:	0f b6 c4             	movzbl %ah,%eax
-f0107880:	89 45 e4             	mov    %eax,-0x1c(%ebp)
+f0107874:	89 f0                	mov    %esi,%eax
+f0107876:	0f b6 c4             	movzbl %ah,%eax
+f0107879:	89 45 e4             	mov    %eax,-0x1c(%ebp)
 
 	if (pci_show_devs)
 		cprintf("PCI: %02x:%02x.%d: bridge to PCI bus %d--%d\n",
-f0107883:	83 c4 08             	add    $0x8,%esp
+f010787c:	83 c4 08             	add    $0x8,%esp
 			pcif->bus->busno, pcif->dev, pcif->func,
 			nbus.busno,
 			(busreg >> PCI_BRIDGE_BUS_SUBORDINATE_SHIFT) & 0xff);
-f0107886:	c1 ee 10             	shr    $0x10,%esi
+f010787f:	c1 ee 10             	shr    $0x10,%esi
 		cprintf("PCI: %02x:%02x.%d: bridge to PCI bus %d--%d\n",
-f0107889:	89 f1                	mov    %esi,%ecx
-f010788b:	0f b6 f1             	movzbl %cl,%esi
-f010788e:	56                   	push   %esi
-f010788f:	50                   	push   %eax
-f0107890:	ff 73 08             	pushl  0x8(%ebx)
-f0107893:	ff 73 04             	pushl  0x4(%ebx)
-f0107896:	8b 03                	mov    (%ebx),%eax
-f0107898:	ff 70 04             	pushl  0x4(%eax)
-f010789b:	68 c4 a1 10 f0       	push   $0xf010a1c4
-f01078a0:	e8 2b c6 ff ff       	call   f0103ed0 <cprintf>
+f0107882:	89 f1                	mov    %esi,%ecx
+f0107884:	0f b6 f1             	movzbl %cl,%esi
+f0107887:	56                   	push   %esi
+f0107888:	50                   	push   %eax
+f0107889:	ff 73 08             	pushl  0x8(%ebx)
+f010788c:	ff 73 04             	pushl  0x4(%ebx)
+f010788f:	8b 03                	mov    (%ebx),%eax
+f0107891:	ff 70 04             	pushl  0x4(%eax)
+f0107894:	68 c4 a1 10 f0       	push   $0xf010a1c4
+f0107899:	e8 32 c6 ff ff       	call   f0103ed0 <cprintf>
 
 	pci_scan_bus(&nbus);
-f01078a5:	83 c4 20             	add    $0x20,%esp
-f01078a8:	89 f8                	mov    %edi,%eax
-f01078aa:	e8 c6 fd ff ff       	call   f0107675 <pci_scan_bus>
+f010789e:	83 c4 20             	add    $0x20,%esp
+f01078a1:	89 f8                	mov    %edi,%eax
+f01078a3:	e8 c6 fd ff ff       	call   f010766e <pci_scan_bus>
 	return 1;
-f01078af:	b8 01 00 00 00       	mov    $0x1,%eax
+f01078a8:	b8 01 00 00 00       	mov    $0x1,%eax
 }
-f01078b4:	8d 65 f4             	lea    -0xc(%ebp),%esp
-f01078b7:	5b                   	pop    %ebx
-f01078b8:	5e                   	pop    %esi
-f01078b9:	5f                   	pop    %edi
-f01078ba:	5d                   	pop    %ebp
-f01078bb:	c3                   	ret    
+f01078ad:	8d 65 f4             	lea    -0xc(%ebp),%esp
+f01078b0:	5b                   	pop    %ebx
+f01078b1:	5e                   	pop    %esi
+f01078b2:	5f                   	pop    %edi
+f01078b3:	5d                   	pop    %ebp
+f01078b4:	c3                   	ret    
 		cprintf("PCI: %02x:%02x.%d: 32-bit bridge IO not supported.\n",
-f01078bc:	ff 73 08             	pushl  0x8(%ebx)
-f01078bf:	ff 73 04             	pushl  0x4(%ebx)
-f01078c2:	8b 03                	mov    (%ebx),%eax
-f01078c4:	ff 70 04             	pushl  0x4(%eax)
-f01078c7:	68 90 a1 10 f0       	push   $0xf010a190
-f01078cc:	e8 ff c5 ff ff       	call   f0103ed0 <cprintf>
+f01078b5:	ff 73 08             	pushl  0x8(%ebx)
+f01078b8:	ff 73 04             	pushl  0x4(%ebx)
+f01078bb:	8b 03                	mov    (%ebx),%eax
+f01078bd:	ff 70 04             	pushl  0x4(%eax)
+f01078c0:	68 90 a1 10 f0       	push   $0xf010a190
+f01078c5:	e8 06 c6 ff ff       	call   f0103ed0 <cprintf>
 		return 0;
-f01078d1:	83 c4 10             	add    $0x10,%esp
-f01078d4:	b8 00 00 00 00       	mov    $0x0,%eax
-f01078d9:	eb d9                	jmp    f01078b4 <pci_bridge_attach+0x7c>
+f01078ca:	83 c4 10             	add    $0x10,%esp
+f01078cd:	b8 00 00 00 00       	mov    $0x0,%eax
+f01078d2:	eb d9                	jmp    f01078ad <pci_bridge_attach+0x7c>
 
-f01078db <pci_conf_write>:
+f01078d4 <pci_conf_write>:
 {
-f01078db:	55                   	push   %ebp
-f01078dc:	89 e5                	mov    %esp,%ebp
-f01078de:	56                   	push   %esi
-f01078df:	53                   	push   %ebx
-f01078e0:	89 cb                	mov    %ecx,%ebx
+f01078d4:	55                   	push   %ebp
+f01078d5:	89 e5                	mov    %esp,%ebp
+f01078d7:	56                   	push   %esi
+f01078d8:	53                   	push   %ebx
+f01078d9:	89 cb                	mov    %ecx,%ebx
 	pci_conf1_set_addr(f->bus->busno, f->dev, f->func, off);
-f01078e2:	8b 48 08             	mov    0x8(%eax),%ecx
-f01078e5:	8b 70 04             	mov    0x4(%eax),%esi
-f01078e8:	8b 00                	mov    (%eax),%eax
-f01078ea:	8b 40 04             	mov    0x4(%eax),%eax
-f01078ed:	83 ec 0c             	sub    $0xc,%esp
-f01078f0:	52                   	push   %edx
-f01078f1:	89 f2                	mov    %esi,%edx
-f01078f3:	e8 a3 fc ff ff       	call   f010759b <pci_conf1_set_addr>
+f01078db:	8b 48 08             	mov    0x8(%eax),%ecx
+f01078de:	8b 70 04             	mov    0x4(%eax),%esi
+f01078e1:	8b 00                	mov    (%eax),%eax
+f01078e3:	8b 40 04             	mov    0x4(%eax),%eax
+f01078e6:	83 ec 0c             	sub    $0xc,%esp
+f01078e9:	52                   	push   %edx
+f01078ea:	89 f2                	mov    %esi,%edx
+f01078ec:	e8 a3 fc ff ff       	call   f0107594 <pci_conf1_set_addr>
 	asm volatile("outl %0,%w1" : : "a" (data), "d" (port));
-f01078f8:	ba fc 0c 00 00       	mov    $0xcfc,%edx
-f01078fd:	89 d8                	mov    %ebx,%eax
-f01078ff:	ef                   	out    %eax,(%dx)
+f01078f1:	ba fc 0c 00 00       	mov    $0xcfc,%edx
+f01078f6:	89 d8                	mov    %ebx,%eax
+f01078f8:	ef                   	out    %eax,(%dx)
 }
-f0107900:	83 c4 10             	add    $0x10,%esp
-f0107903:	8d 65 f8             	lea    -0x8(%ebp),%esp
-f0107906:	5b                   	pop    %ebx
-f0107907:	5e                   	pop    %esi
-f0107908:	5d                   	pop    %ebp
-f0107909:	c3                   	ret    
+f01078f9:	83 c4 10             	add    $0x10,%esp
+f01078fc:	8d 65 f8             	lea    -0x8(%ebp),%esp
+f01078ff:	5b                   	pop    %ebx
+f0107900:	5e                   	pop    %esi
+f0107901:	5d                   	pop    %ebp
+f0107902:	c3                   	ret    
 
-f010790a <pci_func_enable>:
+f0107903 <pci_func_enable>:
 
 // External PCI subsystem interface
 
 void
 pci_func_enable(struct pci_func *f)
 {
-f010790a:	55                   	push   %ebp
-f010790b:	89 e5                	mov    %esp,%ebp
-f010790d:	57                   	push   %edi
-f010790e:	56                   	push   %esi
-f010790f:	53                   	push   %ebx
-f0107910:	83 ec 2c             	sub    $0x2c,%esp
-f0107913:	8b 7d 08             	mov    0x8(%ebp),%edi
+f0107903:	55                   	push   %ebp
+f0107904:	89 e5                	mov    %esp,%ebp
+f0107906:	57                   	push   %edi
+f0107907:	56                   	push   %esi
+f0107908:	53                   	push   %ebx
+f0107909:	83 ec 2c             	sub    $0x2c,%esp
+f010790c:	8b 7d 08             	mov    0x8(%ebp),%edi
 	pci_conf_write(f, PCI_COMMAND_STATUS_REG,
-f0107916:	b9 07 00 00 00       	mov    $0x7,%ecx
-f010791b:	ba 04 00 00 00       	mov    $0x4,%edx
-f0107920:	89 f8                	mov    %edi,%eax
-f0107922:	e8 b4 ff ff ff       	call   f01078db <pci_conf_write>
+f010790f:	b9 07 00 00 00       	mov    $0x7,%ecx
+f0107914:	ba 04 00 00 00       	mov    $0x4,%edx
+f0107919:	89 f8                	mov    %edi,%eax
+f010791b:	e8 b4 ff ff ff       	call   f01078d4 <pci_conf_write>
 		       PCI_COMMAND_MEM_ENABLE |
 		       PCI_COMMAND_MASTER_ENABLE);
 
 	uint32_t bar_width;
 	uint32_t bar;
 	for (bar = PCI_MAPREG_START; bar < PCI_MAPREG_END;
-f0107927:	be 10 00 00 00       	mov    $0x10,%esi
-f010792c:	eb 27                	jmp    f0107955 <pci_func_enable+0x4b>
+f0107920:	be 10 00 00 00       	mov    $0x10,%esi
+f0107925:	eb 27                	jmp    f010794e <pci_func_enable+0x4b>
 			base = PCI_MAPREG_MEM_ADDR(oldv);
 			if (pci_show_addrs)
 				cprintf("  mem region %d: %d bytes at 0x%x\n",
 					regnum, size, base);
 		} else {
 			size = PCI_MAPREG_IO_SIZE(rv);
-f010792e:	89 c3                	mov    %eax,%ebx
-f0107930:	83 e3 fc             	and    $0xfffffffc,%ebx
-f0107933:	f7 db                	neg    %ebx
-f0107935:	21 c3                	and    %eax,%ebx
+f0107927:	89 c3                	mov    %eax,%ebx
+f0107929:	83 e3 fc             	and    $0xfffffffc,%ebx
+f010792c:	f7 db                	neg    %ebx
+f010792e:	21 c3                	and    %eax,%ebx
 			base = PCI_MAPREG_IO_ADDR(oldv);
-f0107937:	8b 45 e0             	mov    -0x20(%ebp),%eax
-f010793a:	83 e0 fc             	and    $0xfffffffc,%eax
-f010793d:	89 45 d8             	mov    %eax,-0x28(%ebp)
+f0107930:	8b 45 e0             	mov    -0x20(%ebp),%eax
+f0107933:	83 e0 fc             	and    $0xfffffffc,%eax
+f0107936:	89 45 d8             	mov    %eax,-0x28(%ebp)
 		bar_width = 4;
-f0107940:	c7 45 e4 04 00 00 00 	movl   $0x4,-0x1c(%ebp)
-f0107947:	eb 74                	jmp    f01079bd <pci_func_enable+0xb3>
+f0107939:	c7 45 e4 04 00 00 00 	movl   $0x4,-0x1c(%ebp)
+f0107940:	eb 74                	jmp    f01079b6 <pci_func_enable+0xb3>
 	     bar += bar_width)
-f0107949:	03 75 e4             	add    -0x1c(%ebp),%esi
+f0107942:	03 75 e4             	add    -0x1c(%ebp),%esi
 	for (bar = PCI_MAPREG_START; bar < PCI_MAPREG_END;
-f010794c:	83 fe 27             	cmp    $0x27,%esi
-f010794f:	0f 87 c5 00 00 00    	ja     f0107a1a <pci_func_enable+0x110>
+f0107945:	83 fe 27             	cmp    $0x27,%esi
+f0107948:	0f 87 c5 00 00 00    	ja     f0107a13 <pci_func_enable+0x110>
 		uint32_t oldv = pci_conf_read(f, bar);
-f0107955:	89 f2                	mov    %esi,%edx
-f0107957:	89 f8                	mov    %edi,%eax
-f0107959:	e8 f2 fc ff ff       	call   f0107650 <pci_conf_read>
-f010795e:	89 45 e0             	mov    %eax,-0x20(%ebp)
+f010794e:	89 f2                	mov    %esi,%edx
+f0107950:	89 f8                	mov    %edi,%eax
+f0107952:	e8 f2 fc ff ff       	call   f0107649 <pci_conf_read>
+f0107957:	89 45 e0             	mov    %eax,-0x20(%ebp)
 		pci_conf_write(f, bar, 0xffffffff);
-f0107961:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
-f0107966:	89 f2                	mov    %esi,%edx
-f0107968:	89 f8                	mov    %edi,%eax
-f010796a:	e8 6c ff ff ff       	call   f01078db <pci_conf_write>
+f010795a:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
+f010795f:	89 f2                	mov    %esi,%edx
+f0107961:	89 f8                	mov    %edi,%eax
+f0107963:	e8 6c ff ff ff       	call   f01078d4 <pci_conf_write>
 		uint32_t rv = pci_conf_read(f, bar);
-f010796f:	89 f2                	mov    %esi,%edx
-f0107971:	89 f8                	mov    %edi,%eax
-f0107973:	e8 d8 fc ff ff       	call   f0107650 <pci_conf_read>
+f0107968:	89 f2                	mov    %esi,%edx
+f010796a:	89 f8                	mov    %edi,%eax
+f010796c:	e8 d8 fc ff ff       	call   f0107649 <pci_conf_read>
 		bar_width = 4;
-f0107978:	c7 45 e4 04 00 00 00 	movl   $0x4,-0x1c(%ebp)
+f0107971:	c7 45 e4 04 00 00 00 	movl   $0x4,-0x1c(%ebp)
 		if (rv == 0)
-f010797f:	85 c0                	test   %eax,%eax
-f0107981:	74 c6                	je     f0107949 <pci_func_enable+0x3f>
+f0107978:	85 c0                	test   %eax,%eax
+f010797a:	74 c6                	je     f0107942 <pci_func_enable+0x3f>
 		int regnum = PCI_MAPREG_NUM(bar);
-f0107983:	8d 4e f0             	lea    -0x10(%esi),%ecx
-f0107986:	89 4d dc             	mov    %ecx,-0x24(%ebp)
-f0107989:	c1 e9 02             	shr    $0x2,%ecx
-f010798c:	89 4d d4             	mov    %ecx,-0x2c(%ebp)
+f010797c:	8d 4e f0             	lea    -0x10(%esi),%ecx
+f010797f:	89 4d dc             	mov    %ecx,-0x24(%ebp)
+f0107982:	c1 e9 02             	shr    $0x2,%ecx
+f0107985:	89 4d d4             	mov    %ecx,-0x2c(%ebp)
 		if (PCI_MAPREG_TYPE(rv) == PCI_MAPREG_TYPE_MEM) {
-f010798f:	a8 01                	test   $0x1,%al
-f0107991:	75 9b                	jne    f010792e <pci_func_enable+0x24>
+f0107988:	a8 01                	test   $0x1,%al
+f010798a:	75 9b                	jne    f0107927 <pci_func_enable+0x24>
 			if (PCI_MAPREG_MEM_TYPE(rv) == PCI_MAPREG_MEM_TYPE_64BIT)
-f0107993:	89 c2                	mov    %eax,%edx
-f0107995:	83 e2 06             	and    $0x6,%edx
+f010798c:	89 c2                	mov    %eax,%edx
+f010798e:	83 e2 06             	and    $0x6,%edx
 				bar_width = 8;
-f0107998:	83 fa 04             	cmp    $0x4,%edx
-f010799b:	0f 94 c1             	sete   %cl
-f010799e:	0f b6 c9             	movzbl %cl,%ecx
-f01079a1:	8d 1c 8d 04 00 00 00 	lea    0x4(,%ecx,4),%ebx
-f01079a8:	89 5d e4             	mov    %ebx,-0x1c(%ebp)
+f0107991:	83 fa 04             	cmp    $0x4,%edx
+f0107994:	0f 94 c1             	sete   %cl
+f0107997:	0f b6 c9             	movzbl %cl,%ecx
+f010799a:	8d 1c 8d 04 00 00 00 	lea    0x4(,%ecx,4),%ebx
+f01079a1:	89 5d e4             	mov    %ebx,-0x1c(%ebp)
 			size = PCI_MAPREG_MEM_SIZE(rv);
-f01079ab:	89 c3                	mov    %eax,%ebx
-f01079ad:	83 e3 f0             	and    $0xfffffff0,%ebx
-f01079b0:	f7 db                	neg    %ebx
-f01079b2:	21 c3                	and    %eax,%ebx
+f01079a4:	89 c3                	mov    %eax,%ebx
+f01079a6:	83 e3 f0             	and    $0xfffffff0,%ebx
+f01079a9:	f7 db                	neg    %ebx
+f01079ab:	21 c3                	and    %eax,%ebx
 			base = PCI_MAPREG_MEM_ADDR(oldv);
-f01079b4:	8b 45 e0             	mov    -0x20(%ebp),%eax
-f01079b7:	83 e0 f0             	and    $0xfffffff0,%eax
-f01079ba:	89 45 d8             	mov    %eax,-0x28(%ebp)
+f01079ad:	8b 45 e0             	mov    -0x20(%ebp),%eax
+f01079b0:	83 e0 f0             	and    $0xfffffff0,%eax
+f01079b3:	89 45 d8             	mov    %eax,-0x28(%ebp)
 			if (pci_show_addrs)
 				cprintf("  io region %d: %d bytes at 0x%x\n",
 					regnum, size, base);
 		}
 
 		pci_conf_write(f, bar, oldv);
-f01079bd:	8b 4d e0             	mov    -0x20(%ebp),%ecx
-f01079c0:	89 f2                	mov    %esi,%edx
-f01079c2:	89 f8                	mov    %edi,%eax
-f01079c4:	e8 12 ff ff ff       	call   f01078db <pci_conf_write>
-f01079c9:	8b 45 dc             	mov    -0x24(%ebp),%eax
-f01079cc:	01 f8                	add    %edi,%eax
+f01079b6:	8b 4d e0             	mov    -0x20(%ebp),%ecx
+f01079b9:	89 f2                	mov    %esi,%edx
+f01079bb:	89 f8                	mov    %edi,%eax
+f01079bd:	e8 12 ff ff ff       	call   f01078d4 <pci_conf_write>
+f01079c2:	8b 45 dc             	mov    -0x24(%ebp),%eax
+f01079c5:	01 f8                	add    %edi,%eax
 		f->reg_base[regnum] = base;
-f01079ce:	8b 55 d8             	mov    -0x28(%ebp),%edx
-f01079d1:	89 50 14             	mov    %edx,0x14(%eax)
+f01079c7:	8b 55 d8             	mov    -0x28(%ebp),%edx
+f01079ca:	89 50 14             	mov    %edx,0x14(%eax)
 		f->reg_size[regnum] = size;
-f01079d4:	89 58 2c             	mov    %ebx,0x2c(%eax)
+f01079cd:	89 58 2c             	mov    %ebx,0x2c(%eax)
 
 		if (size && !base)
-f01079d7:	85 db                	test   %ebx,%ebx
-f01079d9:	0f 84 6a ff ff ff    	je     f0107949 <pci_func_enable+0x3f>
-f01079df:	85 d2                	test   %edx,%edx
-f01079e1:	0f 85 62 ff ff ff    	jne    f0107949 <pci_func_enable+0x3f>
+f01079d0:	85 db                	test   %ebx,%ebx
+f01079d2:	0f 84 6a ff ff ff    	je     f0107942 <pci_func_enable+0x3f>
+f01079d8:	85 d2                	test   %edx,%edx
+f01079da:	0f 85 62 ff ff ff    	jne    f0107942 <pci_func_enable+0x3f>
 			cprintf("PCI device %02x:%02x.%d (%04x:%04x) "
 				"may be misconfigured: "
 				"region %d: base 0x%x, size %d\n",
 				f->bus->busno, f->dev, f->func,
 				PCI_VENDOR(f->dev_id), PCI_PRODUCT(f->dev_id),
-f01079e7:	8b 47 0c             	mov    0xc(%edi),%eax
+f01079e0:	8b 47 0c             	mov    0xc(%edi),%eax
 			cprintf("PCI device %02x:%02x.%d (%04x:%04x) "
-f01079ea:	83 ec 0c             	sub    $0xc,%esp
-f01079ed:	53                   	push   %ebx
-f01079ee:	6a 00                	push   $0x0
-f01079f0:	ff 75 d4             	pushl  -0x2c(%ebp)
-f01079f3:	89 c2                	mov    %eax,%edx
-f01079f5:	c1 ea 10             	shr    $0x10,%edx
-f01079f8:	52                   	push   %edx
-f01079f9:	0f b7 c0             	movzwl %ax,%eax
-f01079fc:	50                   	push   %eax
-f01079fd:	ff 77 08             	pushl  0x8(%edi)
-f0107a00:	ff 77 04             	pushl  0x4(%edi)
-f0107a03:	8b 07                	mov    (%edi),%eax
-f0107a05:	ff 70 04             	pushl  0x4(%eax)
-f0107a08:	68 f4 a1 10 f0       	push   $0xf010a1f4
-f0107a0d:	e8 be c4 ff ff       	call   f0103ed0 <cprintf>
-f0107a12:	83 c4 30             	add    $0x30,%esp
-f0107a15:	e9 2f ff ff ff       	jmp    f0107949 <pci_func_enable+0x3f>
+f01079e3:	83 ec 0c             	sub    $0xc,%esp
+f01079e6:	53                   	push   %ebx
+f01079e7:	6a 00                	push   $0x0
+f01079e9:	ff 75 d4             	pushl  -0x2c(%ebp)
+f01079ec:	89 c2                	mov    %eax,%edx
+f01079ee:	c1 ea 10             	shr    $0x10,%edx
+f01079f1:	52                   	push   %edx
+f01079f2:	0f b7 c0             	movzwl %ax,%eax
+f01079f5:	50                   	push   %eax
+f01079f6:	ff 77 08             	pushl  0x8(%edi)
+f01079f9:	ff 77 04             	pushl  0x4(%edi)
+f01079fc:	8b 07                	mov    (%edi),%eax
+f01079fe:	ff 70 04             	pushl  0x4(%eax)
+f0107a01:	68 f4 a1 10 f0       	push   $0xf010a1f4
+f0107a06:	e8 c5 c4 ff ff       	call   f0103ed0 <cprintf>
+f0107a0b:	83 c4 30             	add    $0x30,%esp
+f0107a0e:	e9 2f ff ff ff       	jmp    f0107942 <pci_func_enable+0x3f>
 				regnum, base, size);
 	}
 
 	cprintf("PCI function %02x:%02x.%d (%04x:%04x) enabled\n",
 		f->bus->busno, f->dev, f->func,
 		PCI_VENDOR(f->dev_id), PCI_PRODUCT(f->dev_id));
-f0107a1a:	8b 47 0c             	mov    0xc(%edi),%eax
+f0107a13:	8b 47 0c             	mov    0xc(%edi),%eax
 	cprintf("PCI function %02x:%02x.%d (%04x:%04x) enabled\n",
-f0107a1d:	83 ec 08             	sub    $0x8,%esp
-f0107a20:	89 c2                	mov    %eax,%edx
-f0107a22:	c1 ea 10             	shr    $0x10,%edx
-f0107a25:	52                   	push   %edx
-f0107a26:	0f b7 c0             	movzwl %ax,%eax
-f0107a29:	50                   	push   %eax
-f0107a2a:	ff 77 08             	pushl  0x8(%edi)
-f0107a2d:	ff 77 04             	pushl  0x4(%edi)
-f0107a30:	8b 07                	mov    (%edi),%eax
-f0107a32:	ff 70 04             	pushl  0x4(%eax)
-f0107a35:	68 50 a2 10 f0       	push   $0xf010a250
-f0107a3a:	e8 91 c4 ff ff       	call   f0103ed0 <cprintf>
+f0107a16:	83 ec 08             	sub    $0x8,%esp
+f0107a19:	89 c2                	mov    %eax,%edx
+f0107a1b:	c1 ea 10             	shr    $0x10,%edx
+f0107a1e:	52                   	push   %edx
+f0107a1f:	0f b7 c0             	movzwl %ax,%eax
+f0107a22:	50                   	push   %eax
+f0107a23:	ff 77 08             	pushl  0x8(%edi)
+f0107a26:	ff 77 04             	pushl  0x4(%edi)
+f0107a29:	8b 07                	mov    (%edi),%eax
+f0107a2b:	ff 70 04             	pushl  0x4(%eax)
+f0107a2e:	68 50 a2 10 f0       	push   $0xf010a250
+f0107a33:	e8 98 c4 ff ff       	call   f0103ed0 <cprintf>
 }
-f0107a3f:	83 c4 20             	add    $0x20,%esp
-f0107a42:	8d 65 f4             	lea    -0xc(%ebp),%esp
-f0107a45:	5b                   	pop    %ebx
-f0107a46:	5e                   	pop    %esi
-f0107a47:	5f                   	pop    %edi
-f0107a48:	5d                   	pop    %ebp
-f0107a49:	c3                   	ret    
+f0107a38:	83 c4 20             	add    $0x20,%esp
+f0107a3b:	8d 65 f4             	lea    -0xc(%ebp),%esp
+f0107a3e:	5b                   	pop    %ebx
+f0107a3f:	5e                   	pop    %esi
+f0107a40:	5f                   	pop    %edi
+f0107a41:	5d                   	pop    %ebp
+f0107a42:	c3                   	ret    
 
-f0107a4a <pci_init>:
+f0107a43 <pci_init>:
 
 int
 pci_init(void)
 {
-f0107a4a:	55                   	push   %ebp
-f0107a4b:	89 e5                	mov    %esp,%ebp
-f0107a4d:	83 ec 0c             	sub    $0xc,%esp
+f0107a43:	55                   	push   %ebp
+f0107a44:	89 e5                	mov    %esp,%ebp
+f0107a46:	83 ec 0c             	sub    $0xc,%esp
 	static struct pci_bus root_bus;
 	memset(&root_bus, 0, sizeof(root_bus));
-f0107a50:	6a 08                	push   $0x8
-f0107a52:	6a 00                	push   $0x0
-f0107a54:	68 8c 0e 58 f0       	push   $0xf0580e8c
-f0107a59:	e8 ae eb ff ff       	call   f010660c <memset>
+f0107a49:	6a 08                	push   $0x8
+f0107a4b:	6a 00                	push   $0x0
+f0107a4d:	68 8c 0e 58 f0       	push   $0xf0580e8c
+f0107a52:	e8 b5 eb ff ff       	call   f010660c <memset>
 
 	return pci_scan_bus(&root_bus);
-f0107a5e:	b8 8c 0e 58 f0       	mov    $0xf0580e8c,%eax
-f0107a63:	e8 0d fc ff ff       	call   f0107675 <pci_scan_bus>
+f0107a57:	b8 8c 0e 58 f0       	mov    $0xf0580e8c,%eax
+f0107a5c:	e8 0d fc ff ff       	call   f010766e <pci_scan_bus>
 }
-f0107a68:	c9                   	leave  
-f0107a69:	c3                   	ret    
+f0107a61:	c9                   	leave  
+f0107a62:	c3                   	ret    
 
-f0107a6a <time_init>:
+f0107a63 <time_init>:
 static unsigned int ticks;
 
 void
 time_init(void)
 {
 	ticks = 0;
-f0107a6a:	c7 05 94 0e 58 f0 00 	movl   $0x0,0xf0580e94
-f0107a71:	00 00 00 
+f0107a63:	c7 05 94 0e 58 f0 00 	movl   $0x0,0xf0580e94
+f0107a6a:	00 00 00 
 }
-f0107a74:	c3                   	ret    
+f0107a6d:	c3                   	ret    
 
-f0107a75 <time_tick>:
+f0107a6e <time_tick>:
 // This should be called once per timer interrupt.  A timer interrupt
 // fires every 10 ms.
 void
 time_tick(void)
 {
 	ticks++;
-f0107a75:	a1 94 0e 58 f0       	mov    0xf0580e94,%eax
-f0107a7a:	83 c0 01             	add    $0x1,%eax
-f0107a7d:	a3 94 0e 58 f0       	mov    %eax,0xf0580e94
+f0107a6e:	a1 94 0e 58 f0       	mov    0xf0580e94,%eax
+f0107a73:	83 c0 01             	add    $0x1,%eax
+f0107a76:	a3 94 0e 58 f0       	mov    %eax,0xf0580e94
 	if (ticks * 10 < ticks)
-f0107a82:	8d 14 80             	lea    (%eax,%eax,4),%edx
-f0107a85:	01 d2                	add    %edx,%edx
-f0107a87:	39 d0                	cmp    %edx,%eax
-f0107a89:	77 01                	ja     f0107a8c <time_tick+0x17>
-f0107a8b:	c3                   	ret    
+f0107a7b:	8d 14 80             	lea    (%eax,%eax,4),%edx
+f0107a7e:	01 d2                	add    %edx,%edx
+f0107a80:	39 d0                	cmp    %edx,%eax
+f0107a82:	77 01                	ja     f0107a85 <time_tick+0x17>
+f0107a84:	c3                   	ret    
 {
-f0107a8c:	55                   	push   %ebp
-f0107a8d:	89 e5                	mov    %esp,%ebp
-f0107a8f:	83 ec 0c             	sub    $0xc,%esp
+f0107a85:	55                   	push   %ebp
+f0107a86:	89 e5                	mov    %esp,%ebp
+f0107a88:	83 ec 0c             	sub    $0xc,%esp
 		panic("time_tick: time overflowed");
-f0107a92:	68 58 a3 10 f0       	push   $0xf010a358
-f0107a97:	6a 13                	push   $0x13
-f0107a99:	68 73 a3 10 f0       	push   $0xf010a373
-f0107a9e:	e8 a6 85 ff ff       	call   f0100049 <_panic>
+f0107a8b:	68 58 a3 10 f0       	push   $0xf010a358
+f0107a90:	6a 13                	push   $0x13
+f0107a92:	68 73 a3 10 f0       	push   $0xf010a373
+f0107a97:	e8 ad 85 ff ff       	call   f0100049 <_panic>
 
-f0107aa3 <time_msec>:
+f0107a9c <time_msec>:
 }
 
 unsigned int
 time_msec(void)
 {
 	return ticks * 10;
-f0107aa3:	a1 94 0e 58 f0       	mov    0xf0580e94,%eax
-f0107aa8:	8d 04 80             	lea    (%eax,%eax,4),%eax
-f0107aab:	01 c0                	add    %eax,%eax
+f0107a9c:	a1 94 0e 58 f0       	mov    0xf0580e94,%eax
+f0107aa1:	8d 04 80             	lea    (%eax,%eax,4),%eax
+f0107aa4:	01 c0                	add    %eax,%eax
 }
-f0107aad:	c3                   	ret    
-f0107aae:	66 90                	xchg   %ax,%ax
+f0107aa6:	c3                   	ret    
+f0107aa7:	66 90                	xchg   %ax,%ax
+f0107aa9:	66 90                	xchg   %ax,%ax
+f0107aab:	66 90                	xchg   %ax,%ax
+f0107aad:	66 90                	xchg   %ax,%ax
+f0107aaf:	90                   	nop
 
 f0107ab0 <__udivdi3>:
 f0107ab0:	55                   	push   %ebp
