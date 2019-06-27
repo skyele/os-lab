@@ -314,6 +314,7 @@ tmain(uint32_t arg) {
 void
 umain(int argc, char **argv)
 {
+	cprintf("%d: in umain serv.c\n", thisenv->env_id);
 	envid_t ns_envid = sys_getenvid();
 
 	binaryname = "ns";
@@ -343,6 +344,7 @@ umain(int argc, char **argv)
 	if (output_envid < 0)
 		panic("error forking");
 	else if (output_envid == 0) {
+		cprintf("%d: after fork\n", thisenv->env_id);
 		output(ns_envid);
 		return;
 	}

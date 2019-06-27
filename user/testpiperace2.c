@@ -56,6 +56,7 @@ umain(int argc, char **argv)
 	while (kid->env_status == ENV_RUNNABLE)
 		if (pipeisclosed(p[0]) != 0) {
 			cprintf("\nRACE: pipe appears closed\n");
+			cprintf("in %s\n", __FUNCTION__);
 			sys_env_destroy(r);
 			exit();
 		}

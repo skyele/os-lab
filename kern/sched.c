@@ -30,8 +30,23 @@ sched_yield(void)
 	// below to halt the cpu.
 
 	// LAB 4: Your code here.
-
-	// sched_halt never returns
+	int i;
+	if(curenv){
+		envid_t cur_tone = ENVX(curenv->env_id);
+		for(i = ENVX(cur_tone + 1); i != cur_tone; i = ENVX(i+1)){
+			if(envs[i].env_status == ENV_RUNNABLE){
+				env_run(&envs[i]);
+			}
+		}
+		if(curenv->env_status == ENV_RUNNING)
+			env_run(curenv);
+	}
+	else{
+		for(i = 0 ; i < NENV; i++)
+     		if(envs[i].env_status == ENV_RUNNABLE) {
+		  		env_run(&envs[i]);
+	  		}
+	}
 	sched_halt();
 }
 
@@ -41,8 +56,8 @@ sched_yield(void)
 void
 sched_halt(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	int i;
-
 	// For debugging and testing purposes, if there are no runnable
 	// environments in the system, then drop into the kernel monitor.
 	for (i = 0; i < NENV; i++) {
@@ -76,7 +91,7 @@ sched_halt(void)
 		"pushl $0\n"
 		"pushl $0\n"
 		// Uncomment the following line after completing exercise 13
-		//"sti\n"
+		"sti\n"
 		"1:\n"
 		"hlt\n"
 		"jmp 1b\n"

@@ -501,9 +501,10 @@ def save(path):
         if fail:
             shutil.copyfile(path, save_path)
             print("    QEMU output saved to %s" % save_path)
-        elif os.path.exists(save_path):
+        elif os.path.exists(save_path):  
             os.unlink(save_path)
             print("    (Old %s failure log removed)" % save_path)
+
 
     f = open(path, "wb")
     return setup_save

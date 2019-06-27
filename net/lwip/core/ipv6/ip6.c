@@ -139,7 +139,6 @@ ip_forward(struct pbuf *p, struct ip_hdr *iphdr)
   IP_STATS_INC(ip.xmit);
 
   PERF_STOP("ip_forward");
-
   netif->output(netif, p, (struct ip_addr *)&(iphdr->dest));
 }
 

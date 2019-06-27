@@ -11,13 +11,13 @@
 #include <kern/pmap.h>
 #include <kern/kpti.h>
 
-struct CpuInfo cpus[NCPU];
-struct CpuInfo *bootcpu;
+struct CpuInfo cpus[NCPU] __user_mapped_data;
+struct CpuInfo *bootcpu __user_mapped_data;
 int ismp;
 int ncpu;
 
 // Per-CPU kernel stacks
-unsigned char percpu_kstacks[NCPU][KSTKSIZE]
+unsigned char percpu_kstacks[NCPU][KSTKSIZE] __user_mapped_data
 __attribute__ ((aligned(PGSIZE)));
 
 

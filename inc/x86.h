@@ -2,6 +2,17 @@
 #define JOS_INC_X86_H
 
 #include <inc/types.h>
+#include <inc/stdio.h>
+
+#define rdmsr(msr,val1,val2) \
+  __asm__ __volatile__("rdmsr" \
+  : "=a" (val1), "=d" (val2) \
+  : "c" (msr))
+
+#define wrmsr(msr,val1,val2) \
+  __asm__ __volatile__("wrmsr" \
+  : /* no outputs */ \
+  : "c" (msr), "a" (val1), "d" (val2))
 
 static inline void
 breakpoint(void)
@@ -157,7 +168,7 @@ rcr2(void)
 	return val;
 }
 
-static inline void
+static inline void 
 lcr3(uint32_t val)
 {
 	asm volatile("movl %0,%%cr3" : : "r" (val));

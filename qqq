@@ -1,0 +1,93 @@
+[33m54b1348[m[33m ([m[1;36mHEAD -> [m[1;32mlab7[m[33m)[m lab6 merge to lab7
+[33md37fef7[m[33m ([m[1;32mlab6[m[33m)[m my solution to lab6
+[33mfadfb59[m[33m ([m[1;31msky/lab6[m[33m)[m finish lab6 add txt
+[33m9003596[m finish challenge read mac address from EEPROM
+[33m0ed0ddc[m finish all exercise!
+[33m9108d0f[m finish exercise 12
+[33me33b630[m finish exercise 10
+[33m059a6cf[m finish exercise 9
+[33m5615ddd[m finish exercise 5
+[33mea14b5d[m[33m ([m[1;31morigin/lab7[m[33m)[m Lab 7
+[33m8c16a66[m finish exercise 1 lab6
+[33m50154ae[m finally merge lab5 start lab6
+[33me303f28[m merge lab5 start lab6
+[33m5bc66f5[m[33m ([m[1;32mlab5[m[33m)[m my solution to lab5
+[33me1e1b18[m[33m ([m[1;31msky/lab5[m[33m)[m finally finish lab5
+[33m8a2ee7e[m finish lab5
+[33m43ae782[m finish challenge
+[33md31e6fa[m[33m ([m[1;31morigin/lab6[m[33m)[m Update handin hint
+[33m9cf3bdd[m Hint of lab6
+[33m238e3da[m finish exercise 10
+[33mbf121d4[m Merge branch 'lab5' of http://ipads.se.sjtu.edu.cn:1312/lab/jos-2019-spring into lab5
+[33m6ed246f[m Lab 6
+[33m1354406[m[33m ([m[1;31morigin/lab5[m[33m)[m Map 8MB in entrypgdir to support large kernel
+[33m852a3d5[m finish exercise 9
+[33m03255ab[m finish exercise 9
+[33m7e0839d[m finish exercise 5
+[33m203bd0a[m exercise 5
+[33me8cf643[m all fix!
+[33md5a8d61[m 2 fix
+[33m521da75[m 1 fix
+[33m50e3fcf[m idk
+[33m37bed4e[m restore .gitignore
+[33m241dfe1[m what is wrong with pingpong?
+[33m9d10482[m officially start lab5
+[33m7901f40[m merge lab4, start lab5
+[33m0bec341[m Update handin hint
+[33m10bbafa[m Lab 5
+[33mefe1825[m[33m ([m[1;31msky/lab4[m[33m, [m[1;32mlab4[m[33m)[m my final solutions to lab 4
+[33m897e289[m my solutions to lab 4'
+[33m9dfe709[m my solutions to lab 4
+[33m264b3d5[m finish lab4 except answer
+[33mae9d04b[m finish lab4 & challenge
+[33m5a37ef9[m finish except challenge
+[33ma7034b9[m start exercise 13
+[33m3102195[m finish exercise7 part A
+[33med3e711[m try to add lock in syscall in exercise 7
+[33md09de9b[m try to finish exercise 7
+[33m3e1d88a[m finish exercise 6
+[33mc5c4de1[m finish trap_init_percpu
+[33md452f8c[m exercise 6
+[33me5ab375[m merged lab3, start lab4
+[33mbc7f202[m before merge lab3
+[33m5b5cb63[m[33m ([m[1;31msky/lab3[m[33m, [m[1;32mlab3[m[33m)[m commit init.ipch
+[33m11bedb5[m finish lab3
+[33m74fd951[m finish answers-lab3.txt
+[33m8d65d4c[m finish lab3
+[33m2850f11[m[33m ([m[1;31morigin/lab4[m[33m)[m merged with lab3
+[33m29452ca[m after merge lab2
+[33m1c512d0[m[33m ([m[1;31msky/master[m[33m, [m[1;32mlab2[m[33m)[m my solution to lab2'
+[33m82757fb[m my solution to lab2
+[33m157f442[m[33m ([m[1;31morigin/lab3[m[33m)[m add sbrk and evilhello2 tests
+[33m8f15cbe[m restore the run-% options in GNUmakefile
+[33m28b20f7[m merged with lab2
+[33mcddc67b[m lab2 last confirmation
+[33mf61efae[m finish lab2
+[33m3287122[m start challenge showmappings
+[33m0ae9430[m lab2 70/80
+[33mfd19a0d[m remote some unrelated file
+[33md1042ce[m Merge branch 'master' of https://github.com/skyele/os-lab into lab2
+[33maa655a8[m Create tmp.txt
+[33mf40a285[m personal github
+[33m247b1db[m clean conflict 2
+[33m5f5d4c8[m clean conflict
+[33mbf597dd[m[33m ([m[1;32mlab1[m[33m)[m my solution to lab1
+[33mb66f9cd[m finish lab1 + add lab1.pdf
+[33m49a15af[m finish lab1
+[33ma3b2fde[m[33m ([m[1;31morigin/lab2[m[33m)[m add hint in entry.S
+[33m0b6c5d8[m init lab2
+[33m1a9408b[m finish exeexercise 14
+[33m4c01c2c[m Merge branch 'lab1' of http://ipads.se.sjtu.edu.cn:1312/lab/jos-2019-spring into lab1
+[33mb46d5e3[m mychange during lab1
+[33mc208b66[m first make
+[33m9833eba[m[33m ([m[1;31morigin/lab1[m[33m, [m[1;31morigin/HEAD[m[33m)[m add test cprintfs
+[33mff4293c[m fix a bug in overflow part
+[33m4f62645[m add overflow part; update grade-lab1
+[33m378dc8f[m handle newline problem in grading script
+[33m41579eb[m update grading script for lab1
+[33mf119178[m lab1 init
+[33mda1f839[m Lab 4
+[33ma9d7717[m Lab 3
+[33m2d1187a[m Lab 2
+[33ma56269d[m Tweak kernel.ld linker script so edata and end are set correctly
+[33m1a83673[m Lab 1

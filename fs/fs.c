@@ -62,7 +62,18 @@ alloc_block(void)
 	// super->s_nblocks blocks in the disk altogether.
 
 	// LAB 5: Your code here.
-	panic("alloc_block not implemented");
+	// panic("alloc_block not implemented");
+	uint32_t blockno;
+	int r;
+	//1 - free, 0 - used
+	for(blockno = 0; blockno < super->s_nblocks; blockno++){
+		if(block_is_free(blockno)){
+			// bitmap[blockno/32] ^= 1<<(blockno%32);//lab5 bug
+			bitmap[blockno/32] &= ~(1<<(blockno%32));
+			flush_block(&bitmap[blockno/32]);
+			return blockno;
+		}
+	}
 	return -E_NO_DISK;
 }
 
@@ -134,8 +145,28 @@ fs_init(void)
 static int
 file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool alloc)
 {
-       // LAB 5: Your code here.
-       panic("file_block_walk not implemented");
+	int r;
+	if(filebno >= NDIRECT + NINDIRECT)
+		return -E_INVAL;
+	else if(filebno < NDIRECT)
+		*ppdiskbno = &(f->f_direct[filebno]);
+    else{
+		if(!f->f_indirect){
+			if(!alloc)
+				return -E_NOT_FOUND;
+			r = alloc_block();
+			if(r < 0)
+				return r;
+			memset(diskaddr(r), 0, BLKSIZE);
+			f->f_indirect = r;
+			flush_block(diskaddr(r));
+		}
+		filebno -= NDIRECT;
+		*ppdiskbno = &(((uint32_t *)diskaddr(f->f_indirect))[filebno]);
+	}
+	return 0;
+	// LAB 5: Your code here.
+    // panic("file_block_walk not implemented");
 }
 
 // Set *blk to the address in memory where the filebno'th
@@ -149,8 +180,23 @@ file_block_walk(struct File *f, uint32_t filebno, uint32_t **ppdiskbno, bool all
 int
 file_get_block(struct File *f, uint32_t filebno, char **blk)
 {
-       // LAB 5: Your code here.
-       panic("file_get_block not implemented");
+    // LAB 5: Your code here.
+	uint32_t *ppdiskbno;
+   	int r;
+	if(filebno >= NDIRECT + NINDIRECT)
+		return -E_INVAL;
+    r = file_block_walk(f, filebno, &ppdiskbno, 1);
+	if(r < 0)
+		return r;
+	if(!*ppdiskbno){
+		r = alloc_block();
+		if(r < 0)
+			return r;
+		*ppdiskbno = r;
+	}
+	*blk = diskaddr(*ppdiskbno);
+	return 0;
+	// panic("file_get_block not implemented");
 }
 
 // Try to find a file named "name" in dir.  If so, set *file to it.
@@ -309,6 +355,7 @@ file_create(const char *path, struct File **pf)
 int
 file_open(const char *path, struct File **pf)
 {
+	cprintf("the path %s\n", path);
 	return walk_path(path, 0, pf, 0);
 }
 
@@ -326,7 +373,6 @@ file_read(struct File *f, void *buf, size_t count, off_t offset)
 		return 0;
 
 	count = MIN(count, f->f_size - offset);
-
 	for (pos = offset; pos < offset + count; ) {
 		if ((r = file_get_block(f, pos / BLKSIZE, &blk)) < 0)
 			return r;
@@ -335,7 +381,6 @@ file_read(struct File *f, void *buf, size_t count, off_t offset)
 		pos += bn;
 		buf += bn;
 	}
-
 	return count;
 }
 

@@ -27,17 +27,41 @@ i386_init(void)
 	// Can't call cprintf until after we do this!
 	cons_init();
 
-	cprintf("6828 decimal is %o octal!\n", 6828);
+	cprintf("in %s\n", __FUNCTION__);
+	//cprintf("6828 decimal is %o octal!%n\n%n", 6828, &chnum1, &chnum2);
+	cprintf("pading space in the right to number 22: %-8d.\n", 22);
+	//cprintf("chnum1: %d chnum2: %d\n", chnum1, chnum2);
+	cprintf("%n", NULL);
+	//memset(ntest, 0xd, sizeof(ntest) - 1);
+	//cprintf("%s%n", ntest, &chnum1); 
+	//cprintf("chnum1: %d\n", chnum1);
+	cprintf("show me the sign: %+d, %+d\n", 1024, -1024);
 
 	// Lab 2 memory management initialization functions
 	mem_init();
-
+	cprintf("after mem_init()\n");
 	// Lab 3 user environment initialization functions
 	env_init();
+	cprintf("after env_init()\n");
 	trap_init();
 
+	uint32_t esp = read_esp();
+	uint32_t ebp = read_ebp();
+	memmove((void*)(KSTACKTOP-KSTKSIZE), bootstack, KSTKSIZE);
+
+	uint32_t off = KSTACKTOP - KSTKSIZE - (uint32_t)bootstack;
+	esp += off;
+	ebp += off;
+
+	asm volatile("movl %0, %%esp"::"r"(esp):);
+	asm volatile("movl %0, %%ebp"::"r"(ebp):);
+
+	// cprintf("the bootstack: 0x%x and the bootstacktop: 0x%x\n",bootstack,bootstacktop);
+	// memmove((void*)(KSTACKTOP-KSTKSIZE), bootstack, KSTKSIZE);
+	// asm volatile("movw %0, %%esp"::"r"(KSTACKTOP):);
 	// Lab 4 multiprocessor initialization functions
 	mp_init();
+	cprintf("after mp_init()\n");
 	lapic_init();
 
 	// Lab 4 multitasking initialization functions
@@ -49,18 +73,18 @@ i386_init(void)
 
 	// Acquire the big kernel lock before waking up APs
 	// Your code here:
-
+	lock_kernel();
 	// Starting non-boot CPUs
 	boot_aps();
 
 #if !defined(TEST_NO_FS)
 	// Start fs.
-	ENV_CREATE(fs_fs, ENV_TYPE_FS);
+	//ENV_CREATE(fs_fs, ENV_TYPE_FS);
 #endif
 
 #if !defined(TEST_NO_NS)
 	// Start ns.
-	ENV_CREATE(net_ns, ENV_TYPE_NS);
+	//ENV_CREATE(net_ns, ENV_TYPE_NS);
 #endif
 
 #if defined(TEST)
@@ -72,7 +96,10 @@ i386_init(void)
 #endif
 #else
 	// Touch all you want.
-	ENV_CREATE(user_icode, ENV_TYPE_USER);
+	ENV_CREATE(user_icode, ENV_TYPE_USER);//lab5 bug just test
+	// ENV_CREATE(user_nosyscall,ENV_TYPE_FS);
+	// ENV_CREATE(user_faultio, ENV_TYPE_USER);
+	// ENV_CREATE(user_testoutput, ENV_TYPE_USER);
 #endif // TEST*
 
 	// Should not be necessary - drains keyboard because interrupt has given up.
@@ -91,6 +118,7 @@ void *mpentry_kstack;
 static void
 boot_aps(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	extern unsigned char mpentry_start[], mpentry_end[];
 	void *code;
 	struct CpuInfo *c;
@@ -119,22 +147,23 @@ void
 mp_main(void)
 {
 	// We are in high EIP now, safe to switch to kern_pgdir 
+	cprintf("in %s\n", __FUNCTION__);
 	lcr3(PADDR(kern_pgdir));
 	cprintf("SMP: CPU %d starting\n", cpunum());
-
+	
 	lapic_init();
 	env_init_percpu();
 	trap_init_percpu();
 	xchg(&thiscpu->cpu_status, CPU_STARTED); // tell boot_aps() we're up
-
 	// Now that we have finished some basic setup, call sched_yield()
 	// to start running processes on this CPU.  But make sure that
 	// only one CPU can enter the scheduler at a time!
 	//
 	// Your code here:
-
+	lock_kernel();
+	sched_yield();
 	// Remove this after you finish Exercise 6
-	for (;;);
+	//for (;;);
 }
 
 /*
@@ -150,6 +179,7 @@ const char *panicstr;
 void
 _panic(const char *file, int line, const char *fmt,...)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	va_list ap;
 
 	if (panicstr)

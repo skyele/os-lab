@@ -1,0 +1,170 @@
+Exercise 1: i386_init identifies the file system environment by passing the type ENV_TYPE_FS to your environment creation function, env_create. Modify env_create in env.c, so that it gives the file system environment I/O privilege, but never gives that privilege to any other environment.
+	Exercise中提到，当env_create传入的EnvType是ENV_TYPE_FS的时候，表示它是file system environment，我们需要给他I/O privilege，方式是将它的tf_eflags的FL_IOPL_MASK位置上。
+	具体代码如下：
+	if(type == ENV_TYPE_FS){
+		e->env_tf.tf_eflags |= FL_IOPL_MASK;
+	}
+
+Question 1. Do you have to do anything else to ensure that this I/O privilege setting is saved and restored properly when you subsequently switch from one environment to another? Why?
+	不需要做额外的操作，因为我们的file system environment是用户态的，当它陷入内核的时候，其trapframe中保存了tf_eflags,当它从内核态切换回用户态时，其tf_eflags会被自动restore，因此不需要额外的操作来保证env 切换时ef_eflags的保存与恢复逻辑。
+
+Exercise 2. Implement the bc_pgfault and flush_block functions in fs/bc.c.bc_pgfault is a page fault handler, just like the one your wrote in the previous lab for copy-on-write fork, except that its job is to load pages in from the disk in response to a page fault. When writing this, keep in mind that (1) addr may not be aligned to a block boundary and (2) ide_read operates in sectors, not blocks.
+The flush_block function should write a block out to disk if necessary. flush_blockshouldn't do anything if the block isn't even in the block cache (that is, the page isn't mapped) or if it's not dirty. We will use the VM hardware to keep track of whether a disk block has been modified since it was last read from or written to disk. To see whether a block needs writing, we can just look to see if the PTE_D "dirty" bit is set in the uvptentry. (The PTE_D bit is set by the processor in response to a write to that page; see 5.2.4.3 in chapter 5 of the 386 reference manual.) After writing the block to disk, flush_block should clear the PTE_D bit using sys_page_map.
+	首先需要实现的bc_pgfault函数，它的逻辑是，在fs env发生page fault的时候，表示磁盘中的文件还没有加载到内存当中，因此和之前的pgfault处理不同，我们除了要将虚拟地址addr映射到一个物理的page之外，还需要通过ide_read将disk中的数据load到内存中来。具体代码如下：
+	sys_page_alloc(0, addr, PTE_P|PTE_U|PTE_W);
+	ide_read(blockno * BLKSECTS, addr, BLKSECTS);
+	sys_page_map(0, addr, 0, addr, uvpt[PGNUM(addr)] & PTE_SYSCALL)
+	接下来要实现的函数是flush_block. 它的主要逻辑是将dirty的page刷到磁盘中去，因此，当我们判断当前的page已经被映射到内存中，且由于被更新而成为dirty的page之后，需要调用ide_write将这个block中的内容都写到磁盘中去。写入磁盘的位置需要进行一个转换，因为我们在内存中看到的是一个个block，而磁盘实际上由一个个sector组成，因此需要对二者进行一个转换，具体代码如下：
+	addr = ROUNDDOWN(addr, PGSIZE);
+	bool is_map = va_is_mapped(addr);
+	bool is_dir = va_is_dirty(addr);
+	if(!is_map || !is_dir)
+		return;
+	ide_write(blockno * BLKSECTS, addr, BLKSECTS);
+	sys_page_map(0, addr, 0, addr, PTE_SYSCALL);
+
+Exercise 3. Use free_block as a model to implement alloc_block in fs/fs.c, which should find a free disk block in the bitmap, mark it used, and return the number of that block. When you allocate a block, you should immediately flush the changed bitmap block to disk with flush_block, to help file system consistency.
+	Alloc_block主要需要通过查找bitmap，来找到一个没有被分配的block，修改该block在bitmap中的对应位为已分配，然后将这个block的block number返回给用户。注意，根据提示，我们需要在修改bitmap的block之后，即时调用flush_block将bitmap block刷到磁盘中去。由于可以借鉴free_block的写法，所以这个exercise还是很好写的，具体代码如下：
+	for(blockno = 0; blockno < super->s_nblocks; blockno++){
+		if(block_is_free(blockno)){
+			// bitmap[blockno/32] ^= 1<<(blockno%32);//lab5 bug
+			bitmap[blockno/32] &= ~(1<<(blockno%32));
+			flush_block(&bitmap[blockno/32]);
+			return blockno;
+		}
+	}
+
+Exercise 4.  Implement file_block_walk and file_get_block. file_block_walk maps from a block offset within a file to the pointer for that block in the struct File or the indirect block, very much like what pgdir_walk did for page tables. file_get_block goes one step further and maps to the actual disk block, allocating a new one if necessary.
+	首先，要实现的是file_block_walk,它的逻辑是提供一个File指针和一个fileno,在File的数据结构里找到第fileno个block对应的block number。第fileno个block number可能存储在direct的block数组中，也可能存储在indirect的block数组中，由于indirect的block存在一个额外的page中，而这个page可能并没有被分配，因此alloc参数被用来解决当发现没有分配indirect block的page时的逻辑。具体的分类讨论如下，当这个fileno在direct的block中，则直接将对应的block number存储在ppdiskbno中即可。否则就是在indirect的block中，这种情况下我们先判断这个indirect block page是否被分配，如果没有被分配而alloc又是false，那么就return -E_NOT_FOUND。而如果没有被分配而alloc是true，则调用alloc_block来申请一个额外的block来存。分配好之后，将这个indirect的block中对应block number存储到ppdiskno中即可。
+	具体代码如下：
+	if(filebno >= NDIRECT + NINDIRECT)
+		return -E_INVAL;
+	else if(filebno < NDIRECT)
+		*ppdiskbno = &(f->f_direct[filebno]);
+    else{
+		if(!f->f_indirect){
+			if(!alloc)
+				return -E_NOT_FOUND;
+			alloc_block();
+			memset(diskaddr(r), 0, BLKSIZE);
+			f->f_indirect = r;
+			flush_block(diskaddr(r));
+		}
+		filebno -= NDIRECT;
+		*ppdiskbno = &(((uint32_t *)diskaddr(f->f_indirect))[filebno]);
+	}
+
+Exercise 5. Implement serve_read in fs/serv.c. serve_read's heavy lifting will be done by the already-implemented file_read in fs/fs.c (which, in turn, is just a bunch of calls to file_get_block). serve_read just has to provide the RPC interface for file reading. Look at the comments and code in serve_set_size to get a general idea of how the server functions should be structured.
+	通过传入的Fsipc指针，得到Fsreq_read和Fsret_read数据结构。在Fsreq_read的req_n字段表示这个请求期望读多少的byte，它的req_fileid存储着这个打开的文件在opentab中的偏移。在Fsret_read的ret_buf字段，表示要将这次read请求读出的内容放到这个buffer中。我们的serve_read函数主要借助openfile_lookup和file_read函数来实现。首先openfile_lookup找到对应的OpenFile函数指针，然后file_read利用这个函数指针，读取内容。需要注意在最后更新openfile的seek position.
+	具体代码如下：
+	struct Fsreq_read *req = &ipc->read;
+	struct Fsret_read *ret = &ipc->readRet;
+	struct OpenFile* open_file;
+	int r;
+	r =	openfile_lookup(envid, req->req_fileid, &open_file);
+	r = file_read(open_file->o_file, ret->ret_buf, MIN(req->req_n, sizeof(ret->ret_buf)), open_file->o_fd->fd_offset);
+	open_file->o_fd->fd_offset += r;
+
+Exercise 6. Implement serve_write in fs/serv.c and devfile_write in lib/file.c.
+	Serve_write的逻辑与serve_read实现类似，不同的只是用file_write取代file_read来表示写入文件的操作。
+	具体代码如下：
+	struct OpenFile* open_file;
+	int r;
+	r = openfile_lookup(envid, req->req_fileid, &open_file);
+	r = file_write(open_file->o_file, req->req_buf, req->req_n, open_file->o_fd->fd_offset);
+	open_file->o_fd->fd_offset += r;
+
+Exercise 7. spawn relies on the new syscall sys_env_set_trapframe to initialize the state of the newly created environment. Implement sys_env_set_trapframe in kern/syscall.c(don't forget to dispatch the new system call in syscall()).
+	根据注释的提示，我们首先将传入的Trapframe指针解引用给参数envid所对应的environment，由于spawn出来的新env是用户态的，因此其tf_cs是11(2),由于其“interrupts enabled”，所以其tf_eflags的FL_IF位被置上。
+	具体代码如下：
+	struct Env* e;
+	envid2env(envid, &e, 0);
+	e->env_tf = *tf;
+	e->env_tf.tf_cs |= 3;
+	e->env_tf.tf_eflags |= FL_IF;
+
+Exercise 8. Change duppage in lib/fork.c to follow the new convention. If the page table entry has the PTE_SHARE bit set, just copy the mapping directly. (You should use PTE_SYSCALL, not 0xfff, to mask out the relevant bits from the page table entry. 0xfffpicks up the accessed and dirty bits as well.)
+Likewise, implement copy_shared_pages in lib/spawn.c. It should loop through all page table entries in the current process (just like fork did), copying any page mappings that have the PTE_SHARE bit set into the child process.
+	首先，修改duppage. 根据注释，我们需要在duppage中加入对PTE中PTE_SHARE被置上的page的特殊处理-直接拷贝mapping，也就是完全将当前此PTE原封不动拷贝到envid对应env中去。代码如下：
+	if((uvpt[pn]) & PTE_SHARE){
+		r = sys_page_map(0, (void *)(pn * PGSIZE), envid, (void *)(pn * PGSIZE), 
+							uvpt[pn] & PTE_SYSCALL);
+		if(r < 0)
+			panic("sys_page_map() panic\n");
+		return 0;
+	}
+	接下来，实现copy_shared_pages。具体逻辑是，通过这个函数，将所有共享page复制到子进程的地址空间。具体实现与duppage中关于PTE_SHARED page实现类似。
+	具体代码如下：
+	for(uintptr_t i = UTEXT; i < USTACKTOP; i+=PGSIZE){
+		if((uvpd[PDX(i)] & PTE_P) && ((uvpt[PGNUM(i)] & (PTE_P | PTE_U | PTE_SHARE)) == (PTE_P | PTE_U | PTE_SHARE)))
+			if((r = sys_page_map((envid_t)0, (void *)i, child, (void *)i, uvpt[PGNUM(i)] & PTE_SYSCALL)) < 0)
+        		panic("sys_page_map: %e\n", r);
+	}
+
+Exercise 9. In your kern/trap.c, call kbd_intr to handle trap IRQ_OFFSET+IRQ_KBD and serial_intr to handle trap IRQ_OFFSET+IRQ_SERIAL.
+	在trap.c中加入这两行：
+	case IRQ_OFFSET + IRQ_KBD:
+		kbd_intr();
+		return;
+	case IRQ_OFFSET + IRQ_SERIAL:
+		serial_intr();
+		return;
+
+Exercise 10. The shell doesn't support I/O redirection. It would be nice to run sh <script instead of having to type in all the commands in the script by hand, as you did above. Add I/O redirection for < to user/sh.c.
+	我们要实现的是Input redirection, 一开始没什么头绪。但是当看到代码中关于output redirection的实现，有了灵感，可以直接参照output redirection的实现来做。只不过在input redirection中在open的时候，注意参数是O_RDONLY,并且dup的newfd是0，也即标准输入。
+	具体代码如下：
+	if ((fd = open(t, O_RDONLY|O_CREAT)) < 0) {
+		cprintf("open %s for read: %e", t, fd);
+		exit();
+	}
+	if (fd != 0) {
+		dup(fd, 0);
+		close(fd);
+	}
+
+Challenge! The block cache has no eviction policy. Once a block gets faulted in to it, it never gets removed and will remain in memory forevermore. Add eviction to the buffer cache. Using the PTE_A "accessed" bits in the page tables, which the hardware sets on any access to a page, you can track approximate usage of disk blocks without the need to modify every place in the code that accesses the disk map region. Be careful with dirty blocks.
+	这里我使用的是时钟算法，来实现evict逻辑。
+	首先，需要维护一个cache数组，我们将它定义为一个固定大小的局部静态数组。它的每一个元素即一个block addr。当在bc_pgfault里处理完一个访问addr的page fault之后，我们将这个addr加入我们的cache数组。当数组满了之后，开始进行我们的evict逻辑。
+	我们维护一个time_clock_hdr，来表示当前“时钟“的指向了哪里。它指向cache数组的一个元素，当被指向的这个元素的PTE_A被置上了，那么我们认为它下次被访问的概率较大，不直接驱逐它，而是把它的PTE_A清除。然后将time_clock_hdr向后移动一格，直到我们找到PTE_A没有被置上的元素，将它evict掉。如果它是dirty的，还需要先flush这个block，然后将新的addr填入这个位置，这就完成了驱逐逻辑。
+	具体代码如下：
+int r;
+	static uintptr_t block_cache_array[CACHE_SIZE];
+	while(true){
+		void *addr = (void *)block_cache_array[time_clock_hdr];
+		if(!addr){
+			block_cache_array[time_clock_hdr] = (uintptr_t)now_addr;
+			time_clock_hdr ++;
+			time_clock_hdr = time_clock_hdr % CACHE_SIZE;
+			return;
+		}
+		if(va_is_accessed(addr)){
+			r = sys_clear_access_bit(0, addr);
+			if(r < 0)
+				panic("sys_clear_access_bit is panic!\n");
+		}
+		else{
+			if(va_is_dirty(addr)){
+				flush_block(addr);
+			}
+			block_cache_array[time_clock_hdr] = (uintptr_t)now_addr;
+			time_clock_hdr ++;
+			time_clock_hdr = time_clock_hdr % CACHE_SIZE;
+			return;
+		}
+		time_clock_hdr ++;
+		time_clock_hdr = time_clock_hdr % CACHE_SIZE;
+	}
+	但是这个地方需要注意的是清楚PTE_A的操作。因为这涉及到了对页表的写操作，因此我们必须借助系统调用来完成。因此，我新实现了一个系统调用--static int sys_clear_access_bit(envid_t envid, void *va)，用于清楚PTE_A位。
+具体代码如下：
+	int ret;
+	struct Env* env;
+	ret = envid2env(envid, &env, 0);
+	if(ret < 0)
+		return ret;
+	pte_t *pte_store;
+	struct PageInfo* page = page_lookup(env->env_pgdir, va, &pte_store);
+	if(page == NULL)
+		return -E_INVAL;
+	*pte_store |= PTE_A;
+	*pte_store ^= PTE_A;
+	return 0;

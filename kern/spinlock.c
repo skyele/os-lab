@@ -39,6 +39,7 @@ get_caller_pcs(uint32_t pcs[])
 static int
 holding(struct spinlock *lock)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	return lock->locked && lock->cpu == thiscpu;
 }
 #endif
@@ -60,6 +61,7 @@ __spin_initlock(struct spinlock *lk, char *name)
 void
 spin_lock(struct spinlock *lk)
 {
+	cprintf("in %s\n", __FUNCTION__);
 #ifdef DEBUG_SPINLOCK
 	if (holding(lk))
 		panic("CPU %d cannot acquire %s: already holding", cpunum(), lk->name);
@@ -82,6 +84,7 @@ spin_lock(struct spinlock *lk)
 void
 spin_unlock(struct spinlock *lk)
 {
+	cprintf("in %s\n", __FUNCTION__);
 #ifdef DEBUG_SPINLOCK
 	if (!holding(lk)) {
 		int i;
@@ -102,11 +105,10 @@ spin_unlock(struct spinlock *lk)
 		}
 		panic("spin_unlock");
 	}
-
 	lk->pcs[0] = 0;
 	lk->cpu = 0;
 #endif
-
+	// cprintf("in endif\n");
 	// The xchg instruction is atomic (i.e. uses the "lock" prefix) with
 	// respect to any other instruction which references the same memory.
 	// x86 CPUs will not reorder loads/stores across locked instructions

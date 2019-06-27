@@ -3,14 +3,29 @@
 
 #include <kern/pci.h>
 
+#define E1000_BASE KSTACKTOP //lab6 bug?
+
+#define TX_PKT_SIZE 1518
+#define RX_PKT_SIZE 2048
+
+#define MAX_PKT_SIZE 1518
+#define RECV_SIZE 2048
+
 #define E1000_VID 0x8086
 #define E1000_DID 0x100e
+
+#define E1000_EEPROM_RD_START        	  0x1
+#define E1000_EEPROM_RD_MAC_ADDR_WD0      0x0
+#define E1000_EEPROM_RD_MAC_ADDR_WD1      0x100
+#define E1000_EEPROM_RD_MAC_ADDR_WD2      0x200
 
 struct E1000 {
 	volatile uint32_t CTRL;             /* 0x00000  Device Control - RW */
 	volatile uint32_t CTRL_DUP;         /* 0x00004  Device Control Duplicate (Shadow) - RW */
 	volatile const uint32_t STATUS;     /* 0x00008  Device Status - RO */
-	uint32_t reserved[49];
+	uint32_t reserved0[2];				/* 0x0000c	*/
+	volatile uint32_t EERD; 			/* 0x00014  EEPROM */
+	uint32_t reserved[46];
 	volatile uint32_t IMS;              /* 0x000D0  Interrupt Mask Set - RW */
 	uint32_t reserved2;
 	volatile uint32_t IMC;              /* 0x000D8  Interrupt Mask Clear - WO */
@@ -78,6 +93,7 @@ struct rx_desc {
 
 #define E1000_RX_STATUS_DD (1U)
 
+uint64_t read_eeprom_mac_addr();
 int pci_e1000_attach(struct pci_func *pcif);
 int e1000_tx_init();
 int e1000_tx(const void *buf, uint32_t len);

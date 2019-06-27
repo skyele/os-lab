@@ -5,6 +5,9 @@
 #define UTEMP2			(UTEMP + PGSIZE)
 #define UTEMP3			(UTEMP2 + PGSIZE)
 
+extern volatile pte_t uvpt[];     // VA of "virtual page table"
+extern volatile pde_t uvpd[];     // VA of current page directory
+
 // Helper functions for spawn.
 static int init_stack(envid_t child, const char **argv, uintptr_t *init_esp);
 static int map_segment(envid_t child, uintptr_t va, size_t memsz,
@@ -19,6 +22,7 @@ static int copy_shared_pages(envid_t child);
 int
 spawn(const char *prog, const char **argv)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	unsigned char elf_buf[512];
 	struct Trapframe child_tf;
 	envid_t child;
@@ -129,7 +133,7 @@ spawn(const char *prog, const char **argv)
 	if ((r = copy_shared_pages(child)) < 0)
 		panic("copy_shared_pages: %e", r);
 
-	child_tf.tf_eflags |= FL_IOPL_3;   // devious: see user/faultio.c
+	// child_tf.tf_eflags |= FL_IOPL_3;   // devious: see user/faultio.c
 	if ((r = sys_env_set_trapframe(child, &child_tf)) < 0)
 		panic("sys_env_set_trapframe: %e", r);
 
@@ -150,6 +154,7 @@ error:
 int
 spawnl(const char *prog, const char *arg0, ...)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	// We calculate argc by advancing the args until we hit NULL.
 	// The contract of the function guarantees that the last
 	// argument will always be NULL, and that none of the other
@@ -186,6 +191,7 @@ spawnl(const char *prog, const char *arg0, ...)
 static int
 init_stack(envid_t child, const char **argv, uintptr_t *init_esp)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	size_t string_size;
 	int argc, i, r;
 	char *string_store;
@@ -301,6 +307,13 @@ map_segment(envid_t child, uintptr_t va, size_t memsz,
 static int
 copy_shared_pages(envid_t child)
 {
+	cprintf("in %s\n", __FUNCTION__);
+	int r;
+	for(uintptr_t i = UTEXT; i < USTACKTOP; i+=PGSIZE){
+		if((uvpd[PDX(i)] & PTE_P) && ((uvpt[PGNUM(i)] & (PTE_P | PTE_U | PTE_SHARE)) == (PTE_P | PTE_U | PTE_SHARE)))
+			if((r = sys_page_map((envid_t)0, (void *)i, child, (void *)i, uvpt[PGNUM(i)] & PTE_SYSCALL)) < 0)
+        		panic("sys_page_map: %e\n", r);
+	}
 	// LAB 5: Your code here.
 	return 0;
 }

@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "kdebug.h": "c",
+        "memlayout.h": "c",
+        "stdlib.h": "c",
+        "string.h": "c",
+        "syscall.h": "c",
+        "trap.h": "c",
+        "sched.h": "c",
+        "error.h": "c",
+        "pmap.h": "c",
+        "e1000.h": "c",
+        "pci.h": "c",
+        "types.h": "c",
+        "array": "c",
+        "deque": "c",
+        "list": "c",
+        "unordered_map": "c",
+        "vector": "c",
+        "initializer_list": "c",
+        "string_view": "c"
+    }
+}

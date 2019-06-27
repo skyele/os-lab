@@ -13,6 +13,7 @@
 unsigned
 primeproc(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	int i, id, p;
 	envid_t envid;
 

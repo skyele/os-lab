@@ -44,7 +44,7 @@
 #define TDCR    (0x03E0/4)   // Timer Divide Configuration
 
 physaddr_t lapicaddr;        // Initialized in mpconfig.c
-volatile uint32_t *lapic;
+volatile uint32_t *lapic __user_mapped_data;	//lab7 bug mapped data
 
 static void
 lapicw(int index, int value)
@@ -56,12 +56,16 @@ lapicw(int index, int value)
 void
 lapic_init(void)
 {
+	cprintf("in %s\n", __FUNCTION__);
 	if (!lapicaddr)
 		return;
 
 	// lapicaddr is the physical address of the LAPIC's 4K MMIO
 	// region.  Map it in to virtual memory so we can access it.
 	lapic = mmio_map_region(lapicaddr, 4096);
+	// cprintf("after lapic init\n");
+	//cprintf("lapic[[[[id]]]]]] %d\n", lapic[ID]);
+	// cprintf("after check lapic\n");
 
 	// Enable local APIC; set spurious interrupt vector.
 	lapicw(SVR, ENABLE | (IRQ_OFFSET + IRQ_SPURIOUS));
@@ -112,11 +116,13 @@ lapic_init(void)
 	lapicw(TPR, 0);
 }
 
-int
+__user_mapped_text int	//lab7 bug mapped text
 cpunum(void)
 {
-	if (lapic)
+	cprintf("in %s\n", __FUNCTION__);
+	if (lapic){
 		return lapic[ID] >> 24;
+	}
 	return 0;
 }
 
