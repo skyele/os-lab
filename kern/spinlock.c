@@ -39,7 +39,6 @@ get_caller_pcs(uint32_t pcs[])
 static int
 holding(struct spinlock *lock)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	return lock->locked && lock->cpu == thiscpu;
 }
 #endif
@@ -61,7 +60,6 @@ __spin_initlock(struct spinlock *lk, char *name)
 void
 spin_lock(struct spinlock *lk)
 {
-	cprintf("in %s\n", __FUNCTION__);
 #ifdef DEBUG_SPINLOCK
 	if (holding(lk))
 		panic("CPU %d cannot acquire %s: already holding", cpunum(), lk->name);
@@ -84,7 +82,6 @@ spin_lock(struct spinlock *lk)
 void
 spin_unlock(struct spinlock *lk)
 {
-	cprintf("in %s\n", __FUNCTION__);
 #ifdef DEBUG_SPINLOCK
 	if (!holding(lk)) {
 		int i;

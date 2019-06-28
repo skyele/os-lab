@@ -223,6 +223,7 @@ sys_page_alloc(envid_t envid, void *va, int perm)
 		page_free(page);
 		return ret;
 	}
+	e->env_kern_pgdir[PDX(va)] = e->env_pgdir[PDX(va)];
 	return 0;
 	// panic("sys_page_alloc not implemented");
 }
@@ -279,7 +280,10 @@ sys_page_map(envid_t srcenvid, void *srcva,
 		if((*pte_store & PTE_W) == 0)
 			return -E_INVAL;
 	}
-	return page_insert(dst_env->env_pgdir, src_page, (void *)dstva, perm);
+	int r = page_insert(dst_env->env_pgdir, src_page, (void *)dstva, perm);
+	if(r >= 0)
+		dst_env->env_kern_pgdir[PDX(dstva)] = dst_env->env_pgdir[PDX(dstva)];
+	return r;
 	// panic("sys_page_map not implemented");
 }
 
@@ -376,10 +380,9 @@ sys_ipc_try_send(envid_t envid, uint32_t value, void *srcva, unsigned perm)
 			return -E_INVAL;
 		if(dst_env->env_ipc_dstva < (void *)UTOP){
 			ret = page_insert(dst_env->env_pgdir, page, dst_env->env_ipc_dstva, perm);
-			if(ret < 0){
-				cprintf("2the ret in rece %d\n", ret);
+			if(ret < 0)
 				return ret;
-			}
+			dst_env->env_kern_pgdir[PDX(dst_env->env_ipc_dstva)] = dst_env->env_pgdir[PDX(dst_env->env_ipc_dstva)];
 		}
 	}
 
@@ -432,6 +435,8 @@ sys_map_kernel_page(void* kpage, void* va)
     if (p == NULL)
         return E_INVAL;
     r = page_insert(curenv->env_pgdir, p, va, PTE_U | PTE_W);
+	if(r>=0)
+		curenv->env_kern_pgdir[PDX(va)] = curenv->env_pgdir[PDX(va)];
     return r;
 }
 
@@ -444,8 +449,8 @@ sys_sbrk(uint32_t inc){
 			return curenv->env_sbrk;
 		}
 	}
-	int i = ROUNDDOWN((uint32_t)curenv->env_sbrk, PGSIZE);
-	int end = ROUNDUP((uint32_t)curenv->env_sbrk + inc, PGSIZE);
+	uint32_t i = ROUNDDOWN((uint32_t)curenv->env_sbrk, PGSIZE);
+	uint32_t end = ROUNDUP((uint32_t)curenv->env_sbrk + inc, PGSIZE);
 	for(; i < end; i+=PGSIZE){
 		struct PageInfo * page = page_alloc(ALLOC_ZERO);
 		if(!page)
@@ -453,6 +458,7 @@ sys_sbrk(uint32_t inc){
 		int ret = page_insert(curenv->env_pgdir, page, (void*)((uint32_t)i), PTE_U | PTE_W);
 		if(ret)
 			panic("there is error in insert");
+		curenv->env_kern_pgdir[PDX(i)] = curenv->env_pgdir[PDX(i)];
 	}
 	curenv->env_sbrk+=inc;
 	return curenv->env_sbrk;

@@ -116,10 +116,9 @@ lapic_init(void)
 	lapicw(TPR, 0);
 }
 
-__user_mapped_text int	//lab7 bug mapped text
+int
 cpunum(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	if (lapic){
 		return lapic[ID] >> 24;
 	}

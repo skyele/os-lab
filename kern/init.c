@@ -20,7 +20,7 @@
 static void boot_aps(void);
 
 
-void
+void 
 i386_init(void)
 {
 	// Initialize the console.
@@ -96,8 +96,8 @@ i386_init(void)
 #endif
 #else
 	// Touch all you want.
-	ENV_CREATE(user_icode, ENV_TYPE_USER);//lab5 bug just test
-	// ENV_CREATE(user_nosyscall,ENV_TYPE_FS);
+	// ENV_CREATE(user_icode, ENV_TYPE_USER);//lab5 bug just test
+	ENV_CREATE(user_nosyscall,ENV_TYPE_FS);
 	// ENV_CREATE(user_faultio, ENV_TYPE_USER);
 	// ENV_CREATE(user_testoutput, ENV_TYPE_USER);
 #endif // TEST*
@@ -179,7 +179,6 @@ const char *panicstr;
 void
 _panic(const char *file, int line, const char *fmt,...)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	va_list ap;
 
 	if (panicstr)

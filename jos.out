@@ -1,0 +1,283 @@
++ cc kern/entrypgdir.c
++ cc kern/init.c
++ cc kern/console.c
++ cc kern/monitor.c
++ cc kern/pmap.c
++ cc kern/env.c
++ cc kern/kclock.c
++ cc kern/picirq.c
++ cc kern/printf.c
++ cc kern/trap.c
++ as kern/trapentry.S
++ cc kern/sched.c
++ cc kern/syscall.c
++ cc kern/kdebug.c
++ cc lib/printfmt.c
++ cc lib/readline.c
++ cc lib/string.c
++ as kern/mpentry.S
++ cc kern/mpconfig.c
++ cc kern/lapic.c
++ cc kern/spinlock.c
++ cc kern/e1000.c
++ cc kern/pci.c
++ cc kern/time.c
++ cc[USER] user/hello.c
++ as[USER] lib/entry.S
++ cc[USER] net/lwip/api/api_lib.c
++ cc[USER] net/lwip/api/api_msg.c
++ cc[USER] net/lwip/api/err.c
++ cc[USER] net/lwip/api/sockets.c
++ cc[USER] net/lwip/api/tcpip.c
++ cc[USER] net/lwip/api/netbuf.c
++ cc[USER] net/lwip/core/init.c
++ cc[USER] net/lwip/core/tcp_in.c
++ cc[USER] net/lwip/core/dhcp.c
++ cc[USER] net/lwip/core/mem.c
++ cc[USER] net/lwip/core/memp.c
++ cc[USER] net/lwip/core/netif.c
++ cc[USER] net/lwip/core/pbuf.c
++ cc[USER] net/lwip/core/raw.c
++ cc[USER] net/lwip/core/stats.c
++ cc[USER] net/lwip/core/sys.c
++ cc[USER] net/lwip/core/tcp.c
++ cc[USER] net/lwip/core/ipv4/ip_addr.c
++ cc[USER] net/lwip/core/ipv4/icmp.c
++ cc[USER] net/lwip/core/ipv4/ip.c
++ cc[USER] net/lwip/core/ipv4/ip_frag.c
++ cc[USER] net/lwip/core/ipv4/inet_chksum.c
++ cc[USER] net/lwip/core/ipv4/inet.c
++ cc[USER] net/lwip/core/tcp_out.c
++ cc[USER] net/lwip/core/udp.c
++ cc[USER] net/lwip/netif/etharp.c
++ cc[USER] net/lwip/netif/loopif.c
++ cc[USER] net/lwip/jos/arch/sys_arch.c
++ cc[USER] net/lwip/jos/arch/thread.c
++ as[USER] net/lwip/jos/arch/longjmp.S
++ cc[USER] net/lwip/jos/arch/perror.c
++ cc[USER] net/lwip/jos/jif/jif.c
++ ar obj/lib/liblwip.a
++ cc[USER] lib/console.c
++ cc[USER] lib/libmain.c
++ cc[USER] lib/exit.c
++ cc[USER] lib/panic.c
++ cc[USER] lib/printf.c
++ cc[USER] lib/printfmt.c
++ cc[USER] lib/readline.c
++ cc[USER] lib/string.c
++ cc[USER] lib/syscall.c
++ cc[USER] lib/pgfault.c
++ as[USER] lib/pfentry.S
++ cc[USER] lib/fork.c
++ cc[USER] lib/ipc.c
++ cc[USER] lib/args.c
++ cc[USER] lib/fd.c
++ cc[USER] lib/file.c
++ cc[USER] lib/fprintf.c
++ cc[USER] lib/pageref.c
++ cc[USER] lib/spawn.c
++ cc[USER] lib/sockets.c
++ cc[USER] lib/nsipc.c
++ cc[USER] lib/malloc.c
++ cc[USER] lib/pipe.c
++ cc[USER] lib/wait.c
++ ar obj/lib/libjos.a
++ ld obj/user/hello
++ cc[USER] user/buggyhello.c
++ ld obj/user/buggyhello
++ cc[USER] user/buggyhello2.c
++ ld obj/user/buggyhello2
++ cc[USER] user/evilhello.c
++ ld obj/user/evilhello
++ cc[USER] user/testbss.c
++ ld obj/user/testbss
++ cc[USER] user/divzero.c
++ ld obj/user/divzero
++ cc[USER] user/breakpoint.c
++ ld obj/user/breakpoint
++ cc[USER] user/softint.c
++ ld obj/user/softint
++ cc[USER] user/badsegment.c
++ ld obj/user/badsegment
++ cc[USER] user/faultread.c
++ ld obj/user/faultread
++ cc[USER] user/faultreadkernel.c
++ ld obj/user/faultreadkernel
++ cc[USER] user/faultwrite.c
++ ld obj/user/faultwrite
++ cc[USER] user/faultwritekernel.c
++ ld obj/user/faultwritekernel
++ cc[USER] user/sbrktest.c
++ ld obj/user/sbrktest
++ cc[USER] user/evilhello2.c
++ ld obj/user/evilhello2
++ cc[USER] user/idle.c
++ ld obj/user/idle
++ cc[USER] user/yield.c
++ ld obj/user/yield
++ cc[USER] user/dumbfork.c
++ ld obj/user/dumbfork
++ cc[USER] user/stresssched.c
++ ld obj/user/stresssched
++ cc[USER] user/faultdie.c
++ ld obj/user/faultdie
++ cc[USER] user/faultregs.c
++ ld obj/user/faultregs
++ cc[USER] user/faultalloc.c
++ ld obj/user/faultalloc
++ cc[USER] user/faultallocbad.c
++ ld obj/user/faultallocbad
++ cc[USER] user/faultnostack.c
++ ld obj/user/faultnostack
++ cc[USER] user/faultbadhandler.c
++ ld obj/user/faultbadhandler
++ cc[USER] user/faultevilhandler.c
++ ld obj/user/faultevilhandler
++ cc[USER] user/forktree.c
++ ld obj/user/forktree
++ cc[USER] user/sendpage.c
++ ld obj/user/sendpage
++ cc[USER] user/spin.c
++ ld obj/user/spin
++ cc[USER] user/fairness.c
++ ld obj/user/fairness
++ cc[USER] user/pingpong.c
++ ld obj/user/pingpong
++ cc[USER] user/pingpongs.c
++ ld obj/user/pingpongs
++ cc[USER] user/primes.c
++ ld obj/user/primes
++ cc[USER] user/faultio.c
++ ld obj/user/faultio
++ cc[USER] user/spawnfaultio.c
++ ld obj/user/spawnfaultio
++ cc[USER] user/testfile.c
++ ld obj/user/testfile
++ cc[USER] user/spawnhello.c
++ ld obj/user/spawnhello
++ cc[USER] user/icode.c
++ ld obj/user/icode
++ cc[USER] fs/ide.c
++ cc[USER] fs/bc.c
++ cc[USER] fs/fs.c
++ cc[USER] fs/serv.c
++ cc[USER] fs/test.c
++ ld obj/fs/fs
++ cc[USER] user/testtime.c
++ ld obj/user/testtime
++ cc[USER] user/httpd.c
++ ld obj/user/httpd
++ cc[USER] user/echosrv.c
++ ld obj/user/echosrv
++ cc[USER] user/echotest.c
++ ld obj/user/echotest
++ cc[USER] net/testoutput.c
++ cc[USER] net/timer.c
++ cc[USER] net/input.c
++ cc[USER] net/output.c
++ ld obj/net/testoutput
++ cc[USER] net/testinput.c
++ ld obj/net/testinput
++ cc[USER] net/serv.c
++ ld obj/net/ns
++ cc[USER] user/testpteshare.c
++ ld obj/user/testpteshare
++ cc[USER] user/testfdsharing.c
++ ld obj/user/testfdsharing
++ cc[USER] user/testpipe.c
++ ld obj/user/testpipe
++ cc[USER] user/testpiperace.c
++ ld obj/user/testpiperace
++ cc[USER] user/testpiperace2.c
++ ld obj/user/testpiperace2
++ cc[USER] user/primespipe.c
++ ld obj/user/primespipe
++ cc[USER] user/testkbd.c
++ ld obj/user/testkbd
++ cc[USER] user/testshell.c
++ ld obj/user/testshell
++ cc[USER] user/kpti.c
++ ld obj/user/kpti
++ ld obj/kern/kernel
++ mk obj/kern/kernel.img
++ cc[USER] user/init.c
++ ld obj/user/init
++ cc[USER] user/cat.c
++ ld obj/user/cat
++ cc[USER] user/echo.c
++ ld obj/user/echo
++ cc[USER] user/ls.c
++ ld obj/user/ls
++ cc[USER] user/lsfd.c
++ ld obj/user/lsfd
++ cc[USER] user/num.c
++ ld obj/user/num
++ cc[USER] user/sh.c
++ ld obj/user/sh
++ mk obj/fs/clean-fs.img
++ cp obj/fs/clean-fs.img obj/fs/fs.img
+in i386_init
+pading space in the right to number 22: 22       .
+
+error! writing through NULL pointer! (%n argument)
+show me the sign: +1024, -1024
+Physical memory: 8192K available, base = 640K, extended = 7552K
+check_page_free_list() succeeded!
+check_page_alloc() succeeded!
+check_page() succeeded!
+check_kern_pgdir() succeeded!
+check_page_free_list() succeeded!
+check_page_installed_pgdir() succeeded!
+__USER_MAP_BEGIN__ = f0121000
+__USER_MAP_END__ = f016c000
+after mem_init()
+after env_init()
+in trap_init_percpu
+SMP: CPU 0 found 1 CPU(s)
+after mp_init()
+in lapic_init
+enabled interrupts: 1 2 4
+PCI: 00:00.0: 8086:1237: class: 6.0 (Bridge device) irq: 0
+PCI: 00:01.0: 8086:7000: class: 6.1 (Bridge device) irq: 0
+PCI: 00:01.1: 8086:7010: class: 1.1 (Storage controller) irq: 0
+PCI: 00:01.3: 8086:7113: class: 6.80 (Bridge device) irq: 9
+PCI: 00:02.0: 1234:1111: class: 3.0 (Display controller) irq: 0
+PCI: 00:03.0: 8086:100e: class: 2.0 (Network controller) irq: 11
+in pci_e1000_attach
+PCI function 00:03.0 (8086:100e) enabled
+in boot_aps
+in env_create
+in env_alloc
+in env_setup_vm
+the e is 0xf06c3000
+the __USER_MAP_BEGIN__ is 0xf0121000 and the __USER_MAP_END__ is 0xf016c000
+set up envs : 0xf06c3000
+[00000000] new env 00001000
+[00001000] user fault va eec00048 ip 00800494
+in print_trapframe
+TRAP frame at 0xf06c3000 from CPU 0
+  edi  0x00000001
+  esi  0x00000000
+  ebp  0xeebfdff0
+  oesp 0xefffffdc
+  ebx  0x00000000
+  edx  0x00000000
+  ecx  0xeec00000
+  eax  0x00001000
+  es   0x----0023
+  ds   0x----0023
+  trap 0x0000000e Page Fault
+  cr2  0xeec00048
+  err  0x00000004 [user, read, not-present]
+  eip  0x00800494
+  cs   0x----001b
+  flag 0x00000286
+  esp  0xeebfdfd8
+  ss   0x----0023
+[00001000] free env 00001000
+in env_free we set the ENV_FREE
+in sched_halt
+No runnable environments in the system!
+Welcome to the JOS kernel monitor!
+Type 'help' for a list of commands.
+qemu: terminating on signal 15 from pid 86855

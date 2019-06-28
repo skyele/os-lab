@@ -43,7 +43,7 @@
 	jmp _alltraps
 
 /* mapped text lab7 */
-.text
+;.text
 .section .user_mapped.text
 /*
  * Lab 3: Your code here for generating entry points for the different traps.

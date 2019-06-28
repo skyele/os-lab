@@ -203,20 +203,22 @@ region_alloc(struct Env *e, void *va, size_t len)
 	//   'va' and 'len' values that are not page-aligned.
 	//   You should round va down, and round (va + len) up.
 	//   (Watch out for corner-cases!)
-	int i = ROUNDDOWN((uint32_t)va, PGSIZE);
-	int end = ROUNDUP((uint32_t)va + len, PGSIZE);
+	uint32_t i = ROUNDDOWN((uint32_t)va, PGSIZE);
+	uint32_t end = ROUNDUP((uint32_t)va + len, PGSIZE);
 	for(; i < end; i+=PGSIZE){
 		struct PageInfo * page = page_alloc(ALLOC_ZERO);
 		if(!page)
 			panic("there is no page\n");
-		int ret = page_insert(e->env_pgdir, page, (void*)((uint32_t)i), PTE_U | PTE_W);
+		int ret = page_insert(e->env_pgdir, page, (void*)(i), PTE_U | PTE_W);
 		if(ret)
 			panic("there is error in insert");
+		// e->env_kern_pgdir[PDX(i)] = e->env_pgdir[PDX(i)];
 	}
 }
 
 static 
 void map_user_region(struct Env *e){
+	memset(e->env_pgdir + PDX(ULIM), 0, sizeof(pde_t) * (NPDENTRIES - PDX(ULIM)));
 	int r;
 	//map _USER_MAP_BEGIN
 	for(uint32_t i = (uint32_t)__USER_MAP_BEGIN__; i < (uint32_t)__USER_MAP_END__; i = ROUNDDOWN(i, PGSIZE) + PGSIZE){
@@ -227,10 +229,7 @@ void map_user_region(struct Env *e){
 		r = page_insert(e->env_pgdir, pageInfo, (void *)i, PTE_P);
 		if(r < 0)
 			panic("test panic error %e\n", r);
-		if(i == 0xf0121000){
-			pageInfo = page_lookup(e->env_pgdir, (void *)i, &pte_store);
-			cprintf("after insert we check pageInfo: 0x%x and perm : 0x%x\n", pageInfo, *pte_store);
-		}	
+		// e->env_kern_pgdir[PDX(i)] = e->env_pgdir[PDX(i)];
 	}
 	//map kernel stack
 	for(int i = 0; i < NCPU; i++){
@@ -241,7 +240,8 @@ void map_user_region(struct Env *e){
 				continue;
 			r = page_insert(e->env_pgdir, pageInfo, va, PTE_P|PTE_W);
 			if(r < 0)
-			panic("test panic error %e\n", r);
+				panic("test panic error %e\n", r);
+			// e->env_kern_pgdir[PDX(va)] = e->env_pgdir[PDX(va)];
 		}
 	}
 	cprintf("set up envs : 0x%x\n", envs);
@@ -255,7 +255,10 @@ void map_user_region(struct Env *e){
 		r = page_insert(e->env_pgdir, pageInfo, (void*)i, PTE_P);
 		if(r < 0)
 			panic("test panic error %e\n", r);
+		// e->env_kern_pgdir[PDX(i)] = e->env_pgdir[PDX(i)];
 	}	
+
+	memmove(e->env_kern_pgdir, e->env_pgdir, sizeof(pde_t) * (PDX(ULIM)));
 }
 
 
@@ -300,15 +303,7 @@ env_setup_vm(struct Env *e)
 	//    - The functions in kern/pmap.h are handy.
 	p->pp_ref++;
 	e->env_pgdir = (pde_t *)page2kva(p);
-	//lab7 bug
-	cprintf("the __USER_MAP_BEGIN__ is 0x%x and the __USER_MAP_END__ is 0x%x\n", __USER_MAP_BEGIN__, __USER_MAP_END__);
-	map_user_region(e);
-	// region_alloc(e, (void*)__USER_MAP_BEGIN__, __USER_MAP_END__-__USER_MAP_BEGIN__);
-	// memcpy((void *)e->env_pgdir, (void *)kern_pgdir, PGSIZE);
-	// LAB 3: Your code here.
 
-	// UVPT maps the env's own page table read-only.
-	// Permissions: kernel R, user R
 	e->env_pgdir[PDX(UVPT)] = PADDR(e->env_pgdir) | PTE_P | PTE_U;
 
 	// LAB 7: Your code here.
@@ -320,6 +315,18 @@ env_setup_vm(struct Env *e)
 	e->env_kern_pgdir = (pde_t *)page2kva(kern_p);
 	memcpy((void *)e->env_kern_pgdir, (void *)kern_pgdir, PGSIZE);
 	e->env_kern_pgdir[PDX(UVPT)] = PADDR(e->env_kern_pgdir) | PTE_P | PTE_U;
+
+	//lab7 bug
+	cprintf("the __USER_MAP_BEGIN__ is 0x%x and the __USER_MAP_END__ is 0x%x\n", __USER_MAP_BEGIN__, __USER_MAP_END__);
+	map_user_region(e);
+	e->env_kern_pgdir[PDX(UVPT)] = PADDR(e->env_kern_pgdir) | PTE_P | PTE_U;
+
+	// region_alloc(e, (void*)__USER_MAP_BEGIN__, __USER_MAP_END__-__USER_MAP_BEGIN__);
+	// memcpy((void *)e->env_pgdir, (void *)kern_pgdir, PGSIZE);
+	// LAB 3: Your code here.
+
+	// UVPT maps the env's own page table read-only.
+	// Permissions: kernel R, user R
 
 	return 0;
 }
@@ -555,12 +562,14 @@ env_free(struct Env *e)
 
 		// free the page table itself
 		e->env_pgdir[pdeno] = 0;
+		e->env_kern_pgdir[pdeno] = 0;
 		page_decref(pa2page(pa));
 	}
 
 	// free the page directory
 	pa = PADDR(e->env_pgdir);
 	e->env_pgdir = 0;
+	e->env_kern_pgdir = 0;
 	page_decref(pa2page(pa));
 	cprintf("in env_free we set the ENV_FREE\n");
 	// return the environment to the free list
@@ -615,7 +624,6 @@ extern struct Pseudodesc idt_pd;
  static void
 check_isolate(struct Env *e)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	pde_t *pgdir = e->env_pgdir;
 	uint32_t cnt = 0;
 	for (uintptr_t va = ULIM; va; va += PGSIZE) {
@@ -648,7 +656,6 @@ check_isolate(struct Env *e)
 		check_user_map(pgdir, (void *) KSTACKTOP - (KSTKSIZE + KSTKGAP) * i - KSTKSIZE, KSTKSIZE, name);
 	}
 	check_user_map(pgdir, env_pop_tf, sizeof(env_pop_tf), "env_pop_tf");
-	cprintf("after %s\n", __FUNCTION__);
 }
 
 //
@@ -725,13 +732,6 @@ env_run(struct Env *e)
 	}
 	// lcr3(PADDR(curenv->env_pgdir));
 	trapframe = curenv->env_tf;
-	pte_t* pte_store;
-	struct PageInfo* pageinfo = page_lookup(curenv->env_pgdir, (void *)0xf012131f, &pte_store);
-	struct PageInfo* pageinfo1 = page_lookup(curenv->env_pgdir, (void *)envs, NULL);
-	cprintf("the curenv is 0x%x\n", curenv);
-	cprintf("the envs 0x%x and pageinfo1 : 0x%0x\n", envs, pageinfo1);
-	cprintf("the pageInfo: 0x%x and permission: 0x%x\n", pageinfo, PGOFF(*pte_store));
-
 	unlock_kernel(); //lab4 bug?
 	lcr3(PADDR(curenv->env_pgdir));
 	env_pop_tf(&trapframe);
