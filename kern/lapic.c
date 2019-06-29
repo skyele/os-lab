@@ -56,7 +56,6 @@ lapicw(int index, int value)
 void
 lapic_init(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	if (!lapicaddr)
 		return;
 

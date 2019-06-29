@@ -8,6 +8,7 @@ wait(envid_t envid)
 
 	assert(envid != 0);
 	e = &envs[ENVX(envid)];
-	while (e->env_id == envid && e->env_status != ENV_FREE)
+	while (e->env_id == envid && e->env_status != ENV_FREE){
 		sys_yield();
+	}
 }

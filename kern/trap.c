@@ -504,7 +504,7 @@ page_fault_handler(struct Trapframe *tf)
 		if((uint32_t)(UXSTACKTOP - tf->tf_esp) < PGSIZE)
 			utf = (struct UTrapframe *)(tf->tf_esp - sizeof(void *) - sizeof(struct UTrapframe));
 		else
-			utf = (struct UTrapframe *)(UXSTACKTOP - sizeof(struct UTrapframe));		
+			utf = (struct UTrapframe *)(UXSTACKTOP - sizeof(struct UTrapframe));
 		user_mem_assert(curenv, (void *)utf, sizeof(struct UTrapframe), PTE_W);
 
 		utf->utf_fault_va = fault_va;

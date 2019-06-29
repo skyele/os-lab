@@ -90,8 +90,11 @@ check_memory_leak2()
 		child = fork();
 		assert(child >= 0);
 		if (child == 0) {
-			for (uintptr_t va = PTSIZE * 4; va < end; va += PGSIZE)
-				assert(sys_page_alloc(0, (void *) va, PTE_U | PTE_P) == 0);
+			for (uintptr_t va = PTSIZE * 4; va < end; va += PGSIZE){
+				int r = sys_page_alloc(0, (void *) va, PTE_U | PTE_P);
+				if (r != 0) 
+					assert(sys_page_alloc(0, (void *) va, PTE_U | PTE_P) == 0);
+			}
 			exit();
 		}
 		wait(child);

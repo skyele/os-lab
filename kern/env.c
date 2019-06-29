@@ -16,7 +16,7 @@
 #include <kern/spinlock.h>
 #include <kern/kpti.h>
 
-struct Env *envs = NULL;		// All environments
+struct Env *envs __user_mapped_data= NULL;		// All environments
 static struct Env *env_free_list;	// Free environment list
 					// (linked by Env->env_link)
 
@@ -124,9 +124,6 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	e = &envs[ENVX(envid)];
 	if (e->env_status == ENV_FREE || e->env_id != envid) {
 		*env_store = 0;
-		if(e->env_status == ENV_FREE)
-			cprintf("ssssssssssssssssss %d\n", envid);
-		cprintf("222222222222222222222\n");
 		return -E_BAD_ENV;
 	}
 
@@ -137,7 +134,6 @@ envid2env(envid_t envid, struct Env **env_store, bool checkperm)
 	// or an immediate child of the current environment.
 	if (checkperm && e != curenv && e->env_parent_id != curenv->env_id) {
 		*env_store = 0;
-		cprintf("33333333333333333333333\n");
 		return -E_BAD_ENV;
 	}
 
@@ -212,12 +208,13 @@ region_alloc(struct Env *e, void *va, size_t len)
 		int ret = page_insert(e->env_pgdir, page, (void*)(i), PTE_U | PTE_W);
 		if(ret)
 			panic("there is error in insert");
-		// e->env_kern_pgdir[PDX(i)] = e->env_pgdir[PDX(i)];
+		e->env_kern_pgdir[PDX(i)] = e->env_pgdir[PDX(i)];
 	}
 }
 
 static 
 void map_user_region(struct Env *e){
+	cprintf("the UTOP is 0x%x\n", UTOP);
 	memset(e->env_pgdir + PDX(ULIM), 0, sizeof(pde_t) * (NPDENTRIES - PDX(ULIM)));
 	int r;
 	//map _USER_MAP_BEGIN
@@ -236,6 +233,7 @@ void map_user_region(struct Env *e){
 		for(uint32_t stackRange = 0; stackRange < KSTKSIZE; stackRange += PGSIZE){
 			void *va = (void *)(KSTACKTOP - (i+1) * KSTKSIZE - i * KSTKGAP + stackRange);
 			struct PageInfo* pageInfo = page_lookup(kern_pgdir, va, NULL);
+			// cprintf("the va 0x%x\n",va);
 			if(pageInfo == NULL)
 				continue;
 			r = page_insert(e->env_pgdir, pageInfo, va, PTE_P|PTE_W);
@@ -252,12 +250,12 @@ void map_user_region(struct Env *e){
 			cprintf("the page info is null\n");
 			continue;
 		}
+		// cprintf("the i %x\n", i);
 		r = page_insert(e->env_pgdir, pageInfo, (void*)i, PTE_P);
 		if(r < 0)
 			panic("test panic error %e\n", r);
 		// e->env_kern_pgdir[PDX(i)] = e->env_pgdir[PDX(i)];
 	}	
-
 	memmove(e->env_kern_pgdir, e->env_pgdir, sizeof(pde_t) * (PDX(ULIM)));
 }
 
@@ -275,8 +273,6 @@ void map_user_region(struct Env *e){
 static int
 env_setup_vm(struct Env *e)
 {
-	cprintf("in %s\n", __FUNCTION__);
-	cprintf("the e is 0x%x\n", e);
 	int i;
 	int r;
 	struct PageInfo *p = NULL;
@@ -303,8 +299,10 @@ env_setup_vm(struct Env *e)
 	//    - The functions in kern/pmap.h are handy.
 	p->pp_ref++;
 	e->env_pgdir = (pde_t *)page2kva(p);
-
+	memmove(e->env_pgdir+PDX(UTOP), kern_pgdir+PDX(UTOP), sizeof(pde_t)*(NPDENTRIES-PDX(UTOP)));
 	e->env_pgdir[PDX(UVPT)] = PADDR(e->env_pgdir) | PTE_P | PTE_U;
+
+	// e->env_pgdir[PDX[]]
 
 	// LAB 7: Your code here.
 	// Allocate another page to hold kernel page table
@@ -314,6 +312,7 @@ env_setup_vm(struct Env *e)
 	kern_p->pp_ref++;
 	e->env_kern_pgdir = (pde_t *)page2kva(kern_p);
 	memcpy((void *)e->env_kern_pgdir, (void *)kern_pgdir, PGSIZE);
+	memmove(e->env_kern_pgdir+PDX(UTOP), kern_pgdir+PDX(UTOP), sizeof(pde_t)*(NPDENTRIES-PDX(UTOP)));
 	e->env_kern_pgdir[PDX(UVPT)] = PADDR(e->env_kern_pgdir) | PTE_P | PTE_U;
 
 	//lab7 bug
@@ -342,10 +341,11 @@ env_setup_vm(struct Env *e)
 int
 env_alloc(struct Env **newenv_store, envid_t parent_id)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	int32_t generation;
 	int r;
 	struct Env *e;
+	pte_t *ssss;
+	struct PageInfo *ppp;
 
 	if (!(e = env_free_list))
 		return -E_NO_FREE_ENV;
@@ -508,7 +508,6 @@ void
 env_create(uint8_t *binary, enum EnvType type)
 {
 	// LAB 3: Your code here.
-	cprintf("in %s\n", __FUNCTION__);
 	// If this is the file server (type == ENV_TYPE_FS) give it I/O privileges.
 	// LAB 5: Your code here.
 	struct Env *e;
@@ -529,9 +528,11 @@ env_create(uint8_t *binary, enum EnvType type)
 void
 env_free(struct Env *e)
 {
+	int r;
 	pte_t *pt;
 	uint32_t pdeno, pteno;
 	physaddr_t pa;
+	physaddr_t pak;
 
 	// If freeing the current environment, switch to kern_pgdir
 	// before freeing the page directory, just in case the page
@@ -566,12 +567,101 @@ env_free(struct Env *e)
 		page_decref(pa2page(pa));
 	}
 
+	for (pdeno = PDX(__USER_MAP_BEGIN__); pdeno <= PDX(__USER_MAP_END__); pdeno++) {
+		// only look at mapped page tables
+		if (!(e->env_pgdir[pdeno] & PTE_P))
+			continue;
+		// find the pa and va of the page table
+		pa = PTE_ADDR(e->env_pgdir[pdeno]);
+		pt = (pte_t*) KADDR(pa);
+
+		uintptr_t begin = (uint32_t)__USER_MAP_BEGIN__, end = (uint32_t)__USER_MAP_END__;
+		// unmap all PTEs in this page table
+		for (pteno = 0; pteno <= PTX(~0); pteno++) {
+			if (pt[pteno] & PTE_P) {
+				// cprintf("free: %x, (%x, %x)\n", PTE_ADDR(pt[pteno]), begin ,end);
+				if ((uintptr_t)KADDR(PTE_ADDR(pt[pteno])) >= begin && (uintptr_t)KADDR(PTE_ADDR(pt[pteno])) < end) {
+					// cprintf("actual free: %x, %x, (%x, %x)\n", PGADDR(pdeno, pteno, 0), PTE_ADDR(pt[pteno]), begin ,end);
+
+					page_remove(e->env_pgdir, PGADDR(pdeno, pteno, 0));
+					// page_remove(e->env_kern_pgdir, PGADDR(pdeno, pteno, 0));
+				}
+			}
+		}
+		// free the page table itself
+		e->env_pgdir[pdeno] = 0;
+		e->env_kern_pgdir[pdeno] = 0;
+		page_decref(pa2page(pa));
+		// page_decref(pa2page(pak));
+	}
+
+	for(int i = 0; i < NCPU; i++){
+		for (pdeno = PDX(KSTACKTOP - (i+1) * KSTKSIZE - i * KSTKGAP); pdeno <= PDX(KSTACKTOP - (i+1) * KSTKSIZE - i * KSTKGAP+KSTKSIZE); pdeno++) {
+			// only look at mapped page tables
+			if (!(e->env_pgdir[pdeno] & PTE_P))
+				continue;
+			// find the pa and va of the page table
+			pa = PTE_ADDR(e->env_pgdir[pdeno]);
+			pt = (pte_t*) KADDR(pa);
+
+			uintptr_t begin = (uint32_t)(KSTACKTOP - (i+1) * KSTKSIZE - i * KSTKGAP), end = (uint32_t)(KSTACKTOP - (i+1) * KSTKSIZE - i * KSTKGAP+KSTKSIZE);
+			// unmap all PTEs in this page table
+			for (pteno = 0; pteno <= PTX(~0); pteno++) {
+				if (pt[pteno] & PTE_P) {
+					// cprintf("free: %x, (%x, %x)\n", PTE_ADDR(pt[pteno]), begin ,end);
+					if ((uintptr_t)KADDR(PTE_ADDR(pt[pteno])) >= begin && (uintptr_t)KADDR(PTE_ADDR(pt[pteno])) < end) {
+						// cprintf("actual free: %x, %x, (%x, %x)\n", PGADDR(pdeno, pteno, 0), PTE_ADDR(pt[pteno]), begin ,end);
+
+						page_remove(e->env_pgdir, PGADDR(pdeno, pteno, 0));
+						// page_remove(e->env_kern_pgdir, PGADDR(pdeno, pteno, 0));
+					}
+				}
+			}
+			// free the page table itself
+			e->env_pgdir[pdeno] = 0;
+			e->env_kern_pgdir[pdeno] = 0;
+			page_decref(pa2page(pa));
+			// page_decref(pa2page(pak));
+		}
+	}
+	
+	for (pdeno = PDX(envs); pdeno <= PDX(envs+NENV); pdeno++) {
+		// only look at mapped page tables
+		if (!(e->env_pgdir[pdeno] & PTE_P))
+			continue;
+		// find the pa and va of the page table
+		pa = PTE_ADDR(e->env_pgdir[pdeno]);
+		pt = (pte_t*) KADDR(pa);
+
+		uintptr_t begin = (uint32_t)envs, end = (uint32_t)envs+NENV;
+		// unmap all PTEs in this page table
+		for (pteno = 0; pteno <= PTX(~0); pteno++) {
+			if (pt[pteno] & PTE_P) {
+				// cprintf("free: %x, (%x, %x)\n", PTE_ADDR(pt[pteno]), begin ,end);
+				if ((uintptr_t)KADDR(PTE_ADDR(pt[pteno])) >= begin && (uintptr_t)KADDR(PTE_ADDR(pt[pteno])) < end) {
+					// cprintf("actual free: %x, %x, (%x, %x)\n", PGADDR(pdeno, pteno, 0), PTE_ADDR(pt[pteno]), begin ,end);
+
+					page_remove(e->env_pgdir, PGADDR(pdeno, pteno, 0));
+					// page_remove(e->env_kern_pgdir, PGADDR(pdeno, pteno, 0));
+				}
+			}
+		}
+		// free the page table itself
+		e->env_pgdir[pdeno] = 0;
+		e->env_kern_pgdir[pdeno] = 0;
+		page_decref(pa2page(pa));
+		// page_decref(pa2page(pak));
+	}
+
+
+
 	// free the page directory
 	pa = PADDR(e->env_pgdir);
+	pak = PADDR(e->env_kern_pgdir);
 	e->env_pgdir = 0;
 	e->env_kern_pgdir = 0;
 	page_decref(pa2page(pa));
-	cprintf("in env_free we set the ENV_FREE\n");
+	page_decref(pa2page(pak));
 	// return the environment to the free list
 	e->env_status = ENV_FREE;
 	e->env_link = env_free_list;
@@ -598,6 +688,7 @@ env_destroy(struct Env *e)
 
 	if (curenv == e) {
 		curenv = NULL;
+		cprintf("after env_free to sched_yield\n");
 		sched_yield();
 	}
 }
@@ -656,6 +747,7 @@ check_isolate(struct Env *e)
 		check_user_map(pgdir, (void *) KSTACKTOP - (KSTKSIZE + KSTKGAP) * i - KSTKSIZE, KSTKSIZE, name);
 	}
 	check_user_map(pgdir, env_pop_tf, sizeof(env_pop_tf), "env_pop_tf");
+
 }
 
 //
@@ -685,7 +777,6 @@ __attribute__((noinline))
 static void
 kpti_run(struct Env *e)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	curenv->env_cpunum = cpunum();
 	lcr3(PADDR(e->env_pgdir));
 	env_pop_tf(&e->env_tf);
@@ -731,7 +822,9 @@ env_run(struct Env *e)
 		// lcr3(PADDR(curenv->env_pgdir));
 	}
 	// lcr3(PADDR(curenv->env_pgdir));
+	// cprintf("the env to run is %d\n", curenv->env_id);
 	trapframe = curenv->env_tf;
+
 	unlock_kernel(); //lab4 bug?
 	lcr3(PADDR(curenv->env_pgdir));
 	env_pop_tf(&trapframe);

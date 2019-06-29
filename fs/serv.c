@@ -318,7 +318,6 @@ fshandler handlers[] = {
 void
 serve(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	uint32_t req, whom;
 	int perm, r;
 	void *pg;

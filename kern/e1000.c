@@ -104,7 +104,6 @@ e1000_rx_init()
 int
 pci_e1000_attach(struct pci_func *pcif)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	// Enable PCI function
 	// Map MMIO region and save the address in 'base;
 	pci_func_enable(pcif);
@@ -121,7 +120,6 @@ e1000_tx(const void *buf, uint32_t len)
 {
 	// Send 'len' bytes in 'buf' to ethernet
 	// Hint: buf is a kernel virtual address
-	cprintf("in %s\n", __FUNCTION__);
 	if(tx_descs[base->TDT].status & E1000_TX_STATUS_DD){
 		tx_descs[base->TDT].status ^= E1000_TX_STATUS_DD;
 		memset(KADDR(tx_descs[base->TDT].addr), 0 , TX_PKT_SIZE);

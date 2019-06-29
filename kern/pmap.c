@@ -693,6 +693,7 @@ user_mem_check(struct Env *env, const void *va, size_t len, int perm)
 		if(!the_pte || (*the_pte & perm) != perm){//lab4 bug
 			cprintf("PTE_P: 0x%x PTE_W: 0x%x PTE_U: 0x%x\n", PTE_P, PTE_W, PTE_U);
 			cprintf("the perm: 0x%x, *the_pte & perm: 0x%x\n", perm, *the_pte & perm);
+			cprintf("the pte: 0x%x\n", PGOFF(*the_pte));
 			user_mem_check_addr = (uintptr_t)i;
 			return -E_FAULT;
 		}

@@ -27,7 +27,6 @@ i386_init(void)
 	// Can't call cprintf until after we do this!
 	cons_init();
 
-	cprintf("in %s\n", __FUNCTION__);
 	//cprintf("6828 decimal is %o octal!%n\n%n", 6828, &chnum1, &chnum2);
 	cprintf("pading space in the right to number 22: %-8d.\n", 22);
 	//cprintf("chnum1: %d chnum2: %d\n", chnum1, chnum2);
@@ -39,10 +38,8 @@ i386_init(void)
 
 	// Lab 2 memory management initialization functions
 	mem_init();
-	cprintf("after mem_init()\n");
 	// Lab 3 user environment initialization functions
 	env_init();
-	cprintf("after env_init()\n");
 	trap_init();
 
 	uint32_t esp = read_esp();
@@ -97,6 +94,7 @@ i386_init(void)
 #else
 	// Touch all you want.
 	// ENV_CREATE(user_icode, ENV_TYPE_USER);//lab5 bug just test
+	// ENV_CREATE(user_nosyscall,ENV_TYPE_FS);
 	ENV_CREATE(user_nosyscall,ENV_TYPE_FS);
 	// ENV_CREATE(user_faultio, ENV_TYPE_USER);
 	// ENV_CREATE(user_testoutput, ENV_TYPE_USER);
@@ -118,7 +116,6 @@ void *mpentry_kstack;
 static void
 boot_aps(void)
 {
-	cprintf("in %s\n", __FUNCTION__);
 	extern unsigned char mpentry_start[], mpentry_end[];
 	void *code;
 	struct CpuInfo *c;
@@ -147,7 +144,6 @@ void
 mp_main(void)
 {
 	// We are in high EIP now, safe to switch to kern_pgdir 
-	cprintf("in %s\n", __FUNCTION__);
 	lcr3(PADDR(kern_pgdir));
 	cprintf("SMP: CPU %d starting\n", cpunum());
 	
